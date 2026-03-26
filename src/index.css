@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* thewhitetechnologies — green accent, light neutrals (layout borrows compact shell only) */
+:root {
+  --hub-bg: #f8fafc;
+  --hub-sidebar: #f1f5f9;
+  --hub-surface: #ffffff;
+  --hub-elevated: #f1f5f9;
+  --hub-card: #ffffff;
+  --hub-line: #e2e8f0;
+  --hub-border2: #cbd5e1;
+  --hub-text: #0f172a;
+  --hub-sub: #64748b;
+  --hub-muted: #64748b;
+  --hub-faint: #94a3b8;
+  --hub-brand: #16a34a;
+  --hub-primary: #16a34a;
+  --hub-primary-hover: #15803d;
+  --hub-tool: #16a34a;
+  --hub-tool-dim: rgba(22, 163, 74, 0.12);
+  --hub-tool-dim2: rgba(22, 163, 74, 0.07);
+  --hub-code-bg: #f0fdf4;
+  --hub-code-text: #14532d;
+  --hub-code-bd: #bbf7d0;
+  --hub-topbar: rgba(248, 250, 252, 0.96);
+  --hub-danger: #c53030;
+  --hub-danger-bg: #fff5f5;
+  --hub-danger-border: #fc8181;
+  --hub-accent: #16a34a;
+  --hub-success: #16a34a;
+  --hub-shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px -2px rgb(15 23 42 / 0.06);
+  --hub-shadow-card-hover: 0 4px 16px rgb(0 0 0 / 0.08);
+  --infinity-dev: #2c5282;
+  --infinity-dev-mid: #2d4a6e;
+  --infinity-ops: #2f855a;
+  --infinity-ops-bright: #48bb78;
+}
+
+.dark {
+  --hub-bg: #0f1419;
+  --hub-sidebar: #121820;
+  --hub-surface: #161d27;
+  --hub-elevated: #1a222e;
+  --hub-card: #161d27;
+  --hub-line: #2d3748;
+  --hub-border2: #3d4a5c;
+  --hub-text: #f1f5f9;
+  --hub-sub: #94a3b8;
+  --hub-muted: #64748b;
+  --hub-faint: #475569;
+  --hub-brand: #4ade80;
+  --hub-primary: #22c55e;
+  --hub-primary-hover: #4ade80;
+  --hub-tool: #22c55e;
+  --hub-tool-dim: rgba(34, 197, 94, 0.14);
+  --hub-tool-dim2: rgba(34, 197, 94, 0.08);
+  --hub-code-bg: rgba(34, 197, 94, 0.08);
+  --hub-code-text: #86efac;
+  --hub-code-bd: #3f6212;
+  --hub-topbar: rgba(15, 20, 25, 0.96);
+  --hub-danger: #ff7b72;
+  --hub-danger-bg: rgba(248, 81, 73, 0.12);
+  --hub-danger-border: #f85149;
+  --hub-accent: #22c55e;
+  --hub-success: #22c55e;
+  --hub-shadow-card: 0 1px 0 rgb(0 0 0 / 0.25), 0 4px 14px -2px rgb(0 0 0 / 0.35);
+  --hub-shadow-card-hover: 0 4px 20px rgb(0 0 0 / 0.35);
+  --infinity-dev: #8b9dc3;
+  --infinity-dev-mid: #6e7a96;
+  --infinity-ops: #3fb950;
+  --infinity-ops-bright: #56d364;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    scroll-padding-top: 3.75rem;
+    -webkit-tap-highlight-color: rgb(22 163 74 / 0.14);
+  }
+
+  html.dark {
+    -webkit-tap-highlight-color: rgb(74 222 128 / 0.16);
+  }
+
+  body {
+    @apply min-h-screen min-h-[100dvh] bg-hub-bg font-sans text-base leading-relaxed text-hub-text antialiased;
+  }
+
+  button,
+  [role='button'],
+  a {
+    touch-action: manipulation;
+  }
+
+  body.panel-open {
+    @apply overflow-hidden;
+  }
+
+  .prose-hub code {
+    @apply rounded px-1 py-0.5 font-mono text-[0.8125rem] leading-snug text-hub-text sm:text-sm;
+    background: var(--hub-tool-dim2);
+    border: 1px solid var(--hub-tool-dim);
+    color: var(--hub-tool);
+  }
+
+  .prose-hub strong {
+    @apply font-semibold text-hub-text;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:border focus:border-hub-line focus:bg-hub-surface focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-hub-text focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-hub-primary focus:ring-offset-2 focus:ring-offset-hub-bg;
+  }
+}
+
+@keyframes hub-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hub-fade-in {
+  animation: hub-fade-in 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-fade-in {
+    animation: none;
+  }
+}
+
+/* Header news ticker — two identical strips, translate -50% for seamless loop */
+@keyframes hub-news-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.hub-news-marquee {
+  overflow: hidden;
+  /* Isolate from header backdrop-filter so ticker text paints correctly (Chromium). */
+  isolation: isolate;
+}
+
+.hub-news-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: hub-news-marquee linear infinite;
+  will-change: transform;
+}
+
+/* Source pills: legible label on colored chip (marquee + reduced-motion layouts). */
+.news-source-badge__label {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+  forced-color-adjust: none;
+}
+
+.hub-news-marquee:hover .hub-news-marquee__track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-news-marquee__track {
+    animation: none;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.nav-tool-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hub-border2);
+  border-radius: 4px;
+}

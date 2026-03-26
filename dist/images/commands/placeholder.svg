@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240" viewBox="0 0 400 240" fill="none">
+  <rect width="400" height="240" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <rect x="16" y="16" width="368" height="28" rx="4" fill="#0f172a"/>
+  <circle cx="28" cy="30" r="4" fill="#475569"/>
+  <circle cx="44" cy="30" r="4" fill="#475569"/>
+  <circle cx="60" cy="30" r="4" fill="#475569"/>
+  <text x="88" y="32" font-family="monospace" font-size="12" fill="#94a3b8">Terminal - command output</text>
+  <rect x="16" y="56" width="368" height="168" rx="4" fill="#0f172a"/>
+  <text x="28" y="80" font-family="monospace" font-size="11" fill="#64748b">$ </text>
+  <text x="44" y="80" font-family="monospace" font-size="11" fill="#e2e8f0">command here</text>
+  <text x="28" y="110" font-family="monospace" font-size="11" fill="#94a3b8">Expected output appears below...</text>
+  <text x="28" y="130" font-family="monospace" font-size="11" fill="#64748b">(Screenshot or diagram)</text>
+</svg>

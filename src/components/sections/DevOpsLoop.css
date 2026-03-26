@@ -1,0 +1,40 @@
+/* Flow along infinity path — length set via inline --devops-loop-len on parent */
+.devops-loop-flow {
+  stroke-dasharray: var(--devops-loop-len, 1600);
+  stroke-dashoffset: 0;
+  animation: devops-loop-dash 14s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devops-loop-flow {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.35;
+  }
+}
+
+@keyframes devops-loop-dash {
+  to {
+    stroke-dashoffset: calc(-1 * var(--devops-loop-len, 1600));
+  }
+}
+
+.devops-loop-float {
+  animation: devops-loop-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devops-loop-float {
+    animation: none;
+  }
+}
+
+@keyframes devops-loop-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
