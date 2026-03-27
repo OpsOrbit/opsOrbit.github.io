@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 
-const STORAGE_KEY = 'devops-command-hub-theme'
+const STORAGE_KEY = 'opsorbit-theme'
+const LEGACY_THEME_KEYS = ['opsobrit-theme', 'devops-command-hub-theme']
 
 const ThemeContext = createContext({
   theme: 'light',
@@ -13,6 +14,10 @@ export function ThemeProvider({ children }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored === 'light' || stored === 'dark') return stored
+      for (const key of LEGACY_THEME_KEYS) {
+        const legacy = localStorage.getItem(key)
+        if (legacy === 'light' || legacy === 'dark') return legacy
+      }
     } catch (_) {}
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark'

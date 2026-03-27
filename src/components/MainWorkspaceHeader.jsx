@@ -1,4 +1,5 @@
 import ToolIcon from './ToolIcon'
+import { BRAND_NAME } from '../brand'
 
 const TOOL_DESC = {
   aws: 'Amazon Web Services CLI',
@@ -40,8 +41,11 @@ export default function MainWorkspaceHeader({
         : browseKey != null
         ? `${toolLabel(browseKey.tool)} · ${browseKey.category}`
         : tool === 'all'
-          ? 'OpsMatrix'
+          ? BRAND_NAME
           : toolLabel(tool)
+
+  const isBrandHomeTitle =
+    workspaceMode === 'commands' && tool === 'all' && browseKey == null
 
   const subtitle =
     workspaceMode === 'scripting'
@@ -74,7 +78,11 @@ export default function MainWorkspaceHeader({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-text)] sm:text-xl">
+        <h2
+          className={`text-lg font-extrabold leading-none tracking-tight sm:text-xl ${
+            isBrandHomeTitle ? 'text-[var(--hub-brand)]' : 'text-[var(--hub-text)]'
+          }`}
+        >
           {title}
         </h2>
         <p className="mt-1 text-[13px] text-[var(--hub-muted)]">{subtitle}</p>

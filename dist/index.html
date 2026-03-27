@@ -3,7 +3,7 @@
   <head>
     <script>
       try {
-        var t = localStorage.getItem('devops-command-hub-theme');
+        var t = localStorage.getItem('opsorbit-theme') || localStorage.getItem('opsobrit-theme') || localStorage.getItem('devops-command-hub-theme');
         if (t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches))
           document.documentElement.classList.add('dark');
       } catch (e) {}
@@ -13,12 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1419" />
-    <title>OpsMatrix</title>
+    <title>OpsOrbit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/assets/index-7sA0ettp.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BNQGXYyh.css">
+    <script type="module" crossorigin src="/assets/index-BSknO0ys.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-hqhbruqW.css">
   </head>
   <body>
     <div id="root"></div>

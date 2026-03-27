@@ -162,8 +162,8 @@ export default function HeaderNewsBanner() {
 
   if (status === 'loading' && items.length === 0) {
     return (
-      <div className="flex min-w-0 max-w-full flex-1 items-center justify-center px-1" aria-hidden>
-        <div className="h-3 w-[min(100%,18rem)] max-w-full animate-pulse rounded-md bg-[var(--hub-line)]/80" />
+      <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 items-center justify-center px-1" aria-hidden>
+        <div className="h-3 w-full max-w-full animate-pulse rounded-md bg-[var(--hub-line)]/80" />
       </div>
     )
   }
@@ -197,15 +197,18 @@ export default function HeaderNewsBanner() {
   )
 
   return (
-    <div className="flex h-full min-w-0 w-full max-w-full flex-1 items-center px-1 sm:px-2">
+    <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-1 items-center px-0.5 sm:px-1">
       <div
-        className="flex min-h-[36px] min-w-0 max-w-full flex-1 items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)]"
+        className="flex min-h-[34px] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)]"
         role="region"
         aria-label="Latest news from dev.to"
       >
-        <div className="flex shrink-0 items-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-2 py-1 sm:px-2.5">
-          <span className="whitespace-nowrap font-[family-name:Orbitron] text-[7px] font-bold uppercase tracking-[0.1em] text-[var(--hub-brand)] sm:text-[8px] sm:tracking-[0.12em]">
-            Latest news
+        <div className="flex min-w-[2.85rem] shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-1.5 py-1 sm:min-w-[3.25rem] sm:px-2.5">
+          <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)] sm:text-[7px] sm:tracking-[0.1em]">
+            latest
+          </span>
+          <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)] sm:text-[7px] sm:tracking-[0.1em]">
+            news
           </span>
         </div>
 

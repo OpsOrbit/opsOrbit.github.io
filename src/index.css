@@ -76,7 +76,7 @@
 @layer base {
   html {
     @apply scroll-smooth;
-    scroll-padding-top: 3.75rem;
+    scroll-padding-top: 6.5rem;
     -webkit-tap-highlight-color: rgb(22 163 74 / 0.14);
   }
 

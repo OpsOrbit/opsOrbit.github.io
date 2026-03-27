@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import BrandLogoMark from './BrandLogoMark'
 import ThemeToggle from './ThemeToggle'
 import MobileMenuDrawer from './MobileMenuDrawer'
 import HeaderNewsBanner from './HeaderNewsBanner'
@@ -19,44 +20,30 @@ export default function Header({
 
   return (
     <header
-      className="sticky top-0 z-[100] flex h-[52px] min-h-[52px] shrink-0 items-center gap-1 border-b border-[var(--hub-line)] pl-0 pr-2 backdrop-blur-[16px] md:gap-3 sm:gap-2 sm:pr-4"
+      className="sticky top-0 z-[100] flex min-h-[5.5rem] shrink-0 items-center gap-1 border-b border-[var(--hub-line)] py-2 pl-0 pr-2 backdrop-blur-[16px] sm:min-h-[6rem] sm:py-2 md:gap-3 sm:gap-2 sm:pr-4"
       style={{ background: 'var(--hub-topbar)' }}
     >
-      <div className="flex h-full shrink-0 items-center gap-1.5 border-r border-[var(--hub-line)] px-2 sm:gap-2.5 sm:px-4">
+      <div className="flex shrink-0 items-center gap-2 border-r border-[var(--hub-line)] px-2 sm:gap-3 sm:px-4">
         <button
           type="button"
-          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-text)] transition-colors duration-150 hover:border-[var(--hub-tool)] md:hidden"
+          className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-text)] transition-colors duration-150 hover:border-[var(--hub-tool)] md:hidden"
           aria-label="Select tool"
           onClick={() => setToolDrawerOpen(true)}
         >
           ☰
         </button>
-        <div
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[var(--hub-tool)]/35 text-sm text-white shadow-sm"
-          style={{
-            background: 'linear-gradient(135deg, var(--hub-primary-hover), var(--hub-primary))',
-          }}
-          aria-hidden
-        >
-          W
-        </div>
-        <div className="min-w-0 shrink-0 leading-tight">
-          <p className="hidden whitespace-nowrap font-[family-name:Orbitron] text-[8px] font-bold uppercase tracking-[0.12em] text-[var(--hub-brand)] sm:block sm:text-[9px]">
-            opsmatrix
-          </p>
-          <p className="whitespace-nowrap text-[11px] font-bold tracking-tight text-[var(--hub-text)] sm:mt-0.5 sm:text-[13px]">
-            OpsMatrix
-          </p>
+        <div className="flex shrink-0 items-center sm:items-start">
+          <BrandLogoMark className="h-[4.25rem] w-[8.5rem] sm:h-[4.75rem] sm:w-[9.75rem] md:h-[5.25rem] md:w-[11.25rem]" />
         </div>
       </div>
 
-      <div className="relative z-[1] hidden min-h-0 min-w-0 flex-1 basis-0 overflow-hidden md:flex md:min-w-[min(100%,200px)] lg:min-w-[260px]">
+      <div className="relative z-[1] hidden min-h-0 min-w-0 flex-1 overflow-hidden px-1 sm:px-2 md:flex">
         <HeaderNewsBanner />
       </div>
 
-      <div className="relative z-[2] flex min-w-0 shrink-0 items-center justify-end gap-1 border-l border-[var(--hub-line)]/60 bg-[var(--hub-topbar)] pl-1.5 sm:gap-2.5 sm:pl-3 sm:pr-1">
+      <div className="relative z-[2] flex shrink-0 items-center justify-end gap-2 border-l border-[var(--hub-line)]/60 bg-[var(--hub-topbar)] pl-1.5 sm:gap-2.5 sm:pl-3 sm:pr-1">
         <>
-          <div className="relative w-[min(100%,8.5rem)] shrink-0 sm:w-[min(100%,12.5rem)] md:w-[min(100%,14rem)] lg:w-[min(100%,16rem)]">
+          <div className="relative w-[min(100%,8.5rem)] max-w-[9rem] shrink-0 sm:w-[min(100%,10rem)] sm:max-w-[10.5rem] md:max-w-[11.5rem]">
             <svg
               className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--hub-muted)]"
               viewBox="0 0 24 24"

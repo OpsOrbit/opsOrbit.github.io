@@ -1,3 +1,5 @@
+import { BRAND_NAME } from '../../brand'
+
 const social = [
   {
     label: 'GitHub',
@@ -16,9 +18,9 @@ export default function Footer() {
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
             <p className="font-[family-name:Orbitron] text-xs font-bold uppercase tracking-[0.14em] text-hub-brand">thewhitetechnologies</p>
-            <p className="mt-2 text-lg font-semibold tracking-tight text-hub-text">DevOps Command Hub</p>
+            <p className="mt-2 text-lg font-semibold tracking-tight text-hub-brand">{BRAND_NAME}</p>
             <p className="mt-2 text-sm leading-relaxed text-hub-sub">
-              Curated commands and workflows for Git, cloud, containers, and automation — built for engineers who ship.
+              DevOps learning hub — commands, scripting guides, and roadmap — curated for engineers who ship.
             </p>
           </div>
           <div className="flex flex-wrap gap-10 sm:gap-14">
@@ -82,7 +84,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="mt-10 border-t border-hub-line/80 pt-8 text-center text-xs text-hub-muted">
-          © {new Date().getFullYear()} thewhitetechnologies · DevOps Command Hub
+          © {new Date().getFullYear()} thewhitetechnologies · {BRAND_NAME}
         </p>
       </div>
     </footer>

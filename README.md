@@ -1,6 +1,6 @@
-# OpsMatrix (React + Vite)
+# OpsOrbit (React + Vite)
 
-OpsMatrix is a DevOps learning platform with:
+**OpsOrbit** is a DevOps learning platform with:
 
 - Tool-wise command explorer (Git, Linux, Docker, Kubernetes, Terraform, etc.)
 - Scripting guides for beginners
@@ -10,6 +10,8 @@ OpsMatrix is a DevOps learning platform with:
 ## Run locally
 
 Requirements: Node.js 20+ and npm.
+
+Brand video logo: place **`public/logo.mp4`** in the repo (served at `/logo.mp4`). If the file is missing, the header shows a green fallback with the first letter of the brand name (**OpsOrbit** → **O**).
 
 ```bash
 npm install
