@@ -48,18 +48,22 @@ git push origin main
 
 GitHub Actions will build and publish automatically.
 
-### 3) Base path configuration
+### 3) Base path (fixes blank white page on Pages)
 
-Vite base path is controlled in `vite.config.js`:
+If the site loads but you only see a **white screen**, the JS/CSS bundle URLs are usually wrong for where GitHub Pages hosts the app.
 
-- User/organization site repo (e.g. `username.github.io`) → keep default `/`
-- Project repo (e.g. `my-app`) → set:
+The deploy workflow sets `VITE_BASE_PATH` automatically:
+
+- **Project repo** (`https://owner.github.io/repo-name/`) → build uses `/repo-name/`
+- **User site repo** named `owner.github.io` → build uses `/`
+
+To override (custom domain, unusual layout), set a repository **Actions variable** named `VITE_BASE_PATH` (e.g. `/` or `/my-app/`, must start and end with `/` for subpaths).
+
+Local production check (do not open `dist/index.html` via `file://`; module scripts will not load):
 
 ```bash
-VITE_BASE_PATH=/my-app/
+npm run build && npm run preview
 ```
-
-You can set `VITE_BASE_PATH` as a GitHub Actions environment variable if needed.
 
 ## Project structure
 

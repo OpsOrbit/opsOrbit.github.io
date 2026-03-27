@@ -52,7 +52,7 @@ export default function MobileMenuDrawer({
             id="mobile-tool-drawer"
             role="dialog"
             aria-modal="true"
-            aria-label="Select tool"
+            aria-label={workspaceMode === 'scripting' ? 'Scripting topics' : 'Select tool'}
             className="relative z-10 flex h-full w-[min(100vw-1.5rem,320px)] flex-col border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
@@ -60,7 +60,9 @@ export default function MobileMenuDrawer({
             transition={{ type: 'spring', stiffness: 380, damping: 34 }}
           >
             <div className="flex h-[52px] shrink-0 items-center justify-between gap-2 border-b border-[var(--hub-line)] px-4">
-              <span className="text-[13px] font-bold tracking-tight text-[var(--hub-text)]">Select tool</span>
+              <span className="text-[13px] font-bold tracking-tight text-[var(--hub-text)]">
+                {workspaceMode === 'scripting' ? 'Scripting topics' : 'Select tool'}
+              </span>
               <button
                 type="button"
                 onClick={onClose}
@@ -133,11 +135,13 @@ export default function MobileMenuDrawer({
                   toolLabel={toolLabel}
                   onNavigate={onClose}
                 />
+              ) : workspaceMode === 'scripting' ? (
+                <div className="mx-3.5 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3.5 py-3 text-[12px] leading-relaxed text-[var(--hub-muted)]">
+                  Scripting topics are in the main workspace — tap a topic at the top, then read the guide below.
+                </div>
               ) : (
                 <div className="mx-3.5 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3.5 py-3 text-[12px] leading-relaxed text-[var(--hub-muted)]">
-                  {workspaceMode === 'scripting'
-                    ? 'Scripting mode is active. Browse topics in the main area.'
-                    : 'Roadmap mode is active. Follow modules in the main area.'}
+                  Roadmap mode is active. Follow modules in the main area.
                 </div>
               )}
               <div className="mx-3.5 mt-4 border-t border-[var(--hub-line)] pt-4">

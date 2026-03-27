@@ -29,6 +29,24 @@ export const TOOL_EXPLANATIONS = {
       'You configure credentials once (`aws configure` or IAM roles), then call `aws <service> <action>` with flags or JSON. Output is often JSON so it can be piped to `jq` or other tools—built for machines and humans together.',
   },
 
+  azure: {
+    whatItIs:
+      'Azure CLI (`az`) is the command-line interface for Microsoft Azure. It lets you create and manage resources like VMs, storage, AKS clusters, and networking directly from scripts or a terminal.',
+    whyWeUseIt:
+      'CLI workflows are repeatable and reviewable, unlike one-off portal clicks. Teams use Azure CLI in local development and CI pipelines to keep operations consistent.',
+    howWeUseIt:
+      'You authenticate with `az login`, choose a subscription, then run `az <group> <command>` patterns. Output can be JSON and filtered with `--query` for automation.',
+  },
+
+  gcp: {
+    whatItIs:
+      'Google Cloud CLI (`gcloud`) is the command-line tool for GCP services like Compute Engine, GKE, Cloud Storage, IAM, and networking.',
+    whyWeUseIt:
+      'It enables infrastructure automation and reliable runbooks. The same commands can run on a laptop, inside CI, or in operational scripts.',
+    howWeUseIt:
+      'You log in with `gcloud auth login`, set an active project, then run service commands such as `gcloud compute`, `gcloud container`, and `gcloud storage`.',
+  },
+
   helm: {
     whatItIs:
       'Helm is a package manager for Kubernetes. A “chart” bundles Kubernetes YAML (Deployments, Services, ConfigMaps) with values you can tweak—like an app store for cluster resources.',

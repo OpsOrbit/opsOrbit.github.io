@@ -83,6 +83,56 @@ export const TOOL_INSTALL = {
     },
   },
 
+  azure: {
+    officialUrl: 'https://learn.microsoft.com/cli/azure/install-azure-cli',
+    officialLabel: 'Microsoft Learn — Install Azure CLI',
+    ubuntu: {
+      steps: [
+        'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash',
+        'az version',
+      ],
+    },
+    linux: {
+      steps: [
+        'Use distro-specific install instructions from Microsoft Learn (Debian/RPM/openSUSE).',
+        'Verify: az version',
+      ],
+    },
+    windows: {
+      steps: [
+        'winget install Microsoft.AzureCLI',
+        'Or install MSI from Microsoft Learn Azure CLI docs.',
+        'Verify in PowerShell: az version',
+      ],
+    },
+  },
+
+  gcp: {
+    officialUrl: 'https://cloud.google.com/sdk/docs/install',
+    officialLabel: 'Google Cloud — Install gcloud CLI',
+    ubuntu: {
+      steps: [
+        'Follow apt instructions in Google Cloud docs to add Cloud SDK repository.',
+        'sudo apt update && sudo apt install -y google-cloud-cli',
+        'gcloud --version',
+      ],
+    },
+    linux: {
+      steps: [
+        'Use package manager instructions or tarball install from cloud.google.com/sdk/docs/install.',
+        'Initialize with: gcloud init',
+        'Verify: gcloud --version',
+      ],
+    },
+    windows: {
+      steps: [
+        'Download Google Cloud CLI installer from cloud.google.com/sdk/docs/install.',
+        'Or use winget if available in your environment.',
+        'Open PowerShell: gcloud --version',
+      ],
+    },
+  },
+
   helm: {
     officialUrl: 'https://helm.sh/docs/intro/install/',
     officialLabel: 'Helm — Installing Helm',

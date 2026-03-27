@@ -13,11 +13,19 @@ import MainLayout from './components/layout/MainLayout'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
 import RoadmapFlow from './components/RoadmapFlow'
+import { SCRIPTING_GUIDES } from './data/scriptingGuides'
+import { ROADMAP_LANES, ROADMAP_FINAL_ORDER } from './data/roadmapData'
+import { filterScriptingGuides, filterRoadmapLanes, filterRoadmapFinalOrder } from './utils/workspaceSearch'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
 
 function toolLabel(t) {
   const labels = {
+    aws: 'AWS',
+    helm: 'Helm',
+    ansible: 'Ansible',
+    azure: 'Azure',
+    gcp: 'GCP',
     git: 'Git',
     linux: 'Linux',
     nginx: 'Nginx',
@@ -26,13 +34,10 @@ function toolLabel(t) {
     tomcat: 'Tomcat',
     postgresql: 'PostgreSQL',
     redis: 'Redis',
-    aws: 'AWS',
-    helm: 'Helm',
-    'github-actions': 'GitHub Actions',
+    'github-actions': 'Jenkins / CI',
     kubernetes: 'Kubernetes',
     terraform: 'Terraform',
     docker: 'Docker',
-    ansible: 'Ansible',
     prometheus: 'Prometheus',
     grafana: 'Grafana',
     maven: 'Maven',
@@ -48,23 +53,25 @@ function levelLabel(l) {
 
 const COUNT_TOOL_IDS = [
   'all',
+  'aws',
+  'azure',
+  'gcp',
   'git',
-  'linux',
+  'github-actions',
+  'docker',
+  'terraform',
+  'kubernetes',
+  'helm',
+  'ansible',
   'nginx',
   'apache',
-  'haproxy',
   'tomcat',
-  'postgresql',
-  'redis',
-  'aws',
-  'helm',
-  'github-actions',
-  'kubernetes',
-  'terraform',
-  'docker',
-  'ansible',
+  'haproxy',
   'prometheus',
   'grafana',
+  'postgresql',
+  'redis',
+  'linux',
   'maven',
   'shell',
 ]
@@ -82,6 +89,7 @@ export default function App() {
   const [browseKey, setBrowseKey] = useState(null)
   const [preferredCategory, setPreferredCategory] = useState(null)
   const [workspaceMode, setWorkspaceMode] = useState('commands')
+  const [scriptingTopicId, setScriptingTopicId] = useState(() => SCRIPTING_GUIDES[0]?.id ?? 'dockerfile')
 
   useEffect(() => {
     setBrowseKey(null)
@@ -126,6 +134,28 @@ export default function App() {
     })
   }, [tool, query])
 
+  const filteredScriptingGuides = useMemo(
+    () => filterScriptingGuides(SCRIPTING_GUIDES, query),
+    [query]
+  )
+
+  useEffect(() => {
+    if (workspaceMode !== 'scripting') return
+    if (filteredScriptingGuides.length === 0) return
+    const ids = new Set(filteredScriptingGuides.map((g) => g.id))
+    if (ids.has(scriptingTopicId)) return
+    setScriptingTopicId(filteredScriptingGuides[0].id)
+  }, [workspaceMode, filteredScriptingGuides, scriptingTopicId])
+
+  const filteredRoadmapLanes = useMemo(() => filterRoadmapLanes(ROADMAP_LANES, query), [query])
+
+  const filteredRoadmapFinalOrder = useMemo(
+    () => filterRoadmapFinalOrder(ROADMAP_FINAL_ORDER, query),
+    [query]
+  )
+
+  const roadmapSearchFiltered = Boolean(query.trim())
+
   const toolCounts = useMemo(() => {
     const q = query.trim().toLowerCase()
     const base = COMMANDS_DATA.filter((c) => {
@@ -167,11 +197,31 @@ export default function App() {
 
   const showCategoryHub = hasCategoryBrowse && browseKey === null && !singleToolSidebarMode
 
-  const workspaceVisibleCount = singleToolSidebarMode
-    ? filtered.length
-    : showCategoryHub
-      ? filtered.length
-      : displayCommands.length
+  const workspaceVisibleCount = useMemo(() => {
+    if (workspaceMode === 'scripting') return filteredScriptingGuides.length
+    if (workspaceMode === 'roadmap') return filteredRoadmapLanes.length
+    if (singleToolSidebarMode) return filtered.length
+    if (showCategoryHub) return filtered.length
+    return displayCommands.length
+  }, [
+    workspaceMode,
+    filteredScriptingGuides.length,
+    filteredRoadmapLanes.length,
+    singleToolSidebarMode,
+    showCategoryHub,
+    filtered.length,
+    displayCommands.length,
+  ])
+
+  const headerBadge = useMemo(() => {
+    if (workspaceMode === 'scripting') {
+      return { count: filteredScriptingGuides.length, noun: 'topics' }
+    }
+    if (workspaceMode === 'roadmap') {
+      return { count: filteredRoadmapLanes.length, noun: 'modules' }
+    }
+    return { count: filtered.length, noun: 'commands' }
+  }, [workspaceMode, filtered.length, filteredScriptingGuides.length, filteredRoadmapLanes.length])
 
   const mainContentKey = `${level}-${tool}-${browseKey?.tool ?? ''}-${browseKey?.category ?? ''}`
 
@@ -197,7 +247,8 @@ export default function App() {
         onToolChange={handleToolChange}
         toolCounts={toolCounts}
         toolLabel={toolLabel}
-        visibleCommandCount={filtered.length}
+        headerBadgeCount={headerBadge.count}
+        headerBadgeNoun={headerBadge.noun}
         workspaceMode={workspaceMode}
         onWorkspaceModeChange={setWorkspaceMode}
       />
@@ -205,7 +256,7 @@ export default function App() {
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <aside
           className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] md:flex"
-          aria-label="Tools"
+          aria-label={workspaceMode === 'scripting' ? 'Scripting workspace' : 'Tools'}
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-visible py-2.5">
             <div
@@ -257,11 +308,13 @@ export default function App() {
                 toolCounts={toolCounts}
                 toolLabel={toolLabel}
               />
+            ) : workspaceMode === 'scripting' ? (
+              <div className="mx-2 mt-1 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 py-3 text-[11px] leading-relaxed text-[var(--hub-muted)] md:mx-3">
+                Topics live in the main workspace — same idea as picking a tool, then seeing commands.
+              </div>
             ) : (
               <div className="mx-2 mt-1 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 py-3 text-[11px] leading-relaxed text-[var(--hub-muted)] md:mx-3">
-                {workspaceMode === 'scripting'
-                  ? 'Scripting mode is focused. Pick topics from the main panel.'
-                  : 'Roadmap mode is focused. Follow the learning flow in the main panel.'}
+                Roadmap mode is focused. Follow the learning flow in the main panel.
               </div>
             )}
           </div>
@@ -274,6 +327,7 @@ export default function App() {
             visibleCount={workspaceVisibleCount}
             browseKey={browseKey}
             workspaceMode={workspaceMode}
+            onBackToAllTools={backToAllTools}
           />
           <main
             id="main-content"
@@ -282,8 +336,20 @@ export default function App() {
           >
             <div className="mx-auto w-full max-w-[1600px]">
               <div key={workspaceMode === 'scripting' ? 'scripting' : mainContentKey} className="hub-fade-in">
-                {workspaceMode === 'scripting' && <ScriptingGuides />}
-                {workspaceMode === 'roadmap' && <RoadmapFlow />}
+                {workspaceMode === 'scripting' && (
+                  <ScriptingGuides
+                    activeId={scriptingTopicId}
+                    onSelectTopic={setScriptingTopicId}
+                    guides={filteredScriptingGuides}
+                  />
+                )}
+                {workspaceMode === 'roadmap' && (
+                  <RoadmapFlow
+                    lanes={filteredRoadmapLanes}
+                    finalOrderLines={filteredRoadmapFinalOrder}
+                    searchFiltered={roadmapSearchFiltered}
+                  />
+                )}
 
                 {workspaceMode === 'commands' && showCategoryHub && (
                   <CategoryHub

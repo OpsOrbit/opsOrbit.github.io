@@ -53,19 +53,15 @@ export const CATEGORY_ORDER = {
     'EKS & Kubernetes',
     'CloudWatch Logs',
   ],
+  azure: ['Setup & Identity', 'Resource Groups', 'Compute', 'Containers', 'Kubernetes'],
+  gcp: ['Setup & Identity', 'Compute', 'Kubernetes', 'Containers', 'Storage'],
   helm: [
     'Core',
     'Repositories',
     'Releases',
     'Release Ops',
   ],
-  'github-actions': [
-    'Setup',
-    'Workflows',
-    'Runs',
-    'Artifacts',
-    'Failure Recovery',
-  ],
+  'github-actions': ['Jenkins', 'GitLab CI', 'GitHub CLI CI'],
   docker: [
     'Setup & Info',
     'Images',
@@ -134,24 +130,36 @@ export const CATEGORY_ORDER = {
   redis: ['Basics', 'Info & memory', 'Keys', 'Danger zone', 'Monitoring', 'Persistence'],
 }
 
+/**
+ * Hub + sidebar order: cloud providers → DevOps delivery stack → platform & ops.
+ *
+ * Cloud: multi-cloud CLIs together.
+ * DevOps: source control → CI → containers → IaC → orchestration → config management.
+ * Rest: web stack, observability, data, then general shell/tooling.
+ */
 const TOOL_ORDER = [
+  // Cloud
+  'aws',
+  'azure',
+  'gcp',
+  // DevOps
   'git',
-  'linux',
-  'nginx',
-  'apache',
-  'haproxy',
-  'tomcat',
-  'postgresql',
-  'redis',
+  'github-actions',
   'docker',
+  'terraform',
   'kubernetes',
   'helm',
-  'terraform',
   'ansible',
-  'aws',
+  // Platform & ops
+  'nginx',
+  'apache',
+  'tomcat',
+  'haproxy',
   'prometheus',
   'grafana',
-  'github-actions',
+  'postgresql',
+  'redis',
+  'linux',
   'maven',
   'shell',
 ]

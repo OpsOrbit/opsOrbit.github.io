@@ -1,7 +1,11 @@
 import ToolIcon from './ToolIcon'
-import { SCRIPTING_GUIDES } from '../data/scriptingGuides'
 
 const TOOL_DESC = {
+  aws: 'Amazon Web Services CLI',
+  helm: 'Kubernetes package manager',
+  ansible: 'Config management & automation',
+  azure: 'Microsoft Azure CLI',
+  gcp: 'Google Cloud CLI',
   git: 'Version control & collaboration',
   linux: 'Shell & system utilities',
   nginx: 'Web server & reverse proxy',
@@ -10,20 +14,24 @@ const TOOL_DESC = {
   tomcat: 'Java servlet container',
   postgresql: 'psql, pg_dump, and maintenance',
   redis: 'redis-cli & cache operations',
-  aws: 'Amazon Web Services CLI',
-  helm: 'Kubernetes package manager',
-  'github-actions': 'CI/CD automation',
+  'github-actions': 'CI/CD (GitHub Actions)',
   kubernetes: 'Container orchestration',
   terraform: 'Infrastructure as code',
   docker: 'Containers & images',
-  ansible: 'Config management & automation',
   prometheus: 'Metrics & PromQL',
   grafana: 'Dashboards & observability UI',
   maven: 'Java build & dependencies',
   shell: 'Bash & scripting',
 }
 
-export default function MainWorkspaceHeader({ tool, toolLabel, visibleCount, browseKey, workspaceMode = 'commands' }) {
+export default function MainWorkspaceHeader({
+  tool,
+  toolLabel,
+  visibleCount,
+  browseKey,
+  workspaceMode = 'commands',
+  onBackToAllTools,
+}) {
   const title =
     workspaceMode === 'scripting'
       ? 'Scripting guides'
@@ -37,7 +45,7 @@ export default function MainWorkspaceHeader({ tool, toolLabel, visibleCount, bro
 
   const subtitle =
     workspaceMode === 'scripting'
-      ? 'Plain-language intros to Dockerfile, Compose, Jenkinsfile, Ansible, Terraform, and Kubernetes YAML — for beginners.'
+      ? 'In-depth guides: Docker, Compose, Jenkins, Ansible, Terraform, Kubernetes, GitHub Actions, GitLab CI, Helm, Bash, and Make.'
       : workspaceMode === 'roadmap'
         ? 'Animated flow graph covering what to learn across all tools, from fundamentals to delivery and observability.'
       : browseKey != null
@@ -71,8 +79,22 @@ export default function MainWorkspaceHeader({ tool, toolLabel, visibleCount, bro
         </h2>
         <p className="mt-1 text-[13px] text-[var(--hub-muted)]">{subtitle}</p>
       </div>
+      {workspaceMode === 'commands' && tool !== 'all' && typeof onBackToAllTools === 'function' && (
+        <button
+          type="button"
+          onClick={onBackToAllTools}
+          className="shrink-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] px-2.5 py-1.5 text-xs font-semibold text-[var(--hub-muted)] transition-colors hover:text-[var(--hub-text)]"
+          aria-label="Back to all tools"
+        >
+          ← Back
+        </button>
+      )}
       <div className="hidden shrink-0 rounded-full border border-[var(--hub-border2)] px-3 py-1 font-mono text-[11px] font-semibold text-[var(--hub-muted)] sm:block">
-        {workspaceMode === 'scripting' ? `${SCRIPTING_GUIDES.length} topics` : workspaceMode === 'roadmap' ? 'all tools' : `${visibleCount} cmds`}
+        {workspaceMode === 'scripting'
+          ? `${visibleCount} topics`
+          : workspaceMode === 'roadmap'
+            ? `${visibleCount} modules`
+            : `${visibleCount} cmds`}
       </div>
     </header>
   )

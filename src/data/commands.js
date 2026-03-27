@@ -9,6 +9,8 @@ import { TERRAFORM_COMMANDS } from './terraformCommands.js'
 import { DOCKER_COMMANDS } from './dockerCommands.js'
 import { ANSIBLE_COMMANDS } from './ansibleCommands.js'
 import { AWS_COMMANDS } from './awsCommands.js'
+import { AZURE_COMMANDS } from './azureCommands.js'
+import { GCP_COMMANDS } from './gcpCommands.js'
 import { HELM_COMMANDS } from './helmCommands.js'
 import { GITHUB_ACTIONS_COMMANDS } from './githubActionsCommands.js'
 import { NGINX_COMMANDS, APACHE_COMMANDS } from './webServerCommands.js'
@@ -24,6 +26,8 @@ export const COMMANDS_DATA = [
   ...DOCKER_COMMANDS,
   ...ANSIBLE_COMMANDS,
   ...AWS_COMMANDS,
+  ...AZURE_COMMANDS,
+  ...GCP_COMMANDS,
   ...HELM_COMMANDS,
   ...GITHUB_ACTIONS_COMMANDS,
   ...NGINX_COMMANDS,

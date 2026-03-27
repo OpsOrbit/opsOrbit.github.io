@@ -1,0 +1,75 @@
+export const ROADMAP_LANES = [
+  {
+    id: 'linux',
+    title: '1) Linux (Core Foundation)',
+    tools: 'Linux',
+    topics: ['File system and hierarchy', 'Permissions (chmod/chown/ACL)', 'Process management', 'System services (systemctl)', 'Networking basics', 'Disk and memory management', 'Logs analysis', 'Shell scripting'],
+  },
+  { id: 'git', title: '2) Version Control', tools: 'Git', topics: ['Git workflow', 'Branching strategies', 'Merge vs rebase', 'Conflict resolution', 'Tagging and releases', 'Git hooks'] },
+  { id: 'build', title: '3) Build Tools', tools: 'Maven, Gradle', topics: ['Build lifecycle', 'Dependency management', 'Plugins', 'Artifact packaging'] },
+  {
+    id: 'cicd',
+    title: '4) CI/CD',
+    tools: 'Jenkins, GitLab CI',
+    topics: ['Pipeline creation', 'Declarative vs scripted', 'Stages and jobs', 'Artifact handling', 'Parameterized builds', 'Shared libraries', 'Pipeline optimization', 'Secrets handling'],
+  },
+  {
+    id: 'docker',
+    title: '5) Containerization',
+    tools: 'Docker',
+    topics: ['Docker architecture', 'Dockerfile', 'Image lifecycle', 'Volumes', 'Networking', 'Multi-stage builds', 'Docker Compose', 'Image optimization'],
+  },
+  {
+    id: 'k8s',
+    title: '6) Container Orchestration',
+    tools: 'Kubernetes',
+    topics: ['Cluster architecture', 'Pods / ReplicaSets / Deployments', 'Services', 'Ingress', 'ConfigMaps and Secrets', 'Namespaces', 'Resource limits', 'Rolling updates / rollback', 'Autoscaling', 'Troubleshooting'],
+  },
+  { id: 'helm', title: '7) Package Management (K8s)', tools: 'Helm', topics: ['Chart structure', 'values.yaml', 'Templates', 'Releases', 'Chart versioning', 'Reusability'] },
+  {
+    id: 'iac',
+    title: '8) Infrastructure as Code',
+    tools: 'Terraform, Ansible',
+    topics: ['Terraform providers/resources/variables/modules', 'State management and remote backend', 'Ansible playbooks and inventory', 'Roles', 'Templates (Jinja2)', 'Handlers', 'Idempotency'],
+  },
+  {
+    id: 'monitoring',
+    title: '9) Monitoring and Logging',
+    tools: 'Prometheus, Grafana, ELK',
+    topics: ['Metrics collection', 'Exporters', 'Alerting', 'Dashboards', 'Log aggregation', 'Log parsing', 'Centralized logging'],
+  },
+  {
+    id: 'security',
+    title: '10) Security / DevSecOps',
+    tools: 'OWASP Top 10',
+    topics: ['SAST', 'DAST', 'Dependency scanning', 'Container security', 'Secrets management', 'IAM concepts', 'Secure coding practices', 'Vulnerability management'],
+  },
+  {
+    id: 'app-servers',
+    title: '11) Application Servers',
+    tools: 'Nginx, Apache HTTP Server, Tomcat',
+    topics: ['Reverse proxy', 'Load balancing', 'SSL/TLS', 'Virtual hosts', 'Caching', 'WAR deployment', 'Server configuration', 'Thread tuning', 'Logs'],
+  },
+  { id: 'artifacts', title: '12) Artifact Management', tools: 'Nexus, Artifactory', topics: ['Repository types', 'Artifact versioning', 'Access control', 'Storage management'] },
+  { id: 'networking', title: '13) Networking (DevOps Level)', tools: 'Core networking', topics: ['DNS', 'HTTP/HTTPS', 'SSL/TLS', 'Load balancing concepts', 'Reverse proxy', 'Ports and protocols'] },
+  { id: 'gitops', title: '14) GitOps and CD', tools: 'Argo CD', topics: ['GitOps principles', 'Declarative deployments', 'Sync strategies', 'Rollbacks'] },
+  { id: 'testing', title: '15) Testing in DevOps', tools: 'Testing stack', topics: ['Unit testing', 'Integration testing', 'API testing', 'Performance testing', 'Automation testing'] },
+  { id: 'scripting', title: '16) Scripting', tools: 'Bash, Python', topics: ['Bash scripting', 'Python basics', 'Automation scripts', 'API calls'] },
+  { id: 'queues', title: '17) Message Queues', tools: 'Kafka, RabbitMQ', topics: ['Pub/Sub', 'Event-driven systems'] },
+  {
+    id: 'practices',
+    title: '18) DevOps Practices',
+    tools: 'Release operations',
+    topics: ['CI/CD design', 'Blue-Green deployment', 'Canary deployment', 'Rollback strategies', 'High availability', 'Disaster recovery'],
+  },
+]
+
+export const ROADMAP_FINAL_ORDER = [
+  'Linux → Git',
+  'Build Tools → CI/CD',
+  'Docker → Kubernetes → Helm',
+  'Terraform → Ansible',
+  'Monitoring → Security',
+  'Application Servers',
+  'GitOps → Advanced practices',
+]

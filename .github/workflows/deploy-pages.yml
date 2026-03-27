@@ -31,7 +31,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Vite must use the same path GitHub Pages serves the site from, or /assets/*.js 404 → blank page.
+      # - Project site: https://owner.github.io/repo-name/  → base /repo-name/
+      # - User/org site: https://owner.github.io/ (repo often named owner.github.io) → base /
+      - name: Resolve Vite base path
+        id: vite_base
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          OVERRIDE: ${{ vars.VITE_BASE_PATH }}
+        run: |
+          if [ -n "$OVERRIDE" ]; then
+            echo "path=$OVERRIDE" >> "$GITHUB_OUTPUT"
+          elif [ "$REPO_NAME" = "${{ github.repository_owner }}.github.io" ]; then
+            echo "path=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=/${REPO_NAME}/" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build
+        env:
+          VITE_BASE_PATH: ${{ steps.vite_base.outputs.path }}
         run: npm run build
 
       - name: Upload Pages artifact
