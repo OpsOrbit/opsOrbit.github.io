@@ -1,57 +1,70 @@
-# DevOps Command Hub (React)
+# OpsMatrix (React + Vite)
 
-A **futuristic** React version of the DevOps Command Hub with:
+OpsMatrix is a DevOps learning platform with:
 
-- **Glassmorphism** UI: frosted glass cards and header with backdrop blur
-- **Gradient mesh background** and soft glows for a tech/cyber look
-- **Tool icons**: SVG icons for Git, Linux, Kubernetes, Terraform, Docker, Ansible, Maven, Shell
-- **Hero section** with tagline and gradient accent
-- **Staggered card animations** when results load
-- **Level + Tool filters**: Beginner / Intermediate / Advanced and per-tool
-- **Search**, **side panel** with copy and blur overlay
-- **Orbitron** + **Exo 2** + **JetBrains Mono** for a distinct, modern typography
+- Tool-wise command explorer (Git, Linux, Docker, Kubernetes, Terraform, etc.)
+- Scripting guides for beginners
+- Tool-based roadmap mode
+- Light/Dark theme support
 
 ## Run locally
 
-You need **Node.js** and **npm** installed.
+Requirements: Node.js 20+ and npm.
 
 ```bash
-cd devops-commands-react
 npm install
 npm run dev
 ```
 
-Then open **http://localhost:5173**.
+Open `http://localhost:5173`.
 
 ## Build for production
 
 ```bash
 npm run build
-npm run preview   # optional: preview the build
+npm run preview
 ```
 
-Static output is in `dist/`.
+Build output is generated in `dist/`.
 
-## Deploy to Netlify (drag and drop)
+## Deploy to GitHub Pages (recommended)
 
-1. **Build the site** (on your machine):
-   ```bash
-   cd devops-commands-react
-   npm install
-   npm run build
-   ```
-2. Open **[Netlify](https://app.netlify.com)** and sign in.
-3. On the dashboard, find the **“Drag and drop your site output folder here”** area.
-4. **Drag the `dist` folder** (inside `devops-commands-react`) onto that area.  
-   - On Windows: `devops-commands-react\dist`  
-   - On Mac/Linux: `devops-commands-react/dist`
-5. Netlify will deploy and give you a URL (e.g. `random-name-123.netlify.app`).
+This repo includes an Actions workflow at `.github/workflows/deploy-pages.yml` that deploys on every push to `main`.
 
-**Important:** Drag the **`dist`** folder (the build output), not the whole project. The `dist` folder contains the built HTML, CSS, and JS that Netlify serves.
+### 1) Enable Pages in GitHub
+
+In your GitHub repo:
+
+1. Go to **Settings** → **Pages**
+2. Under **Build and deployment**, choose **Source: GitHub Actions**
+
+### 2) Push to main
+
+```bash
+git add .
+git commit -m "Configure GitHub Pages deployment"
+git push origin main
+```
+
+GitHub Actions will build and publish automatically.
+
+### 3) Base path configuration
+
+Vite base path is controlled in `vite.config.js`:
+
+- User/organization site repo (e.g. `username.github.io`) → keep default `/`
+- Project repo (e.g. `my-app`) → set:
+
+```bash
+VITE_BASE_PATH=/my-app/
+```
+
+You can set `VITE_BASE_PATH` as a GitHub Actions environment variable if needed.
 
 ## Project structure
 
-- `src/App.jsx` – main state, filters, command panel
-- `src/data/commands.js` – command list (same data as vanilla app)
-- `src/components/` – Header, Hero, Nav, CommandCard, CommandPanel, ToolIcon
-- `src/index.css` – futuristic theme (glass, gradients, animations)
+- `src/App.jsx` - main app state and mode switching
+- `src/components/` - UI components (header, sidebar, cards, guides, roadmap)
+- `src/data/` - command data and guide content
+- `src/context/` - theme context
+- `src/index.css` - global styles and theme tokens
