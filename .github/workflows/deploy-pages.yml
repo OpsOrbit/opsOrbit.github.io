@@ -34,19 +34,28 @@ jobs:
       # Vite must use the same path GitHub Pages serves the site from, or /assets/*.js 404 → blank page.
       # - Project site: https://owner.github.io/repo-name/  → base /repo-name/
       # - User/org site: https://owner.github.io/ (repo often named owner.github.io) → base /
+      # User/org Pages URL is always https://<owner-lowercase>.github.io/ at repo root.
+      # Repository name must match <owner>.github.io but GitHub mixes casing (opsorbit vs OpsOrbit) — compare case-insensitively or every asset gets base /RepoName.github.io/ and returns 301 → white screen.
       - name: Resolve Vite base path
         id: vite_base
         env:
           REPO_NAME: ${{ github.event.repository.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
           OVERRIDE: ${{ vars.VITE_BASE_PATH }}
         run: |
           if [ -n "$OVERRIDE" ]; then
-            echo "path=$OVERRIDE" >> "$GITHUB_OUTPUT"
-          elif [ "$REPO_NAME" = "${{ github.repository_owner }}.github.io" ]; then
-            echo "path=/" >> "$GITHUB_OUTPUT"
+            BASE="$OVERRIDE"
           else
-            echo "path=/${REPO_NAME}/" >> "$GITHUB_OUTPUT"
+            repo_lc=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
+            owner_lc=$(echo "$REPO_OWNER" | tr '[:upper:]' '[:lower:]')
+            if [ "$repo_lc" = "${owner_lc}.github.io" ]; then
+              BASE="/"
+            else
+              BASE="/${REPO_NAME}/"
+            fi
           fi
+          echo "path=$BASE" >> "$GITHUB_OUTPUT"
+          echo "Resolved VITE_BASE_PATH=$BASE (user site uses /)"
 
       - name: Build
         env:

@@ -52,6 +52,9 @@ GitHub Actions will build and publish automatically.
 
 ### 3) Base path (fixes blank white page on Pages)
 
+The deploy workflow detects **user/org** sites by matching `repository.name` to `owner.github.io` **case-insensitively**. If that check failed (e.g. `opsorbit.github.io` vs `OpsOrbit.github.io`), Vite would use the wrong base, asset URLs would redirect (301), and you would see a **white screen** — this is fixed in `.github/workflows/deploy-pages.yml`.
+
+
 If the site loads but you only see a **white screen**, the JS/CSS bundle URLs are usually wrong for where GitHub Pages hosts the app.
 
 The deploy workflow sets `VITE_BASE_PATH` automatically:
