@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react'
 import { OFFICIAL_NEWS_FEEDS } from '../../lib/officialNewsFeeds.js'
 
-const CACHE_KEY = 'devops-hub-header-news-v10-official-rss'
+const CACHE_KEY = 'devops-hub-header-news-v11-static-official'
 const CACHE_MS = 12 * 60 * 1000
 /** dev.to tag slugs — Forem API is CORS-friendly in the browser. */
 const TAGS = [
@@ -122,6 +122,13 @@ function rssProxyBase() {
   return '/api/rss-feed'
 }
 
+/** Baked at build time into `public/official-news.json` (works on GitHub Pages). */
+function officialNewsJsonUrl() {
+  const base = import.meta.env.BASE_URL || '/'
+  const prefix = base.endsWith('/') ? base : `${base}/`
+  return `${prefix}official-news.json`
+}
+
 async function fetchWithTimeout(url, ms = 14000) {
   const ctrl = new AbortController()
   const t = setTimeout(() => ctrl.abort(), ms)
@@ -132,11 +139,39 @@ async function fetchWithTimeout(url, ms = 14000) {
   }
 }
 
-/**
- * Official AWS / Azure / GCP / Google AI RSS via same-origin proxy (allowlisted server-side).
- * Fails quietly when the host has no function (e.g. raw GitHub Pages).
- */
+function mapOfficialRows(raw) {
+  const out = []
+  let idx = 0
+  for (const row of raw) {
+    if (!row?.title || !row?.url) continue
+    const source = row.source || 'DevOps'
+    out.push({
+      id: `official-${source}-${idx}-${normalizeUrl(String(row.url))}`.slice(0, 180),
+      source,
+      title: String(row.title).trim(),
+      url: String(row.url).trim(),
+    })
+    idx += 1
+  }
+  return out
+}
+
+/** Production: static JSON from `prebuild` (GitHub Pages). Dev / fallback: RSS proxy. */
 async function fetchOfficialHeadlines() {
+  if (!import.meta.env.DEV) {
+    try {
+      const res = await fetchWithTimeout(officialNewsJsonUrl(), 8000)
+      if (res.ok) {
+        const data = await res.json()
+        const raw = Array.isArray(data.items) ? data.items : []
+        const fromFile = mapOfficialRows(raw)
+        if (fromFile.length > 0) return fromFile
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   const base = rssProxyBase()
   const settled = await Promise.allSettled(
     OFFICIAL_NEWS_FEEDS.map(async ({ source, url }) => {

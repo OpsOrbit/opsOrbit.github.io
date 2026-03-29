@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/fetch-official-news.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "gen:data": "node scripts/gen-git.mjs && node scripts/gen-linux.mjs && node scripts/gen-docker.mjs && node scripts/gen-terraform.mjs && node scripts/gen-ansible.mjs && node scripts/gen-kubernetes.mjs"
