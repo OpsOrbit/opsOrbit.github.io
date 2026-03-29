@@ -10,6 +10,7 @@ import SidebarNav from './components/SidebarNav'
 import SidebarToolTree from './components/SidebarToolTree'
 import MainWorkspaceHeader from './components/MainWorkspaceHeader'
 import MainLayout from './components/layout/MainLayout'
+import DockMagnify from './components/DockMagnify'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
 import RoadmapFlow from './components/RoadmapFlow'
@@ -255,21 +256,23 @@ export default function App() {
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <aside
-          className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] md:flex"
+          className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] md:flex"
           aria-label={workspaceMode === 'scripting' ? 'Scripting workspace' : 'Tools'}
         >
-          <div className="flex min-h-0 flex-1 flex-col overflow-visible py-2.5">
-            <div
-              className="mx-2 mb-2 grid shrink-0 grid-cols-3 gap-1 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-0.5 md:mx-3"
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
+            <DockMagnify
+              className="mx-2 mb-2 flex min-w-0 shrink-0 flex-col gap-1 overflow-hidden rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-1 md:mx-3"
+              itemClipClassName="flex w-full min-w-0 overflow-hidden rounded-md"
+              itemWrapperClassName="flex w-full min-w-0 justify-center origin-center"
               role="group"
               aria-label="Commands, scripting, or roadmap"
             >
               <button
                 type="button"
                 onClick={() => setWorkspaceMode('commands')}
-                className={`min-h-[36px] rounded-md px-1 py-1.5 text-center text-[8px] font-bold uppercase leading-tight tracking-wide transition-colors sm:text-[9px] ${
+                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                   workspaceMode === 'commands'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                     : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
                 }`}
                 aria-pressed={workspaceMode === 'commands'}
@@ -279,9 +282,9 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setWorkspaceMode('scripting')}
-                className={`min-h-[36px] rounded-md px-1 py-1.5 text-center text-[8px] font-bold uppercase leading-tight tracking-wide transition-colors sm:text-[9px] ${
+                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                   workspaceMode === 'scripting'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                     : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
                 }`}
                 aria-pressed={workspaceMode === 'scripting'}
@@ -291,16 +294,16 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setWorkspaceMode('roadmap')}
-                className={`min-h-[36px] rounded-md px-1 py-1.5 text-center text-[8px] font-bold uppercase leading-tight tracking-wide transition-colors sm:text-[9px] ${
+                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                   workspaceMode === 'roadmap'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                     : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
                 }`}
                 aria-pressed={workspaceMode === 'roadmap'}
               >
                 Roadmap
               </button>
-            </div>
+            </DockMagnify>
             {workspaceMode === 'commands' ? (
               <SidebarNav
                 tool={tool}

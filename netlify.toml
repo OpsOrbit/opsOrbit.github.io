@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Same-origin `/api/rss-feed` as the Vite dev server; preserves query string.
+[[redirects]]
+  from = "/api/rss-feed"
+  to = "/.netlify/functions/rss-feed"
+  status = 200
+  force = true

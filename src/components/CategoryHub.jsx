@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ToolIcon from './ToolIcon'
 import { compareTools } from '../data/categoryOrder'
 import { CATEGORY_PILL_BUTTON_CLASS, CATEGORY_PILL_NAV_CLASS } from './categoryPillStyles'
+import DockMagnify from './DockMagnify'
 
 /**
  * Accordion-style tool sections; categories inside an expanded tool are horizontal pill chips.
@@ -94,7 +95,13 @@ export default function CategoryHub({ summaries, onPickCategory, toolLabel, tool
 
           {expanded && (
             <div className="border-t border-hub-line/60 bg-hub-bg/40 px-3 py-3 dark:border-hub-line/60 dark:bg-hub-bg/20 sm:px-4 sm:py-3.5">
-              <nav className={CATEGORY_PILL_NAV_CLASS} aria-label={`${toolLabel(tool)} — pick a category`}>
+              <DockMagnify
+                as="nav"
+                className={CATEGORY_PILL_NAV_CLASS}
+                itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
+                itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
+                aria-label={`${toolLabel(tool)} — pick a category`}
+              >
                 {byTool.get(tool).map((row) => (
                   <button
                     key={`${row.tool}-${row.category}`}
@@ -109,7 +116,7 @@ export default function CategoryHub({ summaries, onPickCategory, toolLabel, tool
                     </span>
                   </button>
                 ))}
-              </nav>
+              </DockMagnify>
             </div>
           )}
         </section>

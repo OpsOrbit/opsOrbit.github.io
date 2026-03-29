@@ -1,34 +1,95 @@
 import { Fragment, useState, useEffect, useCallback } from 'react'
+import { OFFICIAL_NEWS_FEEDS } from '../../lib/officialNewsFeeds.js'
 
-const CACHE_KEY = 'devops-hub-header-news-v8-devto-only'
+const CACHE_KEY = 'devops-hub-header-news-v10-official-rss'
 const CACHE_MS = 12 * 60 * 1000
-const TAGS = ['devops', 'cloud', 'ai', 'kubernetes']
+/** dev.to tag slugs — Forem API is CORS-friendly in the browser. */
+const TAGS = [
+  'aws',
+  'azure',
+  'gcp',
+  'ai',
+  'machinelearning',
+  'llm',
+  'openai',
+  'devops',
+  'cloud',
+  'kubernetes',
+]
 
 /** Solid fills + white label — avoids low-contrast tints and survives parent <a> hover color. */
 const SOURCE_BADGE_STYLE = {
+  AWS: { backgroundColor: '#232F3E', color: '#FFFFFF' },
+  Azure: { backgroundColor: '#0078D4', color: '#FFFFFF' },
+  GCP: { backgroundColor: '#1A73E8', color: '#FFFFFF' },
+  AI: { backgroundColor: '#6D28D9', color: '#FFFFFF' },
   DevOps: { backgroundColor: '#047857', color: '#FFFFFF' },
 }
 
 /**
- * Dev.to public API only (no RSS, no third-party CORS proxies). Forem allows browser CORS on this API.
+ * dev.to public API — CORS-friendly in the browser (community headlines).
  * @see https://developers.forem.com/api/v1
  */
+function normalizeTag(t) {
+  return String(t || '')
+    .toLowerCase()
+    .replace(/^#/, '')
+    .trim()
+}
+
+/**
+ * Pick a marquee badge from article tags + the tag used for this fetch (fallback).
+ */
+function sourceFromArticle(tagList, requestedTag) {
+  const bucket = new Set()
+  for (const t of tagList || []) bucket.add(normalizeTag(t))
+  if (requestedTag) bucket.add(normalizeTag(requestedTag))
+  const tags = [...bucket]
+  const has = (re) => tags.some((t) => re.test(t))
+
+  if (has(/^aws$/) || has(/amazon/) || has(/^lambda$/)) return 'AWS'
+  if (has(/^azure$/) || has(/microsoft-azure/) || has(/^azurerm$/)) return 'Azure'
+  if (has(/^gcp$/) || has(/^googlecloud$/) || has(/google-cloud/) || has(/^google-cloud-platform$/)) return 'GCP'
+  if (
+    has(/^ai$/) ||
+    has(/^machinelearning$/) ||
+    has(/machine-learning/) ||
+    has(/^llm$/) ||
+    has(/generative-ai/) ||
+    has(/^openai$/) ||
+    has(/chatgpt/) ||
+    has(/^langchain$/) ||
+    has(/anthropic/) ||
+    has(/claude/) ||
+    has(/^copilot$/) ||
+    has(/bedrock/)
+  ) {
+    return 'AI'
+  }
+  return 'DevOps'
+}
+
 async function fetchDevtoArticles() {
   const requests = TAGS.map((tag) =>
-    fetch(`https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=7&per_page=3`)
+    fetch(`https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=7&per_page=4`).then((res) => ({
+      res,
+      tag,
+    }))
   )
   const settled = await Promise.allSettled(requests)
   const out = []
   for (const s of settled) {
-    if (s.status !== 'fulfilled' || !s.value.ok) continue
+    if (s.status !== 'fulfilled') continue
+    const { res, tag } = s.value
+    if (!res.ok) continue
     try {
-      const arr = await s.value.json()
+      const arr = await res.json()
       if (!Array.isArray(arr)) continue
       for (const a of arr) {
         if (a?.id != null && a.title && a.url) {
           out.push({
             id: `devto-${a.id}`,
-            source: 'DevOps',
+            source: sourceFromArticle(a.tag_list, tag),
             title: String(a.title).trim(),
             url: a.url,
           })
@@ -53,6 +114,54 @@ function normalizeUrl(u) {
   }
 }
 
+/** Same path in dev (Vite middleware) and on Netlify (redirect → function). Override with VITE_RSS_PROXY_BASE if needed. */
+function rssProxyBase() {
+  if (import.meta.env.DEV) return '/api/rss-feed'
+  const custom = import.meta.env.VITE_RSS_PROXY_BASE
+  if (typeof custom === 'string' && custom.trim()) return custom.replace(/\/$/, '')
+  return '/api/rss-feed'
+}
+
+async function fetchWithTimeout(url, ms = 14000) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  try {
+    return await fetch(url, { signal: ctrl.signal })
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+/**
+ * Official AWS / Azure / GCP / Google AI RSS via same-origin proxy (allowlisted server-side).
+ * Fails quietly when the host has no function (e.g. raw GitHub Pages).
+ */
+async function fetchOfficialHeadlines() {
+  const base = rssProxyBase()
+  const settled = await Promise.allSettled(
+    OFFICIAL_NEWS_FEEDS.map(async ({ source, url }) => {
+      const res = await fetchWithTimeout(`${base}?url=${encodeURIComponent(url)}`)
+      if (!res.ok) throw new Error(String(res.status))
+      const data = await res.json()
+      const raw = Array.isArray(data.items) ? data.items : []
+      return raw.slice(0, 5).map((it, idx) => ({
+        id: `official-${source}-${idx}-${normalizeUrl(String(it.link || ''))}`.slice(0, 180),
+        source,
+        title: String(it.title || '').trim(),
+        url: String(it.link || '').trim(),
+      }))
+    })
+  )
+  const out = []
+  for (const s of settled) {
+    if (s.status !== 'fulfilled') continue
+    for (const it of s.value) {
+      if (it.title && it.url) out.push(it)
+    }
+  }
+  return out
+}
+
 async function loadHeadlines() {
   const cached = sessionStorage.getItem(CACHE_KEY)
   if (cached) {
@@ -66,7 +175,7 @@ async function loadHeadlines() {
     }
   }
 
-  const devtoList = await fetchDevtoArticles()
+  const [officialList, devtoList] = await Promise.all([fetchOfficialHeadlines(), fetchDevtoArticles()])
 
   const byUrl = new Map()
 
@@ -81,9 +190,15 @@ async function loadHeadlines() {
     })
   }
 
+  for (const item of officialList) add(item)
   for (const item of devtoList) add(item)
 
-  const items = [...byUrl.values()].slice(0, 28)
+  const items = [...byUrl.values()]
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[items[i], items[j]] = [items[j], items[i]]
+  }
+  items.splice(48)
 
   if (items.length > 0) {
     try {
@@ -118,7 +233,7 @@ function linkClassCompact() {
 }
 
 function SourceBadge({ source }) {
-  const st = SOURCE_BADGE_STYLE[source] || SOURCE_BADGE_STYLE.DevOps
+  const st = SOURCE_BADGE_STYLE[source] ?? SOURCE_BADGE_STYLE.DevOps
   const bg = st.backgroundColor
   return (
     <span className="news-source-badge relative inline-flex w-max max-w-none shrink-0 items-center justify-center overflow-visible rounded-md px-2 py-1 sm:px-2.5 sm:py-1.5">
@@ -201,7 +316,7 @@ export default function HeaderNewsBanner() {
       <div
         className="flex min-h-[34px] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)]"
         role="region"
-        aria-label="Latest news from dev.to"
+        aria-label="Latest cloud news from official AWS, Azure, GCP, and Google AI blogs plus dev.to"
       >
         <div className="flex min-w-[2.85rem] shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-1.5 py-1 sm:min-w-[3.25rem] sm:px-2.5">
           <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)] sm:text-[7px] sm:tracking-[0.1em]">

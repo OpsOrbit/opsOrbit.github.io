@@ -85,9 +85,9 @@ export default function MobileMenuDrawer({
                       onWorkspaceModeChange('commands')
                       onClose()
                     }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors ${
+                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                       workspaceMode === 'commands'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                         : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
                     }`}
                     aria-pressed={workspaceMode === 'commands'}
@@ -100,9 +100,9 @@ export default function MobileMenuDrawer({
                       onWorkspaceModeChange('scripting')
                       onClose()
                     }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors ${
+                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                       workspaceMode === 'scripting'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                         : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
                     }`}
                     aria-pressed={workspaceMode === 'scripting'}
@@ -115,9 +115,9 @@ export default function MobileMenuDrawer({
                       onWorkspaceModeChange('roadmap')
                       onClose()
                     }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors ${
+                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
                       workspaceMode === 'roadmap'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/35'
+                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
                         : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
                     }`}
                     aria-pressed={workspaceMode === 'roadmap'}
