@@ -11,7 +11,7 @@
 
 Requirements: Node.js 20+ and npm.
 
-Brand video logo: place **`public/logo.mp4`** in the repo (served at `/logo.mp4`). If the file is missing, the header shows a green fallback with the first letter of the brand name (**OpsOrbit** → **O**).
+Brand video logo: place **`public/logo1.mp4`** in the repo (served at `/logo1.mp4`). If the file is missing, the header shows a green fallback with the first letter of the brand name (**OpsOrbit** → **O**).
 
 ```bash
 npm install

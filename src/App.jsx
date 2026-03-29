@@ -311,15 +311,7 @@ export default function App() {
                 toolCounts={toolCounts}
                 toolLabel={toolLabel}
               />
-            ) : workspaceMode === 'scripting' ? (
-              <div className="mx-2 mt-1 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 py-3 text-[11px] leading-relaxed text-[var(--hub-muted)] md:mx-3">
-                Topics live in the main workspace — same idea as picking a tool, then seeing commands.
-              </div>
-            ) : (
-              <div className="mx-2 mt-1 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 py-3 text-[11px] leading-relaxed text-[var(--hub-muted)] md:mx-3">
-                Roadmap mode is focused. Follow the learning flow in the main panel.
-              </div>
-            )}
+            ) : null}
           </div>
         </aside>
 

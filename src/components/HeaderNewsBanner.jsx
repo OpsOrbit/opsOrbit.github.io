@@ -308,7 +308,8 @@ export default function HeaderNewsBanner() {
     run()
   }, [run])
 
-  const durationSec = Math.min(100, Math.max(28, 18 + items.length * 5))
+  /* Longer duration = slower scroll (easier to read). */
+  const durationSec = Math.min(150, Math.max(42, 32 + items.length * 7))
 
   if (status === 'loading' && items.length === 0) {
     return (

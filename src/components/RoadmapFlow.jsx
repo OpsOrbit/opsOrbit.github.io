@@ -34,13 +34,6 @@ export default function RoadmapFlow({
 
   return (
     <section className="space-y-4 pb-8">
-      <header className="rounded-xl border border-[var(--hub-line)] bg-[var(--hub-card)] p-4 sm:p-5">
-        <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-[var(--hub-tool)]">Roadmap</p>
-        <p className="mt-1 text-[14px] leading-relaxed text-[var(--hub-sub)]">
-          Tool-by-tool topics to cover. Complete module 1 to 18, then follow the final learning order.
-        </p>
-      </header>
-
       {lanes.length === 0 ? (
         <Card className="border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-8 py-14 text-center">
           <p className="text-base leading-relaxed text-[var(--hub-sub)]">

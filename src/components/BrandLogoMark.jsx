@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { BRAND_NAME } from '../brand'
 
-/** Public asset: add `public/logo.mp4` in the project root (Vite serves it at /logo.mp4). */
+/** Public asset: add `public/logo1.mp4` (Vite serves it at /logo1.mp4). */
 function logoUrl() {
   const base = import.meta.env.BASE_URL || '/'
-  return `${base.endsWith('/') ? base : `${base}/`}logo.mp4`
+  return `${base.endsWith('/') ? base : `${base}/`}logo1.mp4`
 }
 
 /**
- * Header mark: video scaled past the frame so pillarboxing in the file is cropped away.
- * Wrapper uses theme surface (not black) for any sub-pixel gaps.
+ * Header mark: video fills the frame with object-cover (no side letterboxing).
+ * Uses normal scale only — avoids the old 155% zoom that clipped the wordmark.
  */
 export default function BrandLogoMark({ className = 'h-7 w-7' }) {
   const [videoFailed, setVideoFailed] = useState(false)
@@ -31,10 +31,10 @@ export default function BrandLogoMark({ className = 'h-7 w-7' }) {
 
   return (
     <div
-      className={`relative shrink-0 overflow-hidden rounded-lg border border-[var(--hub-tool)]/35 bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)] ${className}`}
+      className={`relative shrink-0 overflow-hidden rounded-lg border border-[var(--hub-tool)]/35 bg-[#060a10] shadow-sm ${className}`}
     >
       <video
-        className="pointer-events-none absolute left-1/2 top-1/2 block min-h-[155%] min-w-[155%] -translate-x-1/2 -translate-y-1/2 object-cover object-center"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
         autoPlay
         muted
         loop

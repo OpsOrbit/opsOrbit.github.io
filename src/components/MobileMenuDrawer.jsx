@@ -135,15 +135,7 @@ export default function MobileMenuDrawer({
                   toolLabel={toolLabel}
                   onNavigate={onClose}
                 />
-              ) : workspaceMode === 'scripting' ? (
-                <div className="mx-3.5 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3.5 py-3 text-[12px] leading-relaxed text-[var(--hub-muted)]">
-                  Scripting topics are in the main workspace — tap a topic at the top, then read the guide below.
-                </div>
-              ) : (
-                <div className="mx-3.5 rounded-lg border border-dashed border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3.5 py-3 text-[12px] leading-relaxed text-[var(--hub-muted)]">
-                  Roadmap mode is active. Follow modules in the main area.
-                </div>
-              )}
+              ) : null}
               <div className="mx-3.5 mt-4 border-t border-[var(--hub-line)] pt-4">
                 <a
                   href="#main-content"
