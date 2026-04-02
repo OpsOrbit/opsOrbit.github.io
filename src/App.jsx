@@ -28,7 +28,6 @@ import { commandMatchesQuery } from './utils/commandIntentSearch'
 import { mergeRelatedIds } from './utils/commandPanelBreakdown'
 import { filterDevopsTools } from './utils/toolsFilter'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
-import CommandsLearningBar from './components/CommandsLearningBar'
 import ToolsPage from './components/tools/ToolsPage'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
@@ -255,7 +254,8 @@ export default function App() {
   const filtered = useMemo(() => {
     const q = query.trim()
     return COMMANDS_DATA.filter((c) => {
-      const matchTool = tool === 'all' || c.tool === tool
+      // With an active search, match across every tool; empty query keeps sidebar tool filter.
+      const matchTool = q ? true : tool === 'all' || c.tool === tool
       if (!matchTool) return false
       const extras = COMMAND_EXTRAS[c.id] || {}
       return commandMatchesQuery(c, q, extras)
@@ -311,10 +311,15 @@ export default function App() {
   const categorySummaries = useMemo(() => orderedCategorySummaries(filtered), [filtered])
   const hasCategoryBrowse = categorySummaries.length > 0
 
+  const searchCommandsGlobal = query.trim().length > 0
+
+  /** While searching, do not keep a category drill-down filter on the main list. */
+  const effectiveBrowseKey = searchCommandsGlobal ? null : browseKey
+
   const displayCommands = useMemo(() => {
-    if (!browseKey) return filtered
-    return filtered.filter((c) => c.tool === browseKey.tool && c.category === browseKey.category)
-  }, [filtered, browseKey])
+    if (!effectiveBrowseKey) return filtered
+    return filtered.filter((c) => c.tool === effectiveBrowseKey.tool && c.category === effectiveBrowseKey.category)
+  }, [filtered, effectiveBrowseKey])
 
   const commandsByLevel = useMemo(() => {
     const groups = { beginner: [], intermediate: [], advanced: [] }
@@ -507,9 +512,10 @@ export default function App() {
             tool={tool}
             toolLabel={toolLabel}
             visibleCount={workspaceVisibleCount}
-            browseKey={browseKey}
+            browseKey={effectiveBrowseKey}
             workspaceMode={workspaceMode}
             onBackToAllTools={backToAllTools}
+            commandsSearchGlobal={searchCommandsGlobal}
           />
           <main
             id="main-content"
@@ -533,7 +539,6 @@ export default function App() {
                 }
                 className="hub-fade-in"
               >
-                {workspaceMode === 'commands' && <CommandsLearningBar visible />}
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
                     activeId={scriptingTopicId}
@@ -568,7 +573,11 @@ export default function App() {
                   />
                 )}
 
-                {workspaceMode === 'commands' && hasCategoryBrowse && browseKey && !singleToolSidebarMode && (
+                {workspaceMode === 'commands' &&
+                  hasCategoryBrowse &&
+                  browseKey &&
+                  !singleToolSidebarMode &&
+                  !searchCommandsGlobal && (
                   <CategoryBreadcrumb
                     toolLabel={toolLabel}
                     browseKey={browseKey}
@@ -595,6 +604,13 @@ export default function App() {
                           No commands match your search. Adjust the tool filter or try different keywords.
                         </p>
                       </Card>
+                    ) : searchCommandsGlobal ? (
+                      <CommandListByLevel
+                        commandsByLevel={commandsByLevel}
+                        onSelect={setSelected}
+                        toolLabel={toolLabel}
+                        levelLabel={levelLabel}
+                      />
                     ) : (
                       <SidebarToolTree
                         variant="main"

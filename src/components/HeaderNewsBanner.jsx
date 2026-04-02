@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react'
 import { OFFICIAL_NEWS_FEEDS } from '../../lib/officialNewsFeeds.js'
 
-const CACHE_KEY = 'devops-hub-header-news-v12-refresh'
+const CACHE_KEY = 'devops-hub-header-news-v13-cats-dates'
 const CACHE_MS = 60 * 60 * 1000
 /** Background refetch for long-lived tabs (aligned with session cache window). */
 const REFRESH_INTERVAL_MS = 60 * 60 * 1000
@@ -89,11 +89,18 @@ async function fetchDevtoArticles() {
       if (!Array.isArray(arr)) continue
       for (const a of arr) {
         if (a?.id != null && a.title && a.url) {
+          let publishedAt
+          if (a.published_at) {
+            const d = new Date(a.published_at)
+            if (!Number.isNaN(d.getTime())) publishedAt = d.toISOString()
+          }
           out.push({
             id: `devto-${a.id}`,
             source: sourceFromArticle(a.tag_list, tag),
+            category: 'Community',
             title: String(a.title).trim(),
             url: a.url,
+            ...(publishedAt ? { publishedAt } : {}),
           })
         }
       }
@@ -147,15 +154,65 @@ function mapOfficialRows(raw) {
   for (const row of raw) {
     if (!row?.title || !row?.url) continue
     const source = row.source || 'DevOps'
+    const category = typeof row.category === 'string' && row.category.trim() ? row.category.trim() : undefined
+    const publishedAt =
+      typeof row.publishedAt === 'string' && row.publishedAt.trim() ? row.publishedAt.trim() : undefined
     out.push({
       id: `official-${source}-${idx}-${normalizeUrl(String(row.url))}`.slice(0, 180),
       source,
+      ...(category ? { category } : {}),
+      ...(publishedAt ? { publishedAt } : {}),
       title: String(row.title).trim(),
       url: String(row.url).trim(),
     })
     idx += 1
   }
   return out
+}
+
+function formatNewsDate(iso) {
+  if (!iso) return ''
+  try {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return ''
+    const now = new Date()
+    const sameYear = d.getFullYear() === now.getFullYear()
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      ...(sameYear ? {} : { year: 'numeric' }),
+    }).format(d)
+  } catch {
+    return ''
+  }
+}
+
+function headlineSortTime(it) {
+  if (!it.publishedAt) return 0
+  const t = Date.parse(it.publishedAt)
+  return Number.isNaN(t) ? 0 : t
+}
+
+function NewsMetaChips({ category, publishedAt }) {
+  const dateStr = formatNewsDate(publishedAt)
+  if (!category && !dateStr) return null
+  return (
+    <span className="flex shrink-0 items-center gap-1.5" aria-hidden={!category && !dateStr}>
+      {category ? (
+        <span className="max-w-[7.5rem] truncate rounded border border-[var(--hub-line)] bg-[var(--hub-bg)]/90 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[var(--hub-muted)] sm:max-w-[9rem] sm:text-[9px]">
+          {category}
+        </span>
+      ) : null}
+      {dateStr ? (
+        <time
+          dateTime={publishedAt}
+          className="shrink-0 text-[8px] font-semibold tabular-nums text-[var(--hub-faint)] sm:text-[9px]"
+        >
+          {dateStr}
+        </time>
+      ) : null}
+    </span>
+  )
 }
 
 /** Production: static JSON from `prebuild` (GitHub Pages). Dev / fallback: RSS proxy. */
@@ -176,7 +233,7 @@ async function fetchOfficialHeadlines() {
 
   const base = rssProxyBase()
   const settled = await Promise.allSettled(
-    OFFICIAL_NEWS_FEEDS.map(async ({ source, url }) => {
+    OFFICIAL_NEWS_FEEDS.map(async ({ source, category, url }) => {
       const res = await fetchWithTimeout(`${base}?url=${encodeURIComponent(url)}`)
       if (!res.ok) throw new Error(String(res.status))
       const data = await res.json()
@@ -184,8 +241,10 @@ async function fetchOfficialHeadlines() {
       return raw.slice(0, 5).map((it, idx) => ({
         id: `official-${source}-${idx}-${normalizeUrl(String(it.link || ''))}`.slice(0, 180),
         source,
+        category,
         title: String(it.title || '').trim(),
         url: String(it.link || '').trim(),
+        ...(it.publishedAt ? { publishedAt: String(it.publishedAt) } : {}),
       }))
     })
   )
@@ -220,23 +279,37 @@ async function loadHeadlines(force = false) {
 
   const add = (item) => {
     const k = normalizeUrl(item.url)
-    if (!k || byUrl.has(k)) return
-    byUrl.set(k, {
-      id: item.id,
-      source: item.source,
-      title: item.title,
-      url: item.url,
-    })
+    if (!k) return
+    const prev = byUrl.get(k)
+    if (!prev) {
+      byUrl.set(k, {
+        id: item.id,
+        source: item.source,
+        title: item.title,
+        url: item.url,
+        ...(item.category ? { category: item.category } : {}),
+        ...(item.publishedAt ? { publishedAt: item.publishedAt } : {}),
+      })
+      return
+    }
+    const tNew = headlineSortTime(item)
+    const tOld = headlineSortTime(prev)
+    if (tNew > tOld) {
+      byUrl.set(k, {
+        id: item.id,
+        source: item.source,
+        title: item.title,
+        url: item.url,
+        ...(item.category ? { category: item.category } : {}),
+        ...(item.publishedAt ? { publishedAt: item.publishedAt } : {}),
+      })
+    }
   }
 
   for (const item of officialList) add(item)
   for (const item of devtoList) add(item)
 
-  const items = [...byUrl.values()]
-  for (let i = items.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[items[i], items[j]] = [items[j], items[i]]
-  }
+  const items = [...byUrl.values()].sort((a, b) => headlineSortTime(b) - headlineSortTime(a))
   items.splice(48)
 
   if (items.length > 0) {
@@ -319,8 +392,8 @@ export default function HeaderNewsBanner() {
     return () => clearInterval(id)
   }, [run, reduceMotion])
 
-  /* Longer duration = slower scroll (easier to read). */
-  const durationSec = Math.min(150, Math.max(42, 32 + items.length * 7))
+  /* Higher duration (seconds) = slower scroll. Hover pauses the ticker (see index.css). */
+  const durationSec = Math.min(420, Math.max(110, 80 + items.length * 18))
 
   if (status === 'loading' && items.length === 0) {
     return (
@@ -348,10 +421,16 @@ export default function HeaderNewsBanner() {
             target="_blank"
             rel="noopener noreferrer"
             className={linkClassMarquee()}
-            title={`${item.source}: ${item.title}`}
+            title={`${item.source}${item.category ? ` · ${item.category}` : ''}${item.publishedAt ? ` · ${formatNewsDate(item.publishedAt)}` : ''} — ${item.title}`}
           >
-            <SourceBadge source={item.source} />
-            <span className="shrink-0">{item.title}</span>
+            <span className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
+              <SourceBadge source={item.source} />
+              <NewsMetaChips category={item.category} publishedAt={item.publishedAt} />
+            </span>
+            <span className="mx-0.5 shrink-0 text-[var(--hub-faint)]" aria-hidden>
+              ·
+            </span>
+            <span className="min-w-0 shrink-0">{item.title}</span>
           </a>
         </Fragment>
       ))}
@@ -363,7 +442,7 @@ export default function HeaderNewsBanner() {
       <div
         className="flex min-h-[34px] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)]"
         role="region"
-        aria-label="Latest cloud news from official AWS, Azure, GCP, and Google AI blogs plus dev.to"
+        aria-label="Latest cloud news from official AWS, Azure, and GCP blogs by category, plus community posts"
       >
         <div className="flex min-w-[2.85rem] shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-1.5 py-1 sm:min-w-[3.25rem] sm:px-2.5">
           <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)] sm:text-[7px] sm:tracking-[0.1em]">
@@ -388,9 +467,12 @@ export default function HeaderNewsBanner() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={linkClassCompact()}
-                  title={`${item.source}: ${item.title}`}
+                  title={`${item.source}${item.category ? ` · ${item.category}` : ''}${item.publishedAt ? ` · ${formatNewsDate(item.publishedAt)}` : ''} — ${item.title}`}
                 >
-                  <SourceBadge source={item.source} />
+                  <span className="flex shrink-0 items-center gap-1">
+                    <SourceBadge source={item.source} />
+                    <NewsMetaChips category={item.category} publishedAt={item.publishedAt} />
+                  </span>
                   <span className="min-w-0 truncate">{item.title}</span>
                 </a>
               </Fragment>

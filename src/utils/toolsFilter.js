@@ -58,6 +58,12 @@ export function filterDevopsTools(query, categoryId, chips) {
       .join(' ')
       .toLowerCase()
 
-    return hay.includes(q)
+    if (hay.includes(q)) return true
+    const words = q
+      .split(/\s+/)
+      .map((w) => w.replace(/[^a-z0-9*./_+-]/gi, ''))
+      .filter((w) => w.length > 1)
+    if (words.length <= 1) return hay.includes(q)
+    return words.every((w) => hay.includes(w))
   })
 }

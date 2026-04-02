@@ -32,6 +32,8 @@ export default function MainWorkspaceHeader({
   browseKey,
   workspaceMode = 'commands',
   onBackToAllTools,
+  /** True when the user typed a query and command search spans all tools. */
+  commandsSearchGlobal = false,
 }) {
   const headerShellClass =
     'flex shrink-0 items-center gap-3.5 overflow-visible border-b border-[var(--hub-line)] px-4 pb-4 pt-5 sm:gap-4 sm:px-7'
@@ -112,18 +114,20 @@ export default function MainWorkspaceHeader({
     )
   }
 
-  const title =
-    browseKey != null
+  const title = commandsSearchGlobal
+    ? 'Search results'
+    : browseKey != null
       ? `${toolLabel(browseKey.tool)} · ${browseKey.category}`
       : tool === 'all'
         ? BRAND_NAME
         : toolLabel(tool)
 
   const isBrandHomeTitle =
-    workspaceMode === 'commands' && tool === 'all' && browseKey == null
+    workspaceMode === 'commands' && tool === 'all' && browseKey == null && !commandsSearchGlobal
 
-  const subtitle =
-    browseKey != null
+  const subtitle = commandsSearchGlobal
+    ? 'Matches across every CLI tool — clear the search box to narrow by the sidebar again'
+    : browseKey != null
       ? 'Filtered category — pick commands below'
       : tool === 'all'
         ? 'Searchable CLI reference across tools'

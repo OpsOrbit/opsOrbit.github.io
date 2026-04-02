@@ -15,10 +15,30 @@ function flattenScriptingGuideText(guide) {
     .replace(/\*\*/g, '')
 }
 
+function queryWords(query) {
+  return query
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((w) => w.replace(/[^a-z0-9*./_+-]/gi, ''))
+    .filter((w) => w.length > 0)
+}
+
+/** True if every token appears somewhere in blob (order-independent). */
+function blobMatchesTokens(blob, query) {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  if (blob.includes(q)) return true
+  const words = queryWords(query)
+  if (words.length <= 1) return words.length === 0 ? true : blob.includes(words[0])
+  return words.every((w) => w.length > 0 && blob.includes(w))
+}
+
 export function scriptingGuideMatchesQuery(guide, query) {
   const q = query.trim().toLowerCase()
   if (!q) return true
-  return flattenScriptingGuideText(guide).includes(q)
+  const blob = flattenScriptingGuideText(guide)
+  return blobMatchesTokens(blob, query)
 }
 
 export function filterScriptingGuides(guides, query) {
@@ -40,7 +60,8 @@ export function roadmapFlowStepMatchesQuery(step, query) {
       if (l.type === 'tools') parts.push(l.category, 'tools')
     }
   }
-  return parts.filter(Boolean).join(' ').toLowerCase().includes(q)
+  const blob = parts.filter(Boolean).join(' ').toLowerCase()
+  return blobMatchesTokens(blob, query)
 }
 
 export function filterRoadmapFlowSteps(steps, query) {
@@ -52,5 +73,5 @@ export function filterRoadmapFlowSteps(steps, query) {
 export function filterRoadmapFinalOrder(lines, query) {
   const q = query.trim().toLowerCase()
   if (!q) return lines
-  return lines.filter((line) => line.toLowerCase().includes(q))
+  return lines.filter((line) => blobMatchesTokens(line.toLowerCase(), query))
 }
