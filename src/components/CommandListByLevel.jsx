@@ -1,5 +1,7 @@
 import { motion } from 'motion/react'
 import CommandCard from './CommandCard'
+import { COMMAND_EXTRAS } from '../data/commandExtras'
+import { enrichCommand, resolveRelatedCommands, buildCommandFlow, getRealUseCaseText } from '../utils/commandEnrichment'
 
 const LEVEL_ORDER = ['beginner', 'intermediate', 'advanced']
 
@@ -29,17 +31,28 @@ export default function CommandListByLevel({ commandsByLevel, onSelect, toolLabe
               <span className="h-px flex-1 bg-[var(--hub-line)]" aria-hidden />
             </h2>
             <ul className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 md:gap-5 xl:grid-cols-3 xl:gap-6">
-              {list.map((cmd, i) => (
-                <li key={cmd.id}>
-                  <CommandCard
-                    command={cmd}
-                    index={i}
-                    onClick={() => onSelect(cmd)}
-                    toolLabel={toolLabel}
-                    levelLabel={levelLabel}
-                  />
-                </li>
-              ))}
+              {list.map((cmd, i) => {
+                const extras = COMMAND_EXTRAS[cmd.id] || {}
+                const enriched = enrichCommand(cmd)
+                const related = resolveRelatedCommands(cmd, 5)
+                const flowSteps = buildCommandFlow(cmd)
+                const realUseCaseText = getRealUseCaseText(cmd, extras)
+                return (
+                  <li key={cmd.id}>
+                    <CommandCard
+                      command={cmd}
+                      enriched={enriched}
+                      index={i}
+                      onOpenExplain={onSelect}
+                      toolLabel={toolLabel}
+                      levelLabel={levelLabel}
+                      relatedCommands={related}
+                      flowSteps={flowSteps}
+                      realUseCaseText={realUseCaseText}
+                    />
+                  </li>
+                )
+              })}
             </ul>
           </motion.section>
         )

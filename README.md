@@ -1,79 +1,57 @@
-# OpsOrbit (React + Vite)
+# DevOps Command Hub (React)
 
-**OpsOrbit** is a DevOps learning platform with:
+A **futuristic** React version of the DevOps Command Hub with:
 
-- Tool-wise command explorer (Git, Linux, Docker, Kubernetes, Terraform, etc.)
-- Scripting guides for beginners
-- Tool-based roadmap mode
-- Light/Dark theme support
+- **Glassmorphism** UI: frosted glass cards and header with backdrop blur
+- **Gradient mesh background** and soft glows for a tech/cyber look
+- **Tool icons**: SVG icons for Git, Linux, Kubernetes, Terraform, Docker, Ansible, Maven, Shell
+- **Hero section** with tagline and gradient accent
+- **Staggered card animations** when results load
+- **Level + Tool filters**: Beginner / Intermediate / Advanced and per-tool
+- **Search**, **side panel** with copy and blur overlay
+- **Orbitron** + **Exo 2** + **JetBrains Mono** for a distinct, modern typography
 
 ## Run locally
 
-Requirements: Node.js 20+ and npm.
-
-Brand video logo: place **`public/logo1.mp4`** in the repo (served at `/logo1.mp4`). If the file is missing, the header shows a green fallback with the first letter of the brand name (**OpsOrbit** → **O**).
+You need **Node.js** and **npm** installed.
 
 ```bash
+cd devops-commands-react
 npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Then open **http://localhost:5173**.
 
 ## Build for production
 
 ```bash
 npm run build
-npm run preview
+npm run preview   # optional: preview the build
 ```
 
-Build output is generated in `dist/`.
+Static output is in `dist/`.
 
-## Deploy to GitHub Pages (recommended)
+## Deploy to Netlify (drag and drop)
 
-This repo includes an Actions workflow at `.github/workflows/deploy-pages.yml` that deploys on every push to `main`.
+1. **Build the site** (on your machine):
+   ```bash
+   cd devops-commands-react
+   npm install
+   npm run build
+   ```
+2. Open **[Netlify](https://app.netlify.com)** and sign in.
+3. On the dashboard, find the **“Drag and drop your site output folder here”** area.
+4. **Drag the `dist` folder** (inside `devops-commands-react`) onto that area.  
+   - On Windows: `devops-commands-react\dist`  
+   - On Mac/Linux: `devops-commands-react/dist`
+5. Netlify will deploy and give you a URL (e.g. `random-name-123.netlify.app`).
 
-### 1) Enable Pages in GitHub
-
-In your GitHub repo:
-
-1. Go to **Settings** → **Pages**
-2. Under **Build and deployment**, choose **Source: GitHub Actions**
-
-### 2) Push to main
-
-```bash
-git add .
-git commit -m "Configure GitHub Pages deployment"
-git push origin main
-```
-
-GitHub Actions will build and publish automatically.
-
-### 3) Base path (fixes blank white page on Pages)
-
-The deploy workflow detects **user/org** sites by matching `repository.name` to `owner.github.io` **case-insensitively**. If that check failed (e.g. `opsorbit.github.io` vs `OpsOrbit.github.io`), Vite would use the wrong base, asset URLs would redirect (301), and you would see a **white screen** — this is fixed in `.github/workflows/deploy-pages.yml`.
-
-
-If the site loads but you only see a **white screen**, the JS/CSS bundle URLs are usually wrong for where GitHub Pages hosts the app.
-
-The deploy workflow sets `VITE_BASE_PATH` automatically:
-
-- **Project repo** (`https://owner.github.io/repo-name/`) → build uses `/repo-name/`
-- **User site repo** named `owner.github.io` → build uses `/`
-
-To override (custom domain, unusual layout), set a repository **Actions variable** named `VITE_BASE_PATH` (e.g. `/` or `/my-app/`, must start and end with `/` for subpaths).
-
-Local production check (do not open `dist/index.html` via `file://`; module scripts will not load):
-
-```bash
-npm run build && npm run preview
-```
+**Important:** Drag the **`dist`** folder (the build output), not the whole project. The `dist` folder contains the built HTML, CSS, and JS that Netlify serves.
 
 ## Project structure
 
-- `src/App.jsx` - main app state and mode switching
-- `src/components/` - UI components (header, sidebar, cards, guides, roadmap)
-- `src/data/` - command data and guide content
-- `src/context/` - theme context
-- `src/index.css` - global styles and theme tokens
+- `src/App.jsx` – main state, filters, command panel
+- `src/data/commands.js` – command list (same data as vanilla app)
+- `src/components/` – Header, Hero, Nav, CommandCard, CommandPanel, ToolIcon
+- `src/index.css` – futuristic theme (glass, gradients, animations)

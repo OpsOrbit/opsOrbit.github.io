@@ -33,8 +33,83 @@ export default function MainWorkspaceHeader({
   workspaceMode = 'commands',
   onBackToAllTools,
 }) {
-  if (workspaceMode === 'scripting' || workspaceMode === 'roadmap') {
-    return null
+  const headerShellClass =
+    'flex shrink-0 items-center gap-3.5 overflow-visible border-b border-[var(--hub-line)] px-4 pb-4 pt-5 sm:gap-4 sm:px-7'
+  const iconBoxClass =
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-lg font-black sm:h-11 sm:w-11'
+  const countPillClass =
+    'hidden shrink-0 rounded-full border border-[var(--hub-border2)] px-3 py-1 font-mono text-[11px] font-semibold sm:block'
+
+  if (workspaceMode === 'scripting') {
+    return (
+      <header className={headerShellClass}>
+        <div className={iconBoxClass}>
+          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
+            ⚡
+          </span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+            LAB
+          </h2>
+          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+            Interactive DevOps modules — IaC, CI/CD, containers
+          </p>
+        </div>
+        <div className={countPillClass}>
+          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
+          <span className="ml-1 text-[var(--hub-muted)]">topics</span>
+        </div>
+      </header>
+    )
+  }
+
+  if (workspaceMode === 'roadmap') {
+    return (
+      <header className={headerShellClass}>
+        <div className={iconBoxClass}>
+          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
+            ⚡
+          </span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+            Roadmap
+          </h2>
+          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+            Suggested learning path across DevOps topics
+          </p>
+        </div>
+        <div className={countPillClass}>
+          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
+          <span className="ml-1 text-[var(--hub-muted)]">modules</span>
+        </div>
+      </header>
+    )
+  }
+
+  if (workspaceMode === 'tools') {
+    return (
+      <header className={headerShellClass}>
+        <div className={iconBoxClass}>
+          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
+            🧰
+          </span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+            DevOps Tools
+          </h2>
+          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+            Encyclopedia across SCM, CI/CD, cloud, security, observability, and more
+          </p>
+        </div>
+        <div className={countPillClass}>
+          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
+          <span className="ml-1 text-[var(--hub-muted)]">tools</span>
+        </div>
+      </header>
+    )
   }
 
   const title =
@@ -55,8 +130,8 @@ export default function MainWorkspaceHeader({
         : TOOL_DESC[tool] || 'Command reference'
 
   return (
-    <header className="flex shrink-0 items-center gap-3.5 overflow-visible border-b border-[var(--hub-line)] px-4 pb-4 pt-5 sm:gap-4 sm:px-7">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-lg font-black sm:h-11 sm:w-11">
+    <header className={headerShellClass}>
+      <div className={iconBoxClass}>
         {tool !== 'all' && !browseKey ? (
           <ToolIcon tool={tool} className="h-6 w-6 text-[var(--hub-muted)]" />
         ) : (
@@ -85,8 +160,9 @@ export default function MainWorkspaceHeader({
           ← Back
         </button>
       )}
-      <div className="hidden shrink-0 rounded-full border border-[var(--hub-border2)] px-3 py-1 font-mono text-[11px] font-semibold text-[var(--hub-muted)] sm:block">
-        {visibleCount} cmds
+      <div className={countPillClass}>
+        <span className="text-[var(--hub-tool)]">{visibleCount}</span>
+        <span className="ml-1 text-[var(--hub-muted)]">cmds</span>
       </div>
     </header>
   )

@@ -15,6 +15,7 @@ export default function Header({
   headerBadgeNoun,
   workspaceMode = 'commands',
   onWorkspaceModeChange,
+  searchInputRef,
 }) {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false)
 
@@ -56,24 +57,29 @@ export default function Header({
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <input
+              ref={searchInputRef}
               type="search"
               enterKeyHint="search"
               className="h-9 w-full rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] py-2 pl-9 pr-2 text-[12px] text-[var(--hub-text)] outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[var(--hub-muted)] focus:border-[var(--hub-tool)] focus:shadow-[0_0_0_3px_var(--hub-tool-dim)] sm:pr-2.5 sm:text-[13px]"
               placeholder={
                 workspaceMode === 'scripting'
-                  ? 'Search topics…'
+                  ? 'Search lab topics…'
                   : workspaceMode === 'roadmap'
                     ? 'Search modules…'
-                    : 'Search…'
+                    : workspaceMode === 'tools'
+                      ? 'Search tools & categories…'
+                      : 'Search…'
               }
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
               aria-label={
                 workspaceMode === 'scripting'
-                  ? 'Search scripting topics'
+                  ? 'Search LAB topics'
                   : workspaceMode === 'roadmap'
                     ? 'Search roadmap modules'
-                    : 'Search commands'
+                    : workspaceMode === 'tools'
+                      ? 'Search DevOps tools encyclopedia'
+                      : 'Search commands'
               }
             />
           </div>

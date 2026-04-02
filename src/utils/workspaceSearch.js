@@ -27,17 +27,26 @@ export function filterScriptingGuides(guides, query) {
   return guides.filter((g) => scriptingGuideMatchesQuery(g, query))
 }
 
-export function roadmapLaneMatchesQuery(lane, query) {
+export function roadmapFlowStepMatchesQuery(step, query) {
   const q = query.trim().toLowerCase()
   if (!q) return true
-  const hay = [lane.id, lane.title, lane.tools, ...(lane.topics || [])].join(' ').toLowerCase()
-  return hay.includes(q)
+  const parts = [step.id, step.mainTitle, step.panelTitle, step.level, step.track, ...(step.topics || [])]
+  for (const row of step.rows || []) {
+    parts.push(row.text)
+    for (const l of row.links || []) {
+      parts.push(l.label)
+      if (l.type === 'commands') parts.push(l.tool)
+      if (l.type === 'scripting') parts.push(l.topic)
+      if (l.type === 'tools') parts.push(l.category, 'tools')
+    }
+  }
+  return parts.filter(Boolean).join(' ').toLowerCase().includes(q)
 }
 
-export function filterRoadmapLanes(lanes, query) {
+export function filterRoadmapFlowSteps(steps, query) {
   const q = query.trim().toLowerCase()
-  if (!q) return lanes
-  return lanes.filter((l) => roadmapLaneMatchesQuery(l, query))
+  if (!q) return steps
+  return steps.filter((s) => roadmapFlowStepMatchesQuery(s, query))
 }
 
 export function filterRoadmapFinalOrder(lines, query) {

@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { AnimatePresence } from 'motion/react'
 import { COMMANDS_DATA } from './data/commands'
 import { COMMAND_EXTRAS } from './data/commandExtras'
 import { orderedCategorySummaries } from './data/categoryOrder'
@@ -13,12 +14,41 @@ import MainLayout from './components/layout/MainLayout'
 import DockMagnify from './components/DockMagnify'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
+import ScriptingTopicsNav from './components/ScriptingTopicsNav'
 import RoadmapFlow from './components/RoadmapFlow'
 import { SCRIPTING_GUIDES } from './data/scriptingGuides'
-import { ROADMAP_LANES, ROADMAP_FINAL_ORDER } from './data/roadmapData'
-import { filterScriptingGuides, filterRoadmapLanes, filterRoadmapFinalOrder } from './utils/workspaceSearch'
+import { ROADMAP_FLOW_STEPS, ROADMAP_FINAL_ORDER } from './data/roadmapData'
+import { filterScriptingGuides, filterRoadmapFlowSteps, filterRoadmapFinalOrder } from './utils/workspaceSearch'
+import { useLabProgress } from './hooks/useLabProgress'
+import { useCommandFavorites } from './hooks/useCommandFavorites'
+import { useToolFavorites } from './hooks/useToolFavorites'
+import { useCommandLearned } from './hooks/useCommandLearned'
+import { parseWorkspaceHash, buildWorkspaceHash } from './utils/siteHashNavigation'
+import { commandMatchesQuery } from './utils/commandIntentSearch'
+import { mergeRelatedIds } from './utils/commandPanelBreakdown'
+import { filterDevopsTools } from './utils/toolsFilter'
+import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
+import CommandsLearningBar from './components/CommandsLearningBar'
+import ToolsPage from './components/tools/ToolsPage'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
+
+function readInitialWorkspaceState() {
+  const defaults = {
+    workspaceMode: 'commands',
+    tool: 'all',
+    scriptingTopicId: SCRIPTING_GUIDES[0]?.id ?? 'dockerfile',
+    toolsCategoryId: 'all',
+  }
+  if (typeof window === 'undefined') return defaults
+  const parsed = parseWorkspaceHash(window.location.hash)
+  if (!parsed) return defaults
+  if (parsed.mode === 'roadmap') return { ...defaults, workspaceMode: 'roadmap' }
+  if (parsed.mode === 'tools')
+    return { ...defaults, workspaceMode: 'tools', toolsCategoryId: parsed.category || 'all' }
+  if (parsed.mode === 'scripting') return { ...defaults, workspaceMode: 'scripting', scriptingTopicId: parsed.topic }
+  return { ...defaults, workspaceMode: 'commands', tool: parsed.tool }
+}
 
 function toolLabel(t) {
   const labels = {
@@ -44,6 +74,7 @@ function toolLabel(t) {
     maven: 'Maven',
     shell: 'Shell',
   }
+  if (t === 'all') return 'All tools'
   return labels[t] || t
 }
 
@@ -57,6 +88,7 @@ const COUNT_TOOL_IDS = [
   'aws',
   'azure',
   'gcp',
+  'linux',
   'git',
   'github-actions',
   'docker',
@@ -72,25 +104,97 @@ const COUNT_TOOL_IDS = [
   'grafana',
   'postgresql',
   'redis',
-  'linux',
   'maven',
   'shell',
 ]
 
-function rowMatchesQuery(c, q) {
-  if (!q) return true
-  return [c.name, c.command, c.description, c.tool, c.level, c.category].some((s) => s && String(s).toLowerCase().includes(q))
-}
-
 export default function App() {
-  const level = 'all'
-  const [tool, setTool] = useState('all')
+  const [tool, setTool] = useState(() => readInitialWorkspaceState().tool)
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(null)
   const [browseKey, setBrowseKey] = useState(null)
   const [preferredCategory, setPreferredCategory] = useState(null)
-  const [workspaceMode, setWorkspaceMode] = useState('commands')
-  const [scriptingTopicId, setScriptingTopicId] = useState(() => SCRIPTING_GUIDES[0]?.id ?? 'dockerfile')
+  const [workspaceMode, setWorkspaceMode] = useState(() => readInitialWorkspaceState().workspaceMode)
+  const [scriptingTopicId, setScriptingTopicId] = useState(() => readInitialWorkspaceState().scriptingTopicId)
+  const [toolsCategoryId, setToolsCategoryId] = useState(() => readInitialWorkspaceState().toolsCategoryId)
+  const [commandsLearnMode, setCommandsLearnMode] = useState('learn')
+  const [expandedCommandId, setExpandedCommandId] = useState(null)
+  const searchInputRef = useRef(null)
+  const labProgress = useLabProgress()
+  const { isFavorite, toggleFavorite } = useCommandFavorites()
+  const {
+    isFavorite: isToolFavorite,
+    toggleFavorite: toggleToolFavorite,
+  } = useToolFavorites()
+  const { isLearned, toggleLearned } = useCommandLearned()
+
+  const commandsWorkspaceValue = useMemo(
+    () => ({
+      isFavorite,
+      toggleFavorite,
+      isLearned,
+      toggleLearned,
+      learnMode: commandsLearnMode,
+      setLearnMode: setCommandsLearnMode,
+      expandedCommandId,
+      setExpandedCommandId,
+    }),
+    [
+      isFavorite,
+      toggleFavorite,
+      isLearned,
+      toggleLearned,
+      commandsLearnMode,
+      expandedCommandId,
+    ]
+  )
+
+  const openCommandsForLabTool = useCallback((nextTool) => {
+    setWorkspaceMode('commands')
+    setTool(nextTool || 'all')
+    setBrowseKey(null)
+    setPreferredCategory(null)
+  }, [])
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const parsed = parseWorkspaceHash(window.location.hash)
+      if (!parsed) return
+      setWorkspaceMode(parsed.mode)
+      setSelected(null)
+      if (parsed.mode === 'commands') {
+        setTool(parsed.tool)
+        setBrowseKey(null)
+        setPreferredCategory(null)
+      }
+      if (parsed.mode === 'tools') {
+        setToolsCategoryId(parsed.category || 'all')
+      }
+      if (parsed.mode === 'scripting' && parsed.topic) {
+        setScriptingTopicId(parsed.topic)
+      }
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  useEffect(() => {
+    const next = buildWorkspaceHash({
+      mode: workspaceMode,
+      tool,
+      topic: scriptingTopicId,
+      toolsCategory: toolsCategoryId,
+    })
+    if (typeof window === 'undefined') return
+    const cur = window.location.hash
+    if (cur !== next) {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}${next}`
+      )
+    }
+  }, [workspaceMode, tool, scriptingTopicId, toolsCategoryId])
 
   useEffect(() => {
     setBrowseKey(null)
@@ -98,6 +202,22 @@ export default function App() {
 
   useEffect(() => {
     if (workspaceMode !== 'commands') setSelected(null)
+  }, [workspaceMode])
+
+  useEffect(() => {
+    setExpandedCommandId(null)
+  }, [tool, browseKey, query, workspaceMode])
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== '/' || (workspaceMode !== 'commands' && workspaceMode !== 'tools')) return
+      const t = e.target
+      if (t?.tagName === 'INPUT' || t?.tagName === 'TEXTAREA' || t?.isContentEditable) return
+      e.preventDefault()
+      searchInputRef.current?.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [workspaceMode])
 
   const handleToolChange = useCallback(
@@ -126,12 +246,12 @@ export default function App() {
   }, [])
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = query.trim()
     return COMMANDS_DATA.filter((c) => {
-      const matchLevel = level === 'all' || c.level === level
       const matchTool = tool === 'all' || c.tool === tool
-      if (!matchLevel || !matchTool) return false
-      return rowMatchesQuery(c, q)
+      if (!matchTool) return false
+      const extras = COMMAND_EXTRAS[c.id] || {}
+      return commandMatchesQuery(c, q, extras)
     })
   }, [tool, query])
 
@@ -148,21 +268,30 @@ export default function App() {
     setScriptingTopicId(filteredScriptingGuides[0].id)
   }, [workspaceMode, filteredScriptingGuides, scriptingTopicId])
 
-  const filteredRoadmapLanes = useMemo(() => filterRoadmapLanes(ROADMAP_LANES, query), [query])
+  const filteredRoadmapSteps = useMemo(
+    () => filterRoadmapFlowSteps(ROADMAP_FLOW_STEPS, query),
+    [query]
+  )
 
   const filteredRoadmapFinalOrder = useMemo(
     () => filterRoadmapFinalOrder(ROADMAP_FINAL_ORDER, query),
     [query]
   )
 
-  const roadmapSearchFiltered = Boolean(query.trim())
+  const toolsSearchCount = useMemo(() => {
+    if (workspaceMode !== 'tools') return 0
+    return filterDevopsTools(query, toolsCategoryId, {
+      openSource: false,
+      paid: false,
+      cloudNative: false,
+    }).length
+  }, [workspaceMode, query, toolsCategoryId])
 
   const toolCounts = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = query.trim()
     const base = COMMANDS_DATA.filter((c) => {
-      const matchLevel = level === 'all' || c.level === level
-      if (!matchLevel) return false
-      return rowMatchesQuery(c, q)
+      const extras = COMMAND_EXTRAS[c.id] || {}
+      return commandMatchesQuery(c, q, extras)
     })
     const counts = { all: base.length }
     for (const id of COUNT_TOOL_IDS) {
@@ -190,24 +319,33 @@ export default function App() {
 
   const suggestedCommands = useMemo(() => {
     if (!selected) return []
-    const ids = COMMAND_EXTRAS[selected.id]?.suggestedNext || []
+    const e = COMMAND_EXTRAS[selected.id] || {}
+    const ids = mergeRelatedIds(e.suggestedNext || [], e.relatedCommandIds || [])
     return ids.map((id) => COMMANDS_DATA.find((c) => c.id === id)).filter(Boolean)
   }, [selected?.id])
+
+  const resolveCommandByLine = useCallback((line) => {
+    const t = (line || '').trim()
+    if (!t) return undefined
+    return COMMANDS_DATA.find((c) => (c.command || '').trim() === t)
+  }, [])
 
   const singleToolSidebarMode = tool !== 'all'
 
   const showCategoryHub = hasCategoryBrowse && browseKey === null && !singleToolSidebarMode
 
   const workspaceVisibleCount = useMemo(() => {
+    if (workspaceMode === 'tools') return toolsSearchCount
     if (workspaceMode === 'scripting') return filteredScriptingGuides.length
-    if (workspaceMode === 'roadmap') return filteredRoadmapLanes.length
+    if (workspaceMode === 'roadmap') return filteredRoadmapSteps.length
     if (singleToolSidebarMode) return filtered.length
     if (showCategoryHub) return filtered.length
     return displayCommands.length
   }, [
     workspaceMode,
+    toolsSearchCount,
     filteredScriptingGuides.length,
-    filteredRoadmapLanes.length,
+    filteredRoadmapSteps.length,
     singleToolSidebarMode,
     showCategoryHub,
     filtered.length,
@@ -215,18 +353,28 @@ export default function App() {
   ])
 
   const headerBadge = useMemo(() => {
+    if (workspaceMode === 'tools') {
+      return { count: toolsSearchCount, noun: 'tools' }
+    }
     if (workspaceMode === 'scripting') {
       return { count: filteredScriptingGuides.length, noun: 'topics' }
     }
     if (workspaceMode === 'roadmap') {
-      return { count: filteredRoadmapLanes.length, noun: 'modules' }
+      return { count: filteredRoadmapSteps.length, noun: 'modules' }
     }
     return { count: filtered.length, noun: 'commands' }
-  }, [workspaceMode, filtered.length, filteredScriptingGuides.length, filteredRoadmapLanes.length])
+  }, [
+    workspaceMode,
+    toolsSearchCount,
+    filtered.length,
+    filteredScriptingGuides.length,
+    filteredRoadmapSteps.length,
+  ])
 
-  const mainContentKey = `${level}-${tool}-${browseKey?.tool ?? ''}-${browseKey?.category ?? ''}`
+  const mainContentKey = `${tool}-${browseKey?.tool ?? ''}-${browseKey?.category ?? ''}`
 
   return (
+    <CommandsWorkspaceContext.Provider value={commandsWorkspaceValue}>
     <MainLayout className="overflow-hidden">
       <a
         href="#main-content"
@@ -252,12 +400,19 @@ export default function App() {
         headerBadgeNoun={headerBadge.noun}
         workspaceMode={workspaceMode}
         onWorkspaceModeChange={setWorkspaceMode}
+        searchInputRef={searchInputRef}
       />
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <aside
           className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] md:flex"
-          aria-label={workspaceMode === 'scripting' ? 'Scripting workspace' : 'Tools'}
+          aria-label={
+            workspaceMode === 'scripting'
+              ? 'LAB workspace'
+              : workspaceMode === 'tools' || workspaceMode === 'roadmap'
+                ? 'Workspace navigation'
+                : 'Commands tools'
+          }
         >
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
             <DockMagnify
@@ -265,8 +420,20 @@ export default function App() {
               itemClipClassName="flex w-full min-w-0 overflow-hidden rounded-md"
               itemWrapperClassName="flex w-full min-w-0 justify-center origin-center"
               role="group"
-              aria-label="Commands, scripting, or roadmap"
+              aria-label="Tools, Commands, LAB, or Roadmap"
             >
+              <button
+                type="button"
+                onClick={() => setWorkspaceMode('tools')}
+                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                  workspaceMode === 'tools'
+                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
+                }`}
+                aria-pressed={workspaceMode === 'tools'}
+              >
+                Tools
+              </button>
               <button
                 type="button"
                 onClick={() => setWorkspaceMode('commands')}
@@ -288,8 +455,9 @@ export default function App() {
                     : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
                 }`}
                 aria-pressed={workspaceMode === 'scripting'}
+                title="Interactive lab modules"
               >
-                Scripting
+                LAB
               </button>
               <button
                 type="button"
@@ -311,6 +479,17 @@ export default function App() {
                 toolCounts={toolCounts}
                 toolLabel={toolLabel}
               />
+            ) : workspaceMode === 'scripting' ? (
+              <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col md:mx-3">
+                <ScriptingTopicsNav
+                  variant="asideStack"
+                  guides={filteredScriptingGuides}
+                  activeId={scriptingTopicId}
+                  onSelectTopic={setScriptingTopicId}
+                  isTopicLearned={labProgress.isLearned}
+                  className="min-h-0 flex-1"
+                />
+              </div>
             ) : null}
           </div>
         </aside>
@@ -330,19 +509,38 @@ export default function App() {
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom,0px))] pl-[max(0.5rem,env(safe-area-inset-left,0px))] pr-[max(0.5rem,env(safe-area-inset-right,0px))] pt-3 outline-none sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-4 md:pb-6 md:pl-5 md:pr-4 lg:pl-6 lg:pr-5"
           >
             <div className="mx-auto w-full max-w-[1600px]">
-              <div key={workspaceMode === 'scripting' ? 'scripting' : mainContentKey} className="hub-fade-in">
+              <div
+                key={
+                  workspaceMode === 'scripting'
+                    ? 'scripting'
+                    : workspaceMode === 'tools'
+                      ? `tools-${toolsCategoryId}`
+                      : mainContentKey
+                }
+                className="hub-fade-in"
+              >
+                {workspaceMode === 'commands' && <CommandsLearningBar visible />}
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
                     activeId={scriptingTopicId}
                     onSelectTopic={setScriptingTopicId}
                     guides={filteredScriptingGuides}
+                    labProgress={labProgress}
+                    resolveToolLabel={toolLabel}
+                    onOpenCommandsTool={openCommandsForLabTool}
                   />
                 )}
                 {workspaceMode === 'roadmap' && (
-                  <RoadmapFlow
-                    lanes={filteredRoadmapLanes}
-                    finalOrderLines={filteredRoadmapFinalOrder}
-                    searchFiltered={roadmapSearchFiltered}
+                  <RoadmapFlow steps={filteredRoadmapSteps} finalOrderLines={filteredRoadmapFinalOrder} />
+                )}
+
+                {workspaceMode === 'tools' && (
+                  <ToolsPage
+                    query={query}
+                    activeCategoryId={toolsCategoryId}
+                    onSelectCategory={setToolsCategoryId}
+                    isFavorite={isToolFavorite}
+                    toggleFavorite={toggleToolFavorite}
                   />
                 )}
 
@@ -380,7 +578,7 @@ export default function App() {
                     {filtered.length === 0 ? (
                       <Card className="border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-8 py-12 text-center">
                         <p className="text-base leading-relaxed text-[var(--hub-sub)]">
-                          No commands match your search or level filter. Adjust filters or try different keywords.
+                          No commands match your search. Adjust the tool filter or try different keywords.
                         </p>
                       </Card>
                     ) : (
@@ -404,7 +602,7 @@ export default function App() {
                   filtered.length > 0 && (
                   <Card className="border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-8 py-16 text-center">
                     <p className="text-base leading-relaxed text-[var(--hub-sub)]">
-                      No commands in this category for the current filters. Go back or adjust level / search.
+                      No commands in this category for the current search. Go back or try different keywords.
                     </p>
                   </Card>
                 )}
@@ -426,21 +624,26 @@ export default function App() {
         </div>
       </div>
 
-      {selected && (
-        <Suspense fallback={null}>
-          <CommandPanel
-            command={{
-              ...selected,
-              ...(COMMAND_EXTRAS[selected.id] || {}),
-            }}
-            suggestedCommands={suggestedCommands}
-            onSelectCommand={setSelected}
-            onClose={() => setSelected(null)}
-            toolLabel={toolLabel}
-            levelLabel={levelLabel}
-          />
-        </Suspense>
-      )}
+      <AnimatePresence>
+        {selected ? (
+          <Suspense fallback={null}>
+            <CommandPanel
+              key={selected.id}
+              command={{
+                ...selected,
+                ...(COMMAND_EXTRAS[selected.id] || {}),
+              }}
+              suggestedCommands={suggestedCommands}
+              onSelectCommand={setSelected}
+              onClose={() => setSelected(null)}
+              toolLabel={toolLabel}
+              levelLabel={levelLabel}
+              resolveCommandByLine={resolveCommandByLine}
+            />
+          </Suspense>
+        ) : null}
+      </AnimatePresence>
     </MainLayout>
+    </CommandsWorkspaceContext.Provider>
   )
 }

@@ -52,7 +52,13 @@ export default function MobileMenuDrawer({
             id="mobile-tool-drawer"
             role="dialog"
             aria-modal="true"
-            aria-label={workspaceMode === 'scripting' ? 'Scripting topics' : 'Select tool'}
+            aria-label={
+              workspaceMode === 'scripting'
+                ? 'LAB topics'
+                : workspaceMode === 'tools'
+                  ? 'Tool categories'
+                  : 'Select tool'
+            }
             className="relative z-10 flex h-full w-[min(100vw-1.5rem,320px)] flex-col border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
@@ -61,7 +67,11 @@ export default function MobileMenuDrawer({
           >
             <div className="flex h-[52px] shrink-0 items-center justify-between gap-2 border-b border-[var(--hub-line)] px-4">
               <span className="text-[13px] font-bold tracking-tight text-[var(--hub-text)]">
-                {workspaceMode === 'scripting' ? 'Scripting topics' : 'Select tool'}
+                {workspaceMode === 'scripting'
+                  ? 'LAB'
+                  : workspaceMode === 'tools'
+                    ? 'Tool categories'
+                    : 'Select tool'}
               </span>
               <button
                 type="button"
@@ -77,53 +87,71 @@ export default function MobileMenuDrawer({
                 <div
                   className="mx-3.5 mb-3 flex gap-2 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-1"
                   role="group"
-                  aria-label="Commands, scripting, or roadmap"
+                  aria-label="Workspace: Tools, Commands, LAB, or Roadmap"
                 >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onWorkspaceModeChange('commands')
-                      onClose()
-                    }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                      workspaceMode === 'commands'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                        : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
-                    }`}
-                    aria-pressed={workspaceMode === 'commands'}
-                  >
-                    Commands
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onWorkspaceModeChange('scripting')
-                      onClose()
-                    }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                      workspaceMode === 'scripting'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                        : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
-                    }`}
-                    aria-pressed={workspaceMode === 'scripting'}
-                  >
-                    Scripting
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onWorkspaceModeChange('roadmap')
-                      onClose()
-                    }}
-                    className={`flex-1 rounded-md py-2.5 text-[12px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                      workspaceMode === 'roadmap'
-                        ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                        : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
-                    }`}
-                    aria-pressed={workspaceMode === 'roadmap'}
-                  >
-                    Roadmap
-                  </button>
+                  <div className="grid w-full grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('tools')
+                        onClose()
+                      }}
+                      className={`rounded-md py-2.5 text-[12px] font-bold uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'tools'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'tools'}
+                    >
+                      Tools
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('commands')
+                        onClose()
+                      }}
+                      className={`rounded-md py-2.5 text-[12px] font-bold uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'commands'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'commands'}
+                    >
+                      Commands
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('scripting')
+                        onClose()
+                      }}
+                      className={`rounded-md py-2.5 text-[12px] font-bold uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'scripting'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'scripting'}
+                      title="Interactive lab modules"
+                    >
+                      LAB
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('roadmap')
+                        onClose()
+                      }}
+                      className={`rounded-md py-2.5 text-[12px] font-bold uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'roadmap'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'roadmap'}
+                    >
+                      Roadmap
+                    </button>
+                  </div>
                 </div>
               )}
               {workspaceMode === 'commands' ? (

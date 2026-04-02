@@ -2,6 +2,13 @@
  * Extra content for commands: example, exampleOutput, whyNeed, commonOptions, scenarios, image.
  * Key = command id. Merge with COMMANDS_DATA when displaying in panel.
  * image: path to screenshot/illustration (use /images/commands/<id>.png for real pics; placeholder used otherwise).
+ *
+ * Assistant panel (optional):
+ * - stepBreakdown: [{ part, meaning }] overrides auto token breakdown
+ * - commonMistakes: string[]
+ * - simulationLines: string[] — fake terminal lines (else built from exampleOutput)
+ * - relatedCommandIds: string[] — merged with suggestedNext for Related tab
+ * - visualFlow: string[] — explicit command strings for flow diagram
  */
 const IMG = (id) => `/images/commands/${id}.png`
 
@@ -499,5 +506,48 @@ export const COMMAND_EXTRAS = {
     commonOptions: '> out, 2> err, 2>&1, >> append, < file (stdin), | pipe.',
     scenarios: 'Logging in scripts; capturing errors; piping between commands.',
     image: IMG('shell-redirect')
-  }
+  },
+  'aws-configure': {
+    example: 'aws configure',
+    exampleOutput: 'AWS Access Key ID [None]: ...\nAWS Secret Access Key [None]: ...\nDefault region name [None]: us-east-1\nDefault output format [None]: json',
+    whyNeed: 'Stores credentials and defaults so every aws command uses the right account and region.',
+    commonOptions: '--profile name, AWS_PROFILE env, ~/.aws/credentials.',
+    scenarios: 'First-time CLI setup; switching profiles for staging vs prod; onboarding a new laptop.',
+    suggestedNext: ['aws-sts-get-caller-identity', 'aws-s3-ls'],
+    image: IMG('aws-configure'),
+    stepBreakdown: [
+      { part: 'aws', meaning: 'AWS CLI — the program that calls AWS APIs from your machine' },
+      { part: 'configure', meaning: 'Interactive wizard that writes ~/.aws/credentials and ~/.aws/config' },
+    ],
+    commonMistakes: [
+      'Access key pasted with leading/trailing spaces or line breaks',
+      'Secret key saved in the wrong profile while AWS_PROFILE points elsewhere',
+      'Default region set to a region where you have no resources (confusing empty lists)',
+    ],
+    simulationLines: [
+      '$ aws configure',
+      'AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE',
+      'AWS Secret Access Key [None]: ****************abcd',
+      'Default region name [None]: us-east-1',
+      'Default output format [None]: json',
+    ],
+    visualFlow: ['aws configure', 'aws sts get-caller-identity', 'aws s3 ls'],
+    relatedCommandIds: ['aws-s3-cp-recursive'],
+  },
+  'aws-s3-ls': {
+    example: 'aws s3 ls',
+    exampleOutput: '2025-03-01 12:00:00 my-app-assets\n2025-03-02 09:30:00 logs-archive',
+    whyNeed: 'Quick visibility into which buckets exist for the current identity — sanity check after configure.',
+    commonOptions: 's3://bucket/prefix to list inside a bucket; --human-readable with du-style sizes.',
+    scenarios: 'After assume-role; verifying prod vs dev buckets; before sync or cp to pick the right target.',
+    suggestedNext: ['aws-s3-cp-recursive', 'aws-s3-sync'],
+    image: IMG('aws-s3-ls'),
+  },
+  'aws-sts-get-caller-identity': {
+    example: 'aws sts get-caller-identity',
+    exampleOutput: '{\n    "UserId": "AIDAI...",\n    "Account": "123456789012",\n    "Arn": "arn:aws:iam::123456789012:user/dev"\n}',
+    whyNeed: 'Confirms which account and principal you are using — essential before destructive S3 or EC2 actions.',
+    suggestedNext: ['aws-s3-ls', 'aws-ec2-describe-instances'],
+    image: IMG('aws-sts-get-caller-identity'),
+  },
 }

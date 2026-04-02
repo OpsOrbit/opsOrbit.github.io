@@ -1,8 +1,10 @@
 import { Fragment, useState, useEffect, useCallback } from 'react'
 import { OFFICIAL_NEWS_FEEDS } from '../../lib/officialNewsFeeds.js'
 
-const CACHE_KEY = 'devops-hub-header-news-v11-static-official'
-const CACHE_MS = 12 * 60 * 1000
+const CACHE_KEY = 'devops-hub-header-news-v12-refresh'
+const CACHE_MS = 60 * 60 * 1000
+/** Background refetch for long-lived tabs (aligned with session cache window). */
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000
 /** dev.to tag slugs — Forem API is CORS-friendly in the browser. */
 const TAGS = [
   'aws',
@@ -129,11 +131,11 @@ function officialNewsJsonUrl() {
   return `${prefix}official-news.json`
 }
 
-async function fetchWithTimeout(url, ms = 14000) {
+async function fetchWithTimeout(url, ms = 14000, fetchInit = {}) {
   const ctrl = new AbortController()
   const t = setTimeout(() => ctrl.abort(), ms)
   try {
-    return await fetch(url, { signal: ctrl.signal })
+    return await fetch(url, { ...fetchInit, signal: ctrl.signal })
   } finally {
     clearTimeout(t)
   }
@@ -160,7 +162,7 @@ function mapOfficialRows(raw) {
 async function fetchOfficialHeadlines() {
   if (!import.meta.env.DEV) {
     try {
-      const res = await fetchWithTimeout(officialNewsJsonUrl(), 8000)
+      const res = await fetchWithTimeout(officialNewsJsonUrl(), 8000, { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         const raw = Array.isArray(data.items) ? data.items : []
@@ -197,16 +199,18 @@ async function fetchOfficialHeadlines() {
   return out
 }
 
-async function loadHeadlines() {
-  const cached = sessionStorage.getItem(CACHE_KEY)
-  if (cached) {
-    try {
-      const { t, items } = JSON.parse(cached)
-      if (Date.now() - t < CACHE_MS && Array.isArray(items) && items.length > 0) {
-        return { ok: true, items }
+async function loadHeadlines(force = false) {
+  if (!force) {
+    const cached = sessionStorage.getItem(CACHE_KEY)
+    if (cached) {
+      try {
+        const { t, items } = JSON.parse(cached)
+        if (Date.now() - t < CACHE_MS && Array.isArray(items) && items.length > 0) {
+          return { ok: true, items }
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
     }
   }
 
@@ -292,13 +296,17 @@ export default function HeaderNewsBanner() {
   const [status, setStatus] = useState('idle')
   const reduceMotion = usePrefersReducedMotion()
 
-  const run = useCallback(async () => {
-    setStatus('loading')
-    const result = await loadHeadlines()
+  const run = useCallback(async (opts) => {
+    const background = Boolean(opts?.background)
+    const force = Boolean(opts?.force)
+    if (!background) {
+      setStatus('loading')
+    }
+    const result = await loadHeadlines(force)
     if (result.ok && result.items.length > 0) {
       setItems(result.items)
       setStatus('ready')
-    } else {
+    } else if (!background) {
       setItems([])
       setStatus('empty')
     }
@@ -306,7 +314,10 @@ export default function HeaderNewsBanner() {
 
   useEffect(() => {
     run()
-  }, [run])
+    if (reduceMotion) return undefined
+    const id = setInterval(() => run({ background: true, force: true }), REFRESH_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [run, reduceMotion])
 
   /* Longer duration = slower scroll (easier to read). */
   const durationSec = Math.min(150, Math.max(42, 32 + items.length * 7))

@@ -1,15 +1,9 @@
-const LEVELS = [
-  { id: 'all', label: 'All' },
-  { id: 'beginner', label: 'Beginner' },
-  { id: 'intermediate', label: 'Intermediate' },
-  { id: 'advanced', label: 'Advanced' },
-]
-
 const TOOLS = [
   { id: 'all', label: 'All' },
   { id: 'aws', label: 'AWS' },
   { id: 'azure', label: 'Azure' },
   { id: 'gcp', label: 'GCP' },
+  { id: 'linux', label: 'Linux' },
   { id: 'git', label: 'Git' },
   { id: 'github-actions', label: 'Jenkins / CI' },
   { id: 'docker', label: 'Docker' },
@@ -25,7 +19,6 @@ const TOOLS = [
   { id: 'grafana', label: 'Grafana' },
   { id: 'postgresql', label: 'PostgreSQL' },
   { id: 'redis', label: 'Redis' },
-  { id: 'linux', label: 'Linux' },
   { id: 'maven', label: 'Maven' },
   { id: 'shell', label: 'Shell' },
 ]
@@ -40,45 +33,26 @@ function chipClass(selected) {
 }
 
 /**
- * Shared level + tool filter chips (desktop Nav and mobile drawer).
+ * Tool filter chips (desktop Nav when used).
  */
-export default function CommandFilters({ level, onLevelChange, tool, onToolChange, className = '' }) {
+export default function CommandFilters({ tool, onToolChange, className = '' }) {
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3" role="group" aria-label="Skill level">
-        <span className="shrink-0 text-xs font-bold uppercase tracking-wider text-hub-muted">Level</span>
-        <div className="inline-flex flex-wrap gap-1 rounded-2xl bg-hub-bg p-1 ring-1 ring-hub-line/80 dark:bg-hub-elevated/50 dark:ring-hub-line">
-          {LEVELS.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              aria-pressed={level === l.id}
-              onClick={() => onLevelChange(l.id)}
-              className={chipClass(level === l.id)}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="border-t border-hub-line pt-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
-          <span className="shrink-0 pt-1 text-xs font-bold uppercase tracking-wider text-hub-muted">Tool</span>
-          <div className="nav-tool-scroll min-w-0 flex-1 touch-pan-x overflow-x-auto overflow-y-visible pb-0.5 sm:overflow-visible">
-            <div className="inline-flex min-w-max flex-nowrap gap-1 rounded-2xl bg-hub-bg p-1 ring-1 ring-hub-line/80 dark:bg-hub-elevated/50 dark:ring-hub-line sm:min-w-0 sm:flex-wrap">
-              {TOOLS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  aria-pressed={tool === t.id}
-                  onClick={() => onToolChange(t.id)}
-                  className={chipClass(tool === t.id)}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
+    <div className={className}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
+        <span className="shrink-0 pt-1 text-xs font-bold uppercase tracking-wider text-hub-muted">Tool</span>
+        <div className="nav-tool-scroll min-w-0 flex-1 touch-pan-x overflow-x-auto overflow-y-visible pb-0.5 sm:overflow-visible">
+          <div className="inline-flex min-w-max flex-nowrap gap-1 rounded-2xl bg-hub-bg p-1 ring-1 ring-hub-line/80 dark:bg-hub-elevated/50 dark:ring-hub-line sm:min-w-0 sm:flex-wrap">
+            {TOOLS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                aria-pressed={tool === t.id}
+                onClick={() => onToolChange(t.id)}
+                className={chipClass(tool === t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>

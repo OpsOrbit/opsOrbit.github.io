@@ -134,8 +134,8 @@ export const CATEGORY_ORDER = {
  * Hub + sidebar order: cloud providers → DevOps delivery stack → platform & ops.
  *
  * Cloud: multi-cloud CLIs together.
- * DevOps: source control → CI → containers → IaC → orchestration → config management.
- * Rest: web stack, observability, data, then general shell/tooling.
+ * DevOps: Linux / shell fundamentals → source control → CI → containers → IaC → orchestration → config management.
+ * Rest: web stack, observability, data, then build tooling.
  */
 const TOOL_ORDER = [
   // Cloud
@@ -143,6 +143,7 @@ const TOOL_ORDER = [
   'azure',
   'gcp',
   // DevOps
+  'linux',
   'git',
   'github-actions',
   'docker',
@@ -159,7 +160,6 @@ const TOOL_ORDER = [
   'grafana',
   'postgresql',
   'redis',
-  'linux',
   'maven',
   'shell',
 ]

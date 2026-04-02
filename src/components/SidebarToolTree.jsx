@@ -1,4 +1,5 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
+import { useCommandsWorkspace } from '../context/CommandsWorkspaceContext'
 import { orderedCategorySummaries, compareCategories } from '../data/categoryOrder'
 import { CATEGORY_PILL_BUTTON_CLASS, CATEGORY_PILL_NAV_CLASS } from './categoryPillStyles'
 import DockMagnify from './DockMagnify'
@@ -32,27 +33,86 @@ function sortInCategory(a, b) {
 
 /** Main column: compact card for grid (command strip + description). */
 function MainCommandCard({ cmd, onPick, levelLabel }) {
+  const ctx = useCommandsWorkspace()
   const desc = cmd.description || ''
+  const fav = ctx?.isFavorite?.(cmd.id)
+  const [copied, setCopied] = useState(false)
+  const [sim, setSim] = useState(false)
+
+  const copyOnly = useCallback(
+    (e) => {
+      e.stopPropagation()
+      navigator.clipboard.writeText(cmd.command).then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1400)
+      })
+    },
+    [cmd.command]
+  )
+
+  const runSim = useCallback((e) => {
+    e.stopPropagation()
+    setSim(true)
+    setTimeout(() => setSim(false), 1800)
+  }, [])
+
   return (
-    <button
-      type="button"
-      onClick={() => onPick(cmd)}
-      title={cmd.name}
-      className="flex h-full min-h-[7.5rem] flex-col overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-card)] text-left shadow-[var(--hub-shadow-card)] transition-all duration-150 hover:border-[var(--hub-tool)]/40 hover:shadow-[var(--hub-shadow-card-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)]"
-    >
-      <div className="border-b border-[var(--hub-code-bd)] bg-[var(--hub-code-bg)] px-2.5 py-2.5">
-        <span className="mb-1 block text-[8px] font-bold uppercase tracking-[0.12em] text-[var(--hub-faint)]">Command</span>
-        <code className="block break-words font-mono text-[12px] font-semibold leading-snug text-[var(--hub-code-text)] sm:text-[13px]">
-          {cmd.command}
-        </code>
-      </div>
-      <div className="flex flex-1 flex-col bg-[var(--hub-surface)] px-2.5 py-2.5">
-        <p className="flex-1 text-[11px] leading-relaxed text-[var(--hub-sub)] sm:text-[12px]">{desc || '—'}</p>
-        <span className="mt-2 inline-flex w-fit rounded-md border border-[var(--hub-border2)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[var(--hub-muted)]">
-          {levelLabel(cmd.level)}
-        </span>
-      </div>
-    </button>
+    <div className="flex h-full min-h-[7.5rem] flex-col overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-card)] text-left shadow-[var(--hub-shadow-card)] transition-all duration-200 hover:border-[var(--hub-tool)]/40 hover:shadow-[var(--hub-shadow-card-hover)]">
+      <button
+        type="button"
+        onClick={() => onPick(cmd)}
+        title={cmd.name}
+        className="min-w-0 flex-1 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--hub-tool)]"
+      >
+        <div className="border-b border-[var(--hub-code-bd)] bg-[var(--hub-code-bg)] px-2.5 py-2.5">
+          <span className="mb-1 block text-[8px] font-bold uppercase tracking-[0.12em] text-[var(--hub-faint)]">Command</span>
+          <code className="block break-words font-mono text-[12px] font-semibold leading-snug text-[var(--hub-code-text)] sm:text-[13px]">
+            {cmd.command}
+          </code>
+        </div>
+        <div className="flex flex-1 flex-col bg-[var(--hub-surface)] px-2.5 py-2.5">
+          <p className="flex-1 text-[11px] leading-relaxed text-[var(--hub-sub)] sm:text-[12px]">{desc || '—'}</p>
+          <span className="mt-2 inline-flex w-fit rounded-md border border-[var(--hub-border2)] px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[var(--hub-muted)]">
+            {levelLabel(cmd.level)}
+          </span>
+        </div>
+      </button>
+      {ctx ? (
+        <div className="flex items-center gap-1 border-t border-[var(--hub-line)]/80 bg-[var(--hub-bg)]/40 px-2 py-1.5">
+          <button
+            type="button"
+            onClick={copyOnly}
+            className="rounded px-2 py-1 text-[9px] font-bold uppercase text-[var(--hub-tool)] hover:bg-[var(--hub-tool-dim)]"
+          >
+            {copied ? '✓' : 'Copy'}
+          </button>
+          <button
+            type="button"
+            onClick={runSim}
+            className="rounded px-2 py-1 text-[9px] font-bold uppercase text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]"
+          >
+            Run
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              ctx.toggleFavorite?.(cmd.id)
+            }}
+            className={`ml-auto rounded px-2 py-1 text-[10px] font-bold ${fav ? 'text-amber-500' : 'text-[var(--hub-muted)] hover:text-[var(--hub-text)]'}`}
+            title={fav ? 'Remove favorite' : 'Save favorite'}
+            aria-label={fav ? 'Remove from favorites' : 'Save to favorites'}
+          >
+            {fav ? '★' : '☆'}
+          </button>
+        </div>
+      ) : null}
+      {sim ? (
+        <p className="border-t border-emerald-500/20 bg-emerald-500/10 px-2 py-1 text-[9px] text-emerald-800 dark:text-emerald-200">
+          Simulated run — not executed.
+        </p>
+      ) : null}
+    </div>
   )
 }
 
@@ -200,7 +260,7 @@ export default function SidebarToolTree({
         <p
           className={`text-[10px] leading-snug text-[var(--hub-muted)] ${isMain ? 'px-3 py-4 sm:px-4' : 'px-3.5 pb-2'}`}
         >
-          No commands for current search / level.
+          No commands for current search.
         </p>
       </div>
     )

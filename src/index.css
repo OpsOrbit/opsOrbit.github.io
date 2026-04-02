@@ -114,14 +114,13 @@
   }
 }
 
+/* Opacity only — transform on an ancestor breaks position:sticky (scripting topic bar, etc.). */
 @keyframes hub-fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -193,4 +192,72 @@
 ::-webkit-scrollbar-thumb {
   background: var(--hub-border2);
   border-radius: 4px;
+}
+
+/* Roadmap: glowing vertical pipeline (DevOps flow) */
+@keyframes roadmap-pipeline-flow {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0.35;
+  }
+}
+
+@keyframes roadmap-pipeline-shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
+.roadmap-pipeline-line {
+  box-shadow:
+    0 0 12px rgba(34, 197, 94, 0.35),
+    0 0 24px rgba(22, 163, 74, 0.15);
+}
+
+.roadmap-pipeline-line-inner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(34, 197, 94, 0.15) 20%,
+    rgba(74, 222, 128, 0.85) 50%,
+    rgba(34, 197, 94, 0.15) 80%,
+    transparent 100%
+  );
+  background-size: 100% 200%;
+  animation: roadmap-pipeline-shimmer 2.8s ease-in-out infinite;
+}
+
+.roadmap-pipeline-line-inner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
+  animation: roadmap-pipeline-flow 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roadmap-pipeline-line-inner,
+  .roadmap-pipeline-line-inner::after {
+    animation: none;
+  }
+  .roadmap-pipeline-line-inner {
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.35), rgba(74, 222, 128, 0.6), rgba(34, 197, 94, 0.35));
+    background-size: 100% 100%;
+  }
 }

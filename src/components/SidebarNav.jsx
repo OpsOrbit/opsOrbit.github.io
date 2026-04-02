@@ -6,11 +6,11 @@ const TOOL_SECTIONS = [
   { heading: 'Cloud', ids: ['aws', 'azure', 'gcp'] },
   {
     heading: 'DevOps',
-    ids: ['git', 'github-actions', 'docker', 'terraform', 'kubernetes', 'helm', 'ansible'],
+    ids: ['linux', 'git', 'github-actions', 'docker', 'terraform', 'kubernetes', 'helm', 'ansible'],
   },
   {
     heading: 'Platform & ops',
-    ids: ['nginx', 'apache', 'tomcat', 'haproxy', 'prometheus', 'grafana', 'postgresql', 'redis', 'linux', 'maven', 'shell'],
+    ids: ['nginx', 'apache', 'tomcat', 'haproxy', 'prometheus', 'grafana', 'postgresql', 'redis', 'maven', 'shell'],
   },
 ]
 
