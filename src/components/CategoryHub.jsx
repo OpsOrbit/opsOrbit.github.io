@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import ToolIcon from './ToolIcon'
 import { compareTools } from '../data/categoryOrder'
-import { CATEGORY_PILL_BUTTON_CLASS, CATEGORY_PILL_NAV_CLASS } from './categoryPillStyles'
+import {
+  CATEGORY_PILL_BUTTON_CLASS,
+  CATEGORY_PILL_SCROLL_INNER_CLASS,
+  CATEGORY_PILL_SCROLL_OUTER_CLASS,
+} from './categoryPillStyles'
 import DockMagnify from './DockMagnify'
 
 /**
@@ -95,28 +99,30 @@ export default function CategoryHub({ summaries, onPickCategory, toolLabel, tool
 
           {expanded && (
             <div className="border-t border-hub-line/60 bg-hub-bg/40 px-3 py-3 dark:border-hub-line/60 dark:bg-hub-bg/20 sm:px-4 sm:py-3.5">
-              <DockMagnify
-                as="nav"
-                className={CATEGORY_PILL_NAV_CLASS}
-                itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
-                itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
-                aria-label={`${toolLabel(tool)} — pick a category`}
-              >
-                {byTool.get(tool).map((row) => (
-                  <button
-                    key={`${row.tool}-${row.category}`}
-                    type="button"
-                    onClick={() => onPickCategory({ tool: row.tool, category: row.category })}
-                    title={`${row.category} — ${row.count} commands · browse by level`}
-                    className={CATEGORY_PILL_BUTTON_CLASS}
-                  >
-                    <span className="whitespace-nowrap">{row.category}</span>
-                    <span className="ml-1 shrink-0 font-mono text-[0.95em] font-bold tabular-nums opacity-90">
-                      ({row.count})
-                    </span>
-                  </button>
-                ))}
-              </DockMagnify>
+              <div className={CATEGORY_PILL_SCROLL_OUTER_CLASS}>
+                <DockMagnify
+                  as="nav"
+                  className={CATEGORY_PILL_SCROLL_INNER_CLASS}
+                  itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
+                  itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
+                  aria-label={`${toolLabel(tool)} — pick a category`}
+                >
+                  {byTool.get(tool).map((row) => (
+                    <button
+                      key={`${row.tool}-${row.category}`}
+                      type="button"
+                      onClick={() => onPickCategory({ tool: row.tool, category: row.category })}
+                      title={`${row.category} — ${row.count} commands · browse by level`}
+                      className={CATEGORY_PILL_BUTTON_CLASS}
+                    >
+                      <span className="whitespace-nowrap">{row.category}</span>
+                      <span className="ml-1 shrink-0 font-mono text-[0.95em] font-bold tabular-nums opacity-90">
+                        ({row.count})
+                      </span>
+                    </button>
+                  ))}
+                </DockMagnify>
+              </div>
             </div>
           )}
         </section>

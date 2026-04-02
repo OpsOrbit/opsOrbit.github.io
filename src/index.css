@@ -76,8 +76,9 @@
 @layer base {
   html {
     @apply scroll-smooth;
-    scroll-padding-top: 6.5rem;
+    scroll-padding-top: 7.5rem;
     -webkit-tap-highlight-color: rgb(22 163 74 / 0.14);
+    overflow-x: hidden;
   }
 
   html.dark {
@@ -86,6 +87,7 @@
 
   body {
     @apply min-h-screen min-h-[100dvh] bg-hub-bg font-sans text-base leading-relaxed text-hub-text antialiased;
+    overflow-x: hidden;
   }
 
   button,
@@ -180,6 +182,36 @@
 .nav-tool-scroll {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+}
+
+/**
+ * Horizontal chip rows inside a vertically scrolling page (Tools lifecycle, domain pills).
+ * Global `button { touch-action: manipulation }` otherwise steals drags so the row won’t scroll on iOS.
+ */
+.hub-inline-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  touch-action: pan-x pan-y;
+}
+
+.hub-inline-scroll button,
+.hub-inline-scroll [role='button'] {
+  touch-action: pan-x pan-y;
+}
+
+/** Lifecycle / chip rows: hide scrollbars while keeping touch scroll (Tailwind `scrollbar-hide`). */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 ::-webkit-scrollbar {

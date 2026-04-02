@@ -29,6 +29,7 @@ import { mergeRelatedIds } from './utils/commandPanelBreakdown'
 import { filterDevopsTools } from './utils/toolsFilter'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
+import MobileWorkspaceBottomNav from './components/MobileWorkspaceBottomNav'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
 
@@ -414,11 +415,13 @@ export default function App() {
         onWorkspaceModeChange={setWorkspaceMode}
         searchInputRef={searchInputRef}
         onLogoHomeClick={onLogoHomeClick}
+        toolsCategoryId={toolsCategoryId}
+        onSelectToolsCategory={setToolsCategoryId}
       />
 
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <aside
-          className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] md:flex"
+          className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] lg:flex"
           aria-label={
             workspaceMode === 'scripting'
               ? 'LAB workspace'
@@ -429,7 +432,7 @@ export default function App() {
         >
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
             <DockMagnify
-              className="mx-2 mb-2 flex min-w-0 shrink-0 flex-col gap-1 overflow-hidden rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-1 md:mx-3"
+              className="mx-2 mb-2 flex min-w-0 shrink-0 flex-col gap-1 overflow-hidden rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-1 lg:mx-3"
               itemClipClassName="flex w-full min-w-0 overflow-hidden rounded-md"
               itemWrapperClassName="flex w-full min-w-0 justify-center origin-center"
               role="group"
@@ -493,7 +496,7 @@ export default function App() {
                 toolLabel={toolLabel}
               />
             ) : workspaceMode === 'scripting' ? (
-              <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col md:mx-3">
+              <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col lg:mx-3">
                 <ScriptingTopicsNav
                   variant="asideStack"
                   guides={filteredScriptingGuides}
@@ -520,13 +523,13 @@ export default function App() {
           <main
             id="main-content"
             tabIndex={-1}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom,0px))] pl-[max(0.5rem,env(safe-area-inset-left,0px))] pr-[max(0.5rem,env(safe-area-inset-right,0px))] pt-3 outline-none sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-4 md:pb-6 md:pl-5 md:pr-4 lg:pl-6 lg:pr-5"
+            className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pt-3 outline-none sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] sm:pt-4 lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
           >
             <div
               className={
                 workspaceMode === 'scripting' || workspaceMode === 'roadmap'
                   ? 'w-full min-w-0'
-                  : 'mx-auto w-full max-w-[1600px]'
+                  : 'mx-auto w-full min-w-0 max-w-[1600px]'
               }
             >
               <div
@@ -537,7 +540,7 @@ export default function App() {
                       ? `tools-${toolsCategoryId}`
                       : mainContentKey
                 }
-                className="hub-fade-in"
+                className="hub-fade-in min-w-0 w-full"
               >
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
@@ -653,6 +656,8 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      <MobileWorkspaceBottomNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
       <AnimatePresence>
         {selected ? (

@@ -97,7 +97,7 @@ export default function ScriptingTopicsNav({
     return (
       <div className={`w-full shrink-0 ${className}`}>
         <div
-          className="-mx-0.5 sticky top-0 z-[8] mb-4 flex flex-wrap gap-2 border-b border-[var(--hub-line)]/60 bg-[var(--hub-bg)] pb-3 pt-2 shadow-[0_6px_20px_-6px_rgba(0,0,0,0.08)] supports-[backdrop-filter]:backdrop-blur-md supports-[backdrop-filter]:bg-[var(--hub-bg)]/92 dark:border-[var(--hub-line)]/40 dark:shadow-black/25 md:hidden"
+          className="-mx-0.5 sticky top-0 z-[8] mb-4 flex flex-wrap gap-2 border-b border-[var(--hub-line)]/60 bg-[var(--hub-bg)] pb-3 pt-2 shadow-[0_6px_20px_-6px_rgba(0,0,0,0.08)] supports-[backdrop-filter]:backdrop-blur-md supports-[backdrop-filter]:bg-[var(--hub-bg)]/92 dark:border-[var(--hub-line)]/40 dark:shadow-black/25 lg:hidden"
           role="tablist"
           aria-label="LAB topics"
         >

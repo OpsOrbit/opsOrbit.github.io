@@ -4,7 +4,7 @@
 export default function RoadmapMobileDock({ onRoadmap, onCommands }) {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_-8px_rgba(0,0,0,0.12)] backdrop-blur-md dark:bg-[var(--hub-elevated)]/95 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-[60] border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_-8px_rgba(0,0,0,0.12)] backdrop-blur-md dark:bg-[var(--hub-elevated)]/95 lg:hidden"
       aria-label="Roadmap quick navigation"
     >
       <div className="mx-auto flex max-w-lg items-stretch justify-center gap-4 px-4">

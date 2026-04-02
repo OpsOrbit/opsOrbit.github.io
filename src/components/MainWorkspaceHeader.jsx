@@ -36,7 +36,7 @@ export default function MainWorkspaceHeader({
   commandsSearchGlobal = false,
 }) {
   const headerShellClass =
-    'flex shrink-0 items-center gap-3.5 overflow-visible border-b border-[var(--hub-line)] px-4 pb-4 pt-5 sm:gap-4 sm:px-7'
+    'flex shrink-0 items-center gap-3 overflow-visible border-b border-[var(--hub-line)] px-4 pb-3 pt-4 sm:gap-4 sm:px-6 sm:pb-4 sm:pt-5 lg:px-8'
   const iconBoxClass =
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-lg font-black sm:h-11 sm:w-11'
   const countPillClass =
@@ -51,10 +51,10 @@ export default function MainWorkspaceHeader({
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
             LAB
           </h2>
-          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
             Interactive DevOps modules — IaC, CI/CD, containers
           </p>
         </div>
@@ -75,10 +75,10 @@ export default function MainWorkspaceHeader({
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
             Roadmap
           </h2>
-          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
             Suggested learning path across DevOps topics
           </p>
         </div>
@@ -99,10 +99,10 @@ export default function MainWorkspaceHeader({
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-extrabold leading-none tracking-tight text-[var(--hub-brand)] sm:text-xl">
+          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
             DevOps Tools
           </h2>
-          <p className="mt-1 text-[13px] text-[var(--hub-muted)]">
+          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
             Encyclopedia across SCM, CI/CD, cloud, security, observability, and more
           </p>
         </div>
@@ -146,13 +146,13 @@ export default function MainWorkspaceHeader({
       </div>
       <div className="min-w-0 flex-1">
         <h2
-          className={`text-lg font-extrabold leading-none tracking-tight sm:text-xl ${
+          className={`text-base font-extrabold leading-tight tracking-tight sm:text-lg lg:text-xl ${
             isBrandHomeTitle ? 'text-[var(--hub-brand)]' : 'text-[var(--hub-text)]'
           }`}
         >
           {title}
         </h2>
-        <p className="mt-1 text-[13px] text-[var(--hub-muted)]">{subtitle}</p>
+        <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">{subtitle}</p>
       </div>
       {workspaceMode === 'commands' && tool !== 'all' && typeof onBackToAllTools === 'function' && (
         <button

@@ -1,7 +1,11 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 import { useCommandsWorkspace } from '../context/CommandsWorkspaceContext'
 import { orderedCategorySummaries, compareCategories } from '../data/categoryOrder'
-import { CATEGORY_PILL_BUTTON_CLASS, CATEGORY_PILL_NAV_CLASS } from './categoryPillStyles'
+import {
+  CATEGORY_PILL_BUTTON_CLASS,
+  CATEGORY_PILL_SCROLL_INNER_CLASS,
+  CATEGORY_PILL_SCROLL_OUTER_CLASS,
+} from './categoryPillStyles'
 import DockMagnify from './DockMagnify'
 import { getToolExplanation } from '../data/toolExplanations'
 import { getToolInstall } from '../data/toolInstallInfo'
@@ -272,13 +276,14 @@ export default function SidebarToolTree({
       {isMain ? (
         <>
           <div className="border-t border-hub-line/60 bg-hub-bg/40 px-3 py-3 dark:border-hub-line/60 dark:bg-hub-bg/20 sm:px-4 sm:py-3.5">
-            <DockMagnify
-              as="nav"
-              className={CATEGORY_PILL_NAV_CLASS}
-              itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
-              itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
-              aria-label="Select a category"
-            >
+            <div className={CATEGORY_PILL_SCROLL_OUTER_CLASS}>
+              <DockMagnify
+                as="nav"
+                className={CATEGORY_PILL_SCROLL_INNER_CLASS}
+                itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
+                itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
+                aria-label="Select a category"
+              >
               <button
                 type="button"
                 aria-pressed={activeCategory === ALL_KEY}
@@ -354,7 +359,8 @@ export default function SidebarToolTree({
                   <span className="whitespace-nowrap">Install</span>
                 </button>
               )}
-            </DockMagnify>
+              </DockMagnify>
+            </div>
           </div>
           <div className="px-2 pb-4 pt-4 sm:px-3 sm:pb-5">
             {activeSection && (

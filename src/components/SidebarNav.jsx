@@ -102,7 +102,7 @@ export default function SidebarNav({
   )
 
   if (layout === 'stack') {
-    return <div className={`flex flex-col ${className}`}>{toolsBlock}</div>
+    return <div className={`flex min-w-0 flex-col ${className}`}>{toolsBlock}</div>
   }
 
   return (
