@@ -130,7 +130,7 @@ export default function ScriptingGuides({
           guides={guides}
           isTopicLearned={labProgress?.isLearned}
         />
-        <div className="mx-auto w-full max-w-6xl">
+        <div className="w-full min-w-0">
           <Card className="min-w-0 border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-8 py-16 text-center">
             <p className="text-base leading-relaxed text-[var(--hub-sub)]">
               No topics match your search. Try different keywords.
@@ -150,7 +150,7 @@ export default function ScriptingGuides({
         guides={guides}
         isTopicLearned={labProgress?.isLearned}
       />
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="w-full min-w-0">
         <article
           className="min-w-0 overflow-hidden rounded-2xl border border-hub-line bg-hub-surface shadow-card ring-1 ring-hub-primary/10 sm:p-0 dark:ring-hub-primary/15"
           aria-labelledby="lab-guide-title"

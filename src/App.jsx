@@ -35,7 +35,7 @@ const CommandPanel = lazy(() => import('./components/CommandPanel'))
 
 function readInitialWorkspaceState() {
   const defaults = {
-    workspaceMode: 'commands',
+    workspaceMode: 'tools',
     tool: 'all',
     scriptingTopicId: SCRIPTING_GUIDES[0]?.id ?? 'dockerfile',
     toolsCategoryId: 'all',
@@ -152,6 +152,13 @@ export default function App() {
   const openCommandsForLabTool = useCallback((nextTool) => {
     setWorkspaceMode('commands')
     setTool(nextTool || 'all')
+    setBrowseKey(null)
+    setPreferredCategory(null)
+  }, [])
+
+  const onLogoHomeClick = useCallback(() => {
+    setQuery('')
+    setSelected(null)
     setBrowseKey(null)
     setPreferredCategory(null)
   }, [])
@@ -401,6 +408,7 @@ export default function App() {
         workspaceMode={workspaceMode}
         onWorkspaceModeChange={setWorkspaceMode}
         searchInputRef={searchInputRef}
+        onLogoHomeClick={onLogoHomeClick}
       />
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
@@ -508,7 +516,13 @@ export default function App() {
             tabIndex={-1}
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom,0px))] pl-[max(0.5rem,env(safe-area-inset-left,0px))] pr-[max(0.5rem,env(safe-area-inset-right,0px))] pt-3 outline-none sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-4 md:pb-6 md:pl-5 md:pr-4 lg:pl-6 lg:pr-5"
           >
-            <div className="mx-auto w-full max-w-[1600px]">
+            <div
+              className={
+                workspaceMode === 'scripting' || workspaceMode === 'roadmap'
+                  ? 'w-full min-w-0'
+                  : 'mx-auto w-full max-w-[1600px]'
+              }
+            >
               <div
                 key={
                   workspaceMode === 'scripting'

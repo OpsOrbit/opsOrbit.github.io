@@ -84,7 +84,7 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
           </p>
         </Card>
       ) : (
-        <div className="relative mx-auto max-w-4xl px-3 sm:px-5">
+        <div className="relative w-full min-w-0 px-3 sm:px-5">
           <header id="roadmap-modules-top" className="mb-6 text-center scroll-mt-4">
             <h2 className="mx-auto inline-block rounded-xl border border-hub-primary/35 bg-hub-primary px-5 py-2.5 text-center text-[15px] font-extrabold leading-snug tracking-tight text-white shadow-[0_6px_20px_-4px_rgb(22_163_74/0.45)] dark:text-[#0d1117] dark:shadow-[0_6px_22px_-6px_rgb(34_197_94/0.45)] sm:px-8 sm:text-lg">
               OpsOrbit learning path
@@ -135,7 +135,7 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
       )}
 
       {finalOrderLines.length > 0 ? (
-        <section className="mx-auto max-w-4xl rounded-2xl border border-hub-line bg-hub-surface p-4 shadow-[var(--hub-shadow-card)] ring-1 ring-hub-primary/10 sm:p-5 dark:ring-hub-primary/15">
+        <section className="w-full min-w-0 rounded-2xl border border-hub-line bg-hub-surface p-4 shadow-[var(--hub-shadow-card)] ring-1 ring-hub-primary/10 sm:p-5 dark:ring-hub-primary/15">
           <h3 className="text-[12px] font-bold uppercase tracking-[0.1em] text-hub-primary">Summary path</h3>
           <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-[13px] leading-relaxed text-[var(--hub-sub)]">
             {finalOrderLines.map((s) => (

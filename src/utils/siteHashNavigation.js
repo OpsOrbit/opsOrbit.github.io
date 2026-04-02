@@ -77,7 +77,7 @@ export function buildWorkspaceHash({ mode, tool = 'all', topic, toolsCategory = 
     if (HASH_COMMAND_TOOLS.has(tool)) return `#/commands/${tool}`
     return '#/commands/all'
   }
-  return '#/commands/all'
+  return '#/tools'
 }
 
 /**
@@ -93,5 +93,5 @@ export function workspaceHashFromLink(link) {
   if (link.type === 'tools') {
     return buildWorkspaceHash({ mode: 'tools', toolsCategory: link.category || 'all' })
   }
-  return '#/commands/all'
+  return '#/tools'
 }

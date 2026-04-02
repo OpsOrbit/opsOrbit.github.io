@@ -16,6 +16,7 @@ export default function Header({
   workspaceMode = 'commands',
   onWorkspaceModeChange,
   searchInputRef,
+  onLogoHomeClick,
 }) {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false)
 
@@ -33,9 +34,14 @@ export default function Header({
         >
           ☰
         </button>
-        <div className="flex shrink-0 items-center sm:items-start">
+        <a
+          href="#/tools"
+          onClick={() => onLogoHomeClick?.()}
+          className="flex shrink-0 items-center rounded-lg outline-none ring-offset-2 ring-offset-[var(--hub-topbar)] transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] sm:items-start"
+          aria-label="OpsOrbit home — Tools"
+        >
           <BrandLogoMark className="h-[4.25rem] w-[8.5rem] sm:h-[4.75rem] sm:w-[9.75rem] md:h-[5.25rem] md:w-[11.25rem]" />
-        </div>
+        </a>
       </div>
 
       <div className="relative z-[1] hidden min-h-0 min-w-0 flex-1 overflow-hidden px-1 sm:px-2 md:flex">
