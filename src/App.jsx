@@ -388,7 +388,7 @@ export default function App() {
 
   return (
     <CommandsWorkspaceContext.Provider value={commandsWorkspaceValue}>
-    <MainLayout className="overflow-hidden">
+    <MainLayout>
       <a
         href="#main-content"
         className="skip-link"

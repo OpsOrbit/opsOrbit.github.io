@@ -4,6 +4,10 @@
  */
 export default function MainLayout({ children, className = '' }) {
   return (
-    <div className={`flex min-h-screen min-h-[100dvh] flex-col bg-[var(--hub-bg)] ${className}`}>{children}</div>
+    <div
+      className={`flex min-h-0 flex-1 flex-col overflow-x-hidden bg-[var(--hub-bg)] ${className}`}
+    >
+      {children}
+    </div>
   )
 }

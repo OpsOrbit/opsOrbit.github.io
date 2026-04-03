@@ -71,7 +71,7 @@ export default function MobileMenuDrawer({
                   ? 'Menu and tool domains'
                   : 'Select tool'
             }
-            className="relative z-10 flex h-full max-h-[100dvh] min-h-0 w-[min(22rem,calc(100vw-1rem))] flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl"
+            className="relative z-10 flex h-full max-h-[100dvh] min-h-0 w-full max-w-full flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}

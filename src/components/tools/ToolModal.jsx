@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useDragControls } from 'motion/react'
 import { createPortal } from 'react-dom'
 import { categoryLabel } from '../../data/toolsData'
 
@@ -13,6 +13,17 @@ import { categoryLabel } from '../../data/toolsData'
  */
 export default function ToolModal({ tool, isFavorite, onToggleFavorite, onClose }) {
   const panelRef = useRef(null)
+  const dragControls = useDragControls()
+  const [narrowViewport, setNarrowViewport] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 639px)')
+    const fn = () => setNarrowViewport(mq.matches)
+    fn()
+    mq.addEventListener('change', fn)
+    return () => mq.removeEventListener('change', fn)
+  }, [])
 
   useEffect(() => {
     if (!tool) return
@@ -59,8 +70,29 @@ export default function ToolModal({ tool, isFavorite, onToggleFavorite, onClose 
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 24, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        className="relative z-10 flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-2xl dark:bg-[var(--hub-elevated)] sm:rounded-2xl"
+        className="relative z-10 flex max-h-[min(90dvh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-2xl dark:bg-[var(--hub-elevated)] sm:rounded-2xl"
+        drag={narrowViewport ? 'y' : false}
+        dragControls={narrowViewport ? dragControls : undefined}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 260 }}
+        dragElastic={{ top: 0, bottom: 0.3 }}
+        onDragEnd={(_, info) => {
+          if (!narrowViewport) return
+          if (info.offset.y > 72 || info.velocity.y > 420) onClose()
+        }}
+        style={{
+          paddingBottom: narrowViewport ? 'max(0px, env(safe-area-inset-bottom, 0px))' : undefined,
+        }}
       >
+        <div
+          className="flex shrink-0 touch-none flex-col items-center pt-2 pb-1 sm:hidden"
+          onPointerDown={(e) => dragControls.start(e)}
+        >
+          <div
+            className="h-1.5 w-12 cursor-grab rounded-full bg-[var(--hub-border2)] active:cursor-grabbing"
+            aria-hidden
+          />
+        </div>
         <div className="flex shrink-0 items-start gap-3 border-b border-[var(--hub-line)] p-4 sm:p-5">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-card)] text-2xl">
             {tool.logo || '◆'}

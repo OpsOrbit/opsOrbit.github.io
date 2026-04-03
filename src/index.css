@@ -88,6 +88,19 @@
   body {
     @apply min-h-screen min-h-[100dvh] bg-hub-bg font-sans text-base leading-relaxed text-hub-text antialiased;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
+  #root {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
   }
 
   button,
