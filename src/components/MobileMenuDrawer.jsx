@@ -45,7 +45,7 @@ export default function MobileMenuDrawer({
       {open && (
         <motion.div
           key="tool-drawer-shell"
-          className="fixed inset-0 z-[110] flex justify-start lg:hidden"
+          className="fixed inset-0 z-[110] lg:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -71,7 +71,7 @@ export default function MobileMenuDrawer({
                   ? 'Menu and tool domains'
                   : 'Select tool'
             }
-            className="relative z-10 flex h-full max-h-[100dvh] min-h-0 w-full max-w-full flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
+            className="absolute bottom-0 left-0 top-0 z-10 flex w-full max-w-full min-h-0 flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -94,7 +94,7 @@ export default function MobileMenuDrawer({
                 ✕
               </button>
             </div>
-            <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain py-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] [-webkit-overflow-scrolling:touch] [scrollbar-gutter:stable]">
+            <nav className="flex min-h-0 flex-1 touch-pan-y flex-col overflow-y-auto overscroll-y-contain py-2 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] [-webkit-overflow-scrolling:touch]">
               {onWorkspaceModeChange && (
                 <div
                   className="mx-3 mb-3 min-w-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-2"
@@ -182,7 +182,7 @@ export default function MobileMenuDrawer({
                   <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
                     Domain filter
                   </p>
-                  <div className="flex max-h-[min(50vh,22rem)] flex-col gap-1 overflow-y-auto overscroll-contain pr-0.5 [-webkit-overflow-scrolling:touch]">
+                  <div className="flex flex-col gap-1 pr-0.5">
                     <button
                       type="button"
                       onClick={() => {
