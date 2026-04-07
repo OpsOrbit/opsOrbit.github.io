@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CREATOR_LINKEDIN_URL, CREATOR_NAME } from '../brand'
 import BrandLogoMark from './BrandLogoMark'
 import ThemeToggle from './ThemeToggle'
 import MobileMenuDrawer from './MobileMenuDrawer'
@@ -101,6 +102,17 @@ export default function Header({
             <span className="text-[var(--hub-tool)]">{headerBadgeCount}</span>
             <span className="ml-1">{headerBadgeNoun}</span>
           </div>
+          <a
+            href={CREATOR_LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 text-right text-[10px] font-semibold leading-snug text-[var(--hub-muted)] underline-offset-2 transition-colors hover:text-[var(--hub-tool)] hover:underline sm:text-left sm:text-xs"
+            title={`${CREATOR_NAME} on LinkedIn — opens in new tab`}
+          >
+            <span className="hidden sm:inline">Created by </span>
+            <span className="sm:hidden">By </span>
+            {CREATOR_NAME}
+          </a>
           <div className="flex min-h-[44px] min-w-[44px] items-center justify-center sm:min-h-0 sm:min-w-0">
             <ThemeToggle />
           </div>

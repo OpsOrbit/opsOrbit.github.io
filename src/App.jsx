@@ -11,6 +11,7 @@ import SidebarNav from './components/SidebarNav'
 import SidebarToolTree from './components/SidebarToolTree'
 import MainWorkspaceHeader from './components/MainWorkspaceHeader'
 import MainLayout from './components/layout/MainLayout'
+import Footer from './components/layout/Footer'
 import DockMagnify from './components/DockMagnify'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
@@ -718,6 +719,8 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      <Footer />
 
       <MobileWorkspaceBottomNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 

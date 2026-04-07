@@ -1,91 +1,43 @@
-import { BRAND_NAME } from '../../brand'
+import { BRAND_NAME, CREATOR_LINKEDIN_URL, CREATOR_NAME } from '../../brand'
 
-const social = [
-  {
-    label: 'GitHub',
-    href: 'https://github.com/',
-    path: 'M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z',
-  },
-]
+/** Official LinkedIn mark — single-color for hover/currentColor styling */
+function LinkedInIcon({ className = 'h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  )
+}
 
 export default function Footer() {
   return (
     <footer
-      className="mt-auto border-t border-hub-line bg-hub-surface/80 backdrop-blur-sm dark:bg-hub-surface/60"
+      className="shrink-0 border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/90 pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] pt-4 backdrop-blur-md dark:bg-[var(--hub-elevated)]/50 lg:pb-5"
       role="contentinfo"
     >
-      <div className="mx-auto max-w-7xl py-10 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] sm:py-12 sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))]">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-md">
-            <p className="font-[family-name:Orbitron] text-xs font-bold uppercase tracking-[0.14em] text-hub-brand">thewhitetechnologies</p>
-            <p className="mt-2 text-lg font-semibold tracking-tight text-hub-brand">{BRAND_NAME}</p>
-            <p className="mt-2 text-sm leading-relaxed text-hub-sub">
-              DevOps learning hub — commands, scripting guides, and roadmap — curated for engineers who ship.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-10 sm:gap-14">
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-hub-muted">Navigate</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li>
-                  <a
-                    href="#main-content"
-                    className="text-hub-sub transition-colors duration-200 hover:text-hub-primary"
-                  >
-                    Commands
-                  </a>
-                </li>
-                <li>
-                  <a href="#command-filters" className="text-hub-sub transition-colors duration-200 hover:text-hub-primary">
-                    Filters
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-hub-muted">Company</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li>
-                  <a
-                    href="https://thewhitetechnologies.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-hub-sub transition-colors duration-200 hover:text-hub-primary"
-                  >
-                    thewhitetechnologies
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-hub-muted">Social</h2>
-              <ul className="mt-3 flex gap-3">
-                {social.map(({ label, href, path }) => (
-                  <li key={label}>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-hub-line bg-hub-bg text-hub-sub transition-all duration-200 hover:border-hub-primary/40 hover:bg-hub-elevated hover:text-hub-primary dark:bg-hub-elevated/50"
-                    >
-                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                        <path
-                          fillRule="evenodd"
-                          d={path}
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center gap-1 text-center sm:gap-1.5">
+          <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-sm text-[var(--hub-muted)] sm:text-[15px]">
+            <span className="text-[var(--hub-sub)]">Developed by</span>
+            <a
+              href={CREATOR_LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex max-w-full items-center gap-2 rounded-md font-semibold text-[var(--hub-text)] outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-surface)] dark:focus-visible:ring-offset-[var(--hub-bg)]"
+            >
+              <span className="text-[#0A66C2] transition-colors duration-200 group-hover:text-[#004182] dark:text-[#70b5f9] dark:group-hover:text-[#a8d4ff]">
+                <LinkedInIcon />
+              </span>
+              <span className="underline-offset-[3px] transition-colors duration-200 group-hover:text-[var(--hub-tool)] group-hover:underline group-hover:decoration-[var(--hub-tool)]">
+                {CREATOR_NAME}
+              </span>
+              <span className="sr-only">(opens LinkedIn in a new tab)</span>
+            </a>
+          </p>
+          <p className="text-[11px] text-[var(--hub-muted)] sm:text-xs">
+            © {new Date().getFullYear()} {BRAND_NAME}
+          </p>
         </div>
-        <p className="mt-10 border-t border-hub-line/80 pt-8 text-center text-xs text-hub-muted">
-          © {new Date().getFullYear()} thewhitetechnologies · {BRAND_NAME}
-        </p>
       </div>
     </footer>
   )

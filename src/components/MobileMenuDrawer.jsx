@@ -4,6 +4,7 @@ import SidebarNav from './SidebarNav'
 import { DEVOPS_TOOLS, TOOL_CATEGORIES } from '../data/toolsData'
 import { TECH_WORD_CATEGORIES } from '../data/techWordsData'
 import { techWordsCountForCategory } from '../utils/techWordsFilter'
+import { CREATOR_LINKEDIN_URL, CREATOR_NAME } from '../brand'
 
 function buildToolsDomainCounts() {
   const counts = { all: DEVOPS_TOOLS.length }
@@ -284,6 +285,15 @@ export default function MobileMenuDrawer({
                 </div>
               ) : null}
               <div className="mx-3.5 mt-4 border-t border-[var(--hub-line)] pt-4">
+                <a
+                  href={CREATOR_LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onClose}
+                  className="mb-2 block rounded-lg px-3.5 py-2.5 text-[13px] font-semibold text-[var(--hub-muted)] transition-colors hover:bg-[var(--hub-tool-dim)] hover:text-[var(--hub-tool)]"
+                >
+                  Created by {CREATOR_NAME} · LinkedIn ↗
+                </a>
                 <a
                   href="#main-content"
                   onClick={onClose}
