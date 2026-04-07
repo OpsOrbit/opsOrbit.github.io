@@ -1,5 +1,6 @@
 import { SCRIPTING_GUIDES } from '../data/scriptingGuides'
 import { TOOL_CATEGORY_IDS } from '../data/toolsData'
+import { TECH_WORD_CATEGORY_IDS } from '../data/techWordsData'
 
 /** Tools that appear in Commands sidebar (excludes `all`). */
 export const HASH_COMMAND_TOOLS = new Set([
@@ -30,15 +31,20 @@ const SCRIPTING_IDS = new Set(SCRIPTING_GUIDES.map((g) => g.id))
 const DEFAULT_SCRIPTING_TOPIC = SCRIPTING_GUIDES[0]?.id ?? 'dockerfile'
 
 /**
- * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | null}
+ * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | { mode: 'techwords', category: string } | null}
  */
 export function parseWorkspaceHash(hash) {
   if (hash == null || hash === '' || hash === '#') return null
   const trimmed = String(hash).replace(/^#/, '')
-  const match = trimmed.match(/^\/?(commands|scripting|roadmap|tools)(?:\/([^/?#]+))?\/?$/)
+  const match = trimmed.match(/^\/?(commands|scripting|roadmap|tools|techwords)(?:\/([^/?#]+))?\/?$/)
   if (!match) return null
   const [, mode, segment] = match
   if (mode === 'roadmap') return { mode: 'roadmap' }
+  if (mode === 'techwords') {
+    if (!segment || segment === 'all') return { mode: 'techwords', category: 'all' }
+    if (TECH_WORD_CATEGORY_IDS.has(segment)) return { mode: 'techwords', category: segment }
+    return { mode: 'techwords', category: 'all' }
+  }
   if (mode === 'tools') {
     if (!segment || segment === 'all') return { mode: 'tools', category: 'all' }
     if (TOOL_CATEGORY_IDS.has(segment)) return { mode: 'tools', category: segment }
@@ -58,11 +64,22 @@ export function parseWorkspaceHash(hash) {
 }
 
 /**
- * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string }} p
+ * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string }} p
  * @returns {string} Hash starting with #/…
  */
-export function buildWorkspaceHash({ mode, tool = 'all', topic, toolsCategory = 'all' }) {
+export function buildWorkspaceHash({
+  mode,
+  tool = 'all',
+  topic,
+  toolsCategory = 'all',
+  techWordsCategory = 'all',
+}) {
   if (mode === 'roadmap') return '#/roadmap'
+  if (mode === 'techwords') {
+    if (!techWordsCategory || techWordsCategory === 'all') return '#/techwords'
+    if (TECH_WORD_CATEGORY_IDS.has(techWordsCategory)) return `#/techwords/${techWordsCategory}`
+    return '#/techwords'
+  }
   if (mode === 'tools') {
     if (!toolsCategory || toolsCategory === 'all') return '#/tools'
     if (TOOL_CATEGORY_IDS.has(toolsCategory)) return `#/tools/${toolsCategory}`

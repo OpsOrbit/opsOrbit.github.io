@@ -114,6 +114,30 @@ export default function MainWorkspaceHeader({
     )
   }
 
+  if (workspaceMode === 'techwords') {
+    return (
+      <header className={headerShellClass}>
+        <div className={iconBoxClass}>
+          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
+            📖
+          </span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
+            Tech Words
+          </h2>
+          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
+            Explore essential technical terms across Cloud, DevOps, and Networking
+          </p>
+        </div>
+        <div className={countPillClass}>
+          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
+          <span className="ml-1 text-[var(--hub-muted)]">terms</span>
+        </div>
+      </header>
+    )
+  }
+
   const title = commandsSearchGlobal
     ? 'Search results'
     : browseKey != null

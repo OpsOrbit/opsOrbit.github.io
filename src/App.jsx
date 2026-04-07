@@ -29,7 +29,10 @@ import { mergeRelatedIds } from './utils/commandPanelBreakdown'
 import { filterDevopsTools } from './utils/toolsFilter'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
+import TechWordsPage from './components/techwords/TechWordsPage'
 import MobileWorkspaceBottomNav from './components/MobileWorkspaceBottomNav'
+import { filterTechWords } from './utils/techWordsFilter'
+import { useTechWordFavorites } from './hooks/useTechWordFavorites'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
 
@@ -39,11 +42,14 @@ function readInitialWorkspaceState() {
     tool: 'all',
     scriptingTopicId: SCRIPTING_GUIDES[0]?.id ?? 'dockerfile',
     toolsCategoryId: 'all',
+    techWordsCategoryId: 'all',
   }
   if (typeof window === 'undefined') return defaults
   const parsed = parseWorkspaceHash(window.location.hash)
   if (!parsed) return defaults
   if (parsed.mode === 'roadmap') return { ...defaults, workspaceMode: 'roadmap' }
+  if (parsed.mode === 'techwords')
+    return { ...defaults, workspaceMode: 'techwords', techWordsCategoryId: parsed.category || 'all' }
   if (parsed.mode === 'tools')
     return { ...defaults, workspaceMode: 'tools', toolsCategoryId: parsed.category || 'all' }
   if (parsed.mode === 'scripting') return { ...defaults, workspaceMode: 'scripting', scriptingTopicId: parsed.topic }
@@ -117,6 +123,9 @@ export default function App() {
   const [workspaceMode, setWorkspaceMode] = useState(() => readInitialWorkspaceState().workspaceMode)
   const [scriptingTopicId, setScriptingTopicId] = useState(() => readInitialWorkspaceState().scriptingTopicId)
   const [toolsCategoryId, setToolsCategoryId] = useState(() => readInitialWorkspaceState().toolsCategoryId)
+  const [techWordsCategoryId, setTechWordsCategoryId] = useState(
+    () => readInitialWorkspaceState().techWordsCategoryId
+  )
   const [commandsLearnMode, setCommandsLearnMode] = useState('learn')
   const [expandedCommandId, setExpandedCommandId] = useState(null)
   const searchInputRef = useRef(null)
@@ -126,6 +135,10 @@ export default function App() {
     isFavorite: isToolFavorite,
     toggleFavorite: toggleToolFavorite,
   } = useToolFavorites()
+  const {
+    isFavorite: isTechWordFavorite,
+    toggleFavorite: toggleTechWordFavorite,
+  } = useTechWordFavorites()
   const { isLearned, toggleLearned } = useCommandLearned()
 
   const commandsWorkspaceValue = useMemo(
@@ -177,6 +190,9 @@ export default function App() {
       if (parsed.mode === 'tools') {
         setToolsCategoryId(parsed.category || 'all')
       }
+      if (parsed.mode === 'techwords') {
+        setTechWordsCategoryId(parsed.category || 'all')
+      }
       if (parsed.mode === 'scripting' && parsed.topic) {
         setScriptingTopicId(parsed.topic)
       }
@@ -191,6 +207,7 @@ export default function App() {
       tool,
       topic: scriptingTopicId,
       toolsCategory: toolsCategoryId,
+      techWordsCategory: techWordsCategoryId,
     })
     if (typeof window === 'undefined') return
     const cur = window.location.hash
@@ -201,7 +218,7 @@ export default function App() {
         `${window.location.pathname}${window.location.search}${next}`
       )
     }
-  }, [workspaceMode, tool, scriptingTopicId, toolsCategoryId])
+  }, [workspaceMode, tool, scriptingTopicId, toolsCategoryId, techWordsCategoryId])
 
   useEffect(() => {
     setBrowseKey(null)
@@ -217,7 +234,11 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key !== '/' || (workspaceMode !== 'commands' && workspaceMode !== 'tools')) return
+      if (
+        e.key !== '/' ||
+        (workspaceMode !== 'commands' && workspaceMode !== 'tools' && workspaceMode !== 'techwords')
+      )
+        return
       const t = e.target
       if (t?.tagName === 'INPUT' || t?.tagName === 'TEXTAREA' || t?.isContentEditable) return
       e.preventDefault()
@@ -295,6 +316,11 @@ export default function App() {
     }).length
   }, [workspaceMode, query, toolsCategoryId])
 
+  const techWordsSearchCount = useMemo(() => {
+    if (workspaceMode !== 'techwords') return 0
+    return filterTechWords(query, techWordsCategoryId).length
+  }, [workspaceMode, query, techWordsCategoryId])
+
   const toolCounts = useMemo(() => {
     const q = query.trim()
     const base = COMMANDS_DATA.filter((c) => {
@@ -349,6 +375,7 @@ export default function App() {
 
   const workspaceVisibleCount = useMemo(() => {
     if (workspaceMode === 'tools') return toolsSearchCount
+    if (workspaceMode === 'techwords') return techWordsSearchCount
     if (workspaceMode === 'scripting') return filteredScriptingGuides.length
     if (workspaceMode === 'roadmap') return filteredRoadmapSteps.length
     if (singleToolSidebarMode) return filtered.length
@@ -357,6 +384,7 @@ export default function App() {
   }, [
     workspaceMode,
     toolsSearchCount,
+    techWordsSearchCount,
     filteredScriptingGuides.length,
     filteredRoadmapSteps.length,
     singleToolSidebarMode,
@@ -369,6 +397,9 @@ export default function App() {
     if (workspaceMode === 'tools') {
       return { count: toolsSearchCount, noun: 'tools' }
     }
+    if (workspaceMode === 'techwords') {
+      return { count: techWordsSearchCount, noun: 'terms' }
+    }
     if (workspaceMode === 'scripting') {
       return { count: filteredScriptingGuides.length, noun: 'topics' }
     }
@@ -379,6 +410,7 @@ export default function App() {
   }, [
     workspaceMode,
     toolsSearchCount,
+    techWordsSearchCount,
     filtered.length,
     filteredScriptingGuides.length,
     filteredRoadmapSteps.length,
@@ -417,6 +449,8 @@ export default function App() {
         onLogoHomeClick={onLogoHomeClick}
         toolsCategoryId={toolsCategoryId}
         onSelectToolsCategory={setToolsCategoryId}
+        techWordsCategoryId={techWordsCategoryId}
+        onSelectTechWordsCategory={setTechWordsCategoryId}
       />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
@@ -425,7 +459,9 @@ export default function App() {
           aria-label={
             workspaceMode === 'scripting'
               ? 'LAB workspace'
-              : workspaceMode === 'tools' || workspaceMode === 'roadmap'
+              : workspaceMode === 'tools' ||
+                  workspaceMode === 'roadmap' ||
+                  workspaceMode === 'techwords'
                 ? 'Workspace navigation'
                 : 'Commands tools'
           }
@@ -436,7 +472,7 @@ export default function App() {
               itemClipClassName="flex w-full min-w-0 overflow-hidden rounded-md"
               itemWrapperClassName="flex w-full min-w-0 justify-center origin-center"
               role="group"
-              aria-label="Tools, Commands, LAB, or Roadmap"
+              aria-label="Tools, Commands, LAB, Roadmap, or Tech Words"
             >
               <button
                 type="button"
@@ -486,6 +522,19 @@ export default function App() {
                 aria-pressed={workspaceMode === 'roadmap'}
               >
                 Roadmap
+              </button>
+              <button
+                type="button"
+                onClick={() => setWorkspaceMode('techwords')}
+                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-1.5 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                  workspaceMode === 'techwords'
+                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
+                }`}
+                aria-pressed={workspaceMode === 'techwords'}
+                title="Technical dictionary"
+              >
+                Tech Words
               </button>
             </DockMagnify>
             {workspaceMode === 'commands' ? (
@@ -538,7 +587,9 @@ export default function App() {
                     ? 'scripting'
                     : workspaceMode === 'tools'
                       ? `tools-${toolsCategoryId}`
-                      : mainContentKey
+                      : workspaceMode === 'techwords'
+                        ? `techwords-${techWordsCategoryId}`
+                        : mainContentKey
                 }
                 className="hub-fade-in min-w-0 w-full"
               >
@@ -563,6 +614,17 @@ export default function App() {
                     onSelectCategory={setToolsCategoryId}
                     isFavorite={isToolFavorite}
                     toggleFavorite={toggleToolFavorite}
+                  />
+                )}
+
+                {workspaceMode === 'techwords' && (
+                  <TechWordsPage
+                    query={query}
+                    onQueryChange={setQuery}
+                    activeCategoryId={techWordsCategoryId}
+                    onSelectCategory={setTechWordsCategoryId}
+                    isFavorite={isTechWordFavorite}
+                    toggleFavorite={toggleTechWordFavorite}
                   />
                 )}
 

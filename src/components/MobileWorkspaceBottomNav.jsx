@@ -10,7 +10,7 @@ export default function MobileWorkspaceBottomNav({ workspaceMode, onWorkspaceMod
       <button
         type="button"
         onClick={() => onWorkspaceModeChange(mode)}
-        className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-surface)] ${
+        className={`flex min-h-[48px] min-w-[4.25rem] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 text-[9px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-surface)] min-[380px]:min-w-[4.75rem] min-[380px]:text-[10px] ${
           active
             ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
             : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
@@ -31,11 +31,12 @@ export default function MobileWorkspaceBottomNav({ workspaceMode, onWorkspaceMod
       className="fixed bottom-0 left-0 right-0 z-[85] border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/95 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] pt-1 shadow-[0_-4px_24px_-2px_rgba(0,0,0,0.08)] backdrop-blur-md dark:bg-[var(--hub-elevated)]/95 lg:hidden"
       aria-label="Workspace"
     >
-      <div className="mx-auto flex max-w-lg items-stretch justify-center gap-0.5 px-1">
+      <div className="hub-inline-scroll scrollbar-hide mx-auto flex w-full max-w-2xl items-stretch justify-center gap-0.5 overflow-x-auto px-2 sm:max-w-none sm:justify-between sm:overflow-visible sm:px-3">
         <Item mode="tools" label="Tools" icon="🧰" />
         <Item mode="commands" label="Commands" icon="⌘" />
         <Item mode="scripting" label="Lab" icon="⚡" />
         <Item mode="roadmap" label="Roadmap" icon="🗺" />
+        <Item mode="techwords" label="Tech Words" icon="📖" />
       </div>
     </nav>
   )

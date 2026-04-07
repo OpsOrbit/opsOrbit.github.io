@@ -2,6 +2,8 @@ import { useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import SidebarNav from './SidebarNav'
 import { DEVOPS_TOOLS, TOOL_CATEGORIES } from '../data/toolsData'
+import { TECH_WORD_CATEGORIES } from '../data/techWordsData'
+import { techWordsCountForCategory } from '../utils/techWordsFilter'
 
 function buildToolsDomainCounts() {
   const counts = { all: DEVOPS_TOOLS.length }
@@ -22,6 +24,8 @@ export default function MobileMenuDrawer({
   onWorkspaceModeChange,
   toolsCategoryId = 'all',
   onSelectToolsCategory,
+  techWordsCategoryId = 'all',
+  onSelectTechWordsCategory,
 }) {
   const domainCounts = useMemo(() => buildToolsDomainCounts(), [])
   useEffect(() => {
@@ -69,7 +73,9 @@ export default function MobileMenuDrawer({
                 ? 'LAB topics'
                 : workspaceMode === 'tools'
                   ? 'Menu and tool domains'
-                  : 'Select tool'
+                  : workspaceMode === 'techwords'
+                    ? 'Menu and tech dictionary categories'
+                    : 'Select tool'
             }
             className="absolute bottom-0 left-0 top-0 z-10 flex w-full max-w-full min-h-0 flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
             initial={{ x: '-100%' }}
@@ -83,7 +89,9 @@ export default function MobileMenuDrawer({
                   ? 'LAB'
                   : workspaceMode === 'tools'
                     ? 'Browse domains'
-                    : 'Select tool'}
+                    : workspaceMode === 'techwords'
+                      ? 'Tech Words'
+                      : 'Select tool'}
               </span>
               <button
                 type="button"
@@ -99,7 +107,7 @@ export default function MobileMenuDrawer({
                 <div
                   className="mx-3 mb-3 min-w-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-2"
                   role="group"
-                  aria-label="Workspace: Tools, Commands, LAB, or Roadmap"
+                  aria-label="Workspace: Tools, Commands, LAB, Roadmap, or Tech Words"
                 >
                   {/* Full-width column: 2×2 grid clipped labels on narrow drawers; stack reads clearly on all phones */}
                   <div className="flex min-w-0 flex-col gap-1.5">
@@ -164,6 +172,21 @@ export default function MobileMenuDrawer({
                     >
                       Roadmap
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('techwords')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'techwords'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'techwords'}
+                    >
+                      Tech Words
+                    </button>
                   </div>
                 </div>
               )}
@@ -220,6 +243,40 @@ export default function MobileMenuDrawer({
                           <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">
                             {domainCounts[c.id] ?? 0}
                           </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {workspaceMode === 'techwords' && onSelectTechWordsCategory ? (
+                <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
+                    Category filter
+                  </p>
+                  <div className="flex flex-col gap-1 pr-0.5">
+                    {TECH_WORD_CATEGORIES.map((c) => {
+                      const active =
+                        techWordsCategoryId === c.id ||
+                        (c.id === 'all' && (!techWordsCategoryId || techWordsCategoryId === 'all'))
+                      const count = techWordsCountForCategory(c.id)
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            onSelectTechWordsCategory(c.id)
+                            onClose()
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                            active
+                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
+                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                          }`}
+                          aria-pressed={active}
+                        >
+                          <span className="min-w-0 pr-2">{c.label}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
                         </button>
                       )
                     })}

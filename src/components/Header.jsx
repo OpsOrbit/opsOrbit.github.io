@@ -19,6 +19,8 @@ export default function Header({
   onLogoHomeClick,
   toolsCategoryId,
   onSelectToolsCategory,
+  techWordsCategoryId,
+  onSelectTechWordsCategory,
 }) {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false)
 
@@ -75,7 +77,9 @@ export default function Header({
                   ? 'Search modules…'
                   : workspaceMode === 'tools'
                     ? 'Search tools & categories…'
-                    : 'Search…'
+                    : workspaceMode === 'techwords'
+                      ? 'Search tech dictionary…'
+                      : 'Search…'
             }
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
@@ -86,7 +90,9 @@ export default function Header({
                   ? 'Search roadmap modules'
                   : workspaceMode === 'tools'
                     ? 'Search DevOps tools encyclopedia'
-                    : 'Search commands'
+                    : workspaceMode === 'techwords'
+                      ? 'Search technical dictionary'
+                      : 'Search commands'
             }
           />
         </div>
@@ -112,6 +118,8 @@ export default function Header({
         onWorkspaceModeChange={onWorkspaceModeChange}
         toolsCategoryId={toolsCategoryId}
         onSelectToolsCategory={onSelectToolsCategory}
+        techWordsCategoryId={techWordsCategoryId}
+        onSelectTechWordsCategory={onSelectTechWordsCategory}
       />
     </header>
   )
