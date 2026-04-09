@@ -23,14 +23,38 @@ const DOMAIN_SECTIONS = [
   { id: 'edge', title: 'Cloud, APIs & collaboration', categoryIds: ['apim', 'mesh', 'cloud', 'serverless', 'cdn', 'collab'] },
 ]
 
+const DOMAIN_ICONS = {
+  all: '✦',
+  scm: '🔀',
+  cicd: '⚡',
+  build: '📦',
+  artifacts: '📚',
+  containers: '🐳',
+  registries: '🗃️',
+  orchestration: '☸️',
+  iac: '🏗',
+  configmgmt: '🔧',
+  secrets: '🗝',
+  monitoring: '📈',
+  logging: '📜',
+  security: '🛡',
+  testing: '🧪',
+  apim: '🌐',
+  mesh: '🕸',
+  cloud: '☁️',
+  serverless: 'λ',
+  cdn: '🌍',
+  collab: '🤝',
+}
+
 const pillBase =
-  'inline-flex min-h-11 max-w-full shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-left text-xs font-bold uppercase leading-snug tracking-[0.05em] shadow-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:min-h-10 sm:py-1.5 sm:text-sm'
+  'inline-flex min-h-11 max-w-full shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-left text-xs font-bold uppercase leading-snug tracking-[0.05em] shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:min-h-10 sm:py-1.5 sm:text-sm motion-safe:transition-transform'
 
 const pillIdle =
-  'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-tool)] hover:border-[var(--hub-tool)]/55 hover:bg-[var(--hub-tool-dim)] dark:bg-[var(--hub-elevated)]/50'
+  'border-[var(--hub-border2)] bg-[var(--hub-surface)]/90 text-[var(--hub-tool)] backdrop-blur-sm hover:border-indigo-400/45 hover:bg-gradient-to-r hover:from-indigo-50/80 hover:to-violet-50/40 hover:shadow-md dark:bg-[var(--hub-elevated)]/50 dark:hover:from-indigo-950/40 dark:hover:to-violet-950/20'
 
 const pillActive =
-  'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-md ring-1 ring-[var(--hub-tool)]/35 dark:ring-[var(--hub-tool)]/25'
+  'border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-cyan-400/35 dark:from-indigo-500 dark:to-violet-600 dark:shadow-indigo-900/40'
 
 const categoryById = Object.fromEntries(TOOL_CATEGORIES.map((c) => [c.id, c]))
 
@@ -78,6 +102,7 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
   const Pill = ({ id, label, count, onPick }) => {
     const active = id === 'all' ? allActive : activeCategoryId === id
     const go = onPick ?? onSelectCategory
+    const icon = DOMAIN_ICONS[id] || '◇'
     return (
       <button
         type="button"
@@ -85,10 +110,13 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
         className={`${pillBase} ${active ? pillActive : pillIdle}`}
         aria-pressed={active}
       >
+        <span className="text-sm leading-none opacity-90" aria-hidden>
+          {icon}
+        </span>
         <span className="whitespace-nowrap">{label}</span>
         <span
           className={`rounded-full px-1.5 py-0.5 font-mono text-[10px] font-bold sm:text-[11px] ${
-            active ? 'bg-[var(--hub-tool)] text-white' : 'bg-[var(--hub-border2)] text-[var(--hub-muted)]'
+            active ? 'bg-white/25 text-white' : 'bg-[var(--hub-border2)] text-[var(--hub-muted)]'
           }`}
         >
           {count}
@@ -246,7 +274,7 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
       </div>
 
       <nav
-        className="mb-4 hidden overflow-hidden rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-surface)] p-3 shadow-[var(--hub-shadow-card)] dark:bg-[var(--hub-elevated)]/40 sm:mb-6 sm:p-4 lg:mb-6 lg:block lg:p-6"
+        className="mb-4 hidden overflow-hidden rounded-2xl border border-white/25 bg-[var(--hub-surface)]/95 p-3 shadow-[0_12px_40px_-12px_rgba(79,70,229,0.18)] ring-1 ring-indigo-500/10 backdrop-blur-xl dark:border-white/10 dark:bg-[var(--hub-elevated)]/85 dark:shadow-black/40 dark:ring-indigo-400/15 sm:mb-6 sm:p-4 lg:mb-6 lg:block lg:p-6"
         aria-label="Browse tools by domain"
       >
         <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)] sm:mb-3">

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { CREATOR_LINKEDIN_URL, CREATOR_NAME } from '../brand'
 import BrandLogoMark from './BrandLogoMark'
 import ThemeToggle from './ThemeToggle'
 import MobileMenuDrawer from './MobileMenuDrawer'
@@ -22,6 +21,8 @@ export default function Header({
   onSelectToolsCategory,
   techWordsCategoryId,
   onSelectTechWordsCategory,
+  onOpenGlobalSearch,
+  onOpenFavorites,
 }) {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false)
 
@@ -98,21 +99,37 @@ export default function Header({
           />
         </div>
         <div className="flex shrink-0 items-center justify-end gap-2">
+          {onOpenGlobalSearch ? (
+            <button
+              type="button"
+              onClick={() => onOpenGlobalSearch()}
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-tool)] sm:min-h-9 sm:min-w-9"
+              title="Search everywhere (⌘K)"
+              aria-label="Open global search"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+          ) : null}
+          {onOpenFavorites ? (
+            <button
+              type="button"
+              onClick={() => onOpenFavorites()}
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-tool)] sm:min-h-9 sm:min-w-9"
+              title="Favorites"
+              aria-label="Open favorites"
+            >
+              <span className="text-lg leading-none" aria-hidden>
+                ★
+              </span>
+            </button>
+          ) : null}
           <div className="hidden items-center rounded-md border border-[var(--hub-border2)] bg-[var(--hub-surface)] px-2.5 py-2 font-mono text-xs font-semibold text-[var(--hub-muted)] sm:flex md:px-3">
             <span className="text-[var(--hub-tool)]">{headerBadgeCount}</span>
             <span className="ml-1">{headerBadgeNoun}</span>
           </div>
-          <a
-            href={CREATOR_LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 text-right text-[10px] font-semibold leading-snug text-[var(--hub-muted)] underline-offset-2 transition-colors hover:text-[var(--hub-tool)] hover:underline sm:text-left sm:text-xs"
-            title={`${CREATOR_NAME} on LinkedIn — opens in new tab`}
-          >
-            <span className="hidden sm:inline">Created by </span>
-            <span className="sm:hidden">By </span>
-            {CREATOR_NAME}
-          </a>
           <div className="flex min-h-[44px] min-w-[44px] items-center justify-center sm:min-h-0 sm:min-w-0">
             <ThemeToggle />
           </div>

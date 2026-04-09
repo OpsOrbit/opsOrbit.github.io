@@ -7,9 +7,20 @@ import {
 } from '../../data/techWordsData'
 import { filterTechWords } from '../../utils/techWordsFilter'
 import { useTechWordRecent } from '../../hooks/useTechWordRecent'
+import WorkspaceHero from '../workspace/WorkspaceHero'
+import FilterChip from '../tools/FilterChip'
 
-const pillBase =
-  'shrink-0 rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] sm:text-sm'
+const CAT_ICONS = {
+  all: '✦',
+  networking: '🌐',
+  cloud: '☁️',
+  devops: '∞',
+  kubernetes: '☸️',
+  security: '🛡',
+  cicd: '⚡',
+  linux: '🐧',
+  general: '📘',
+}
 
 function TechWordCard({
   term,
@@ -41,10 +52,10 @@ function TechWordCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       transition={{ duration: 0.22 }}
-      className={`group flex flex-col overflow-hidden rounded-2xl border bg-[var(--hub-card)] shadow-[var(--hub-shadow-card)] transition-[border-color,box-shadow] duration-200 dark:bg-[var(--hub-elevated)]/40 ${
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-white/25 bg-gradient-to-br from-white/95 via-indigo-50/30 to-violet-50/20 shadow-[0_8px_32px_-12px_rgba(79,70,229,0.15)] backdrop-blur-xl transition-[border-color,box-shadow,transform] duration-200 dark:border-white/10 dark:from-[var(--hub-card)] dark:via-indigo-950/20 dark:to-violet-950/10 dark:shadow-black/30 ${
         open
-          ? 'border-[var(--hub-tool)] ring-1 ring-[var(--hub-tool)]/25'
-          : 'border-[var(--hub-line)] hover:border-[var(--hub-tool)]/45 hover:shadow-[var(--hub-shadow-card-hover)]'
+          ? 'border-indigo-400/50 ring-2 ring-cyan-400/25'
+          : 'border-[var(--hub-line)]/80 hover:border-indigo-400/40 hover:shadow-[0_12px_40px_-8px_rgba(99,102,241,0.2)]'
       }`}
     >
       <div className="flex min-w-0 items-start gap-3 p-4 sm:p-5">
@@ -56,7 +67,7 @@ function TechWordCard({
         >
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-extrabold text-[var(--hub-text)] sm:text-xl">{term.term}</h3>
-            <span className="rounded-md border border-[var(--hub-border2)] bg-[var(--hub-tool-dim2)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--hub-tool)]">
+            <span className="rounded-md border border-indigo-200/60 bg-indigo-50/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-950/50 dark:text-cyan-200/90">
               {categoryLabelForTechWord(term.categoryId)}
             </span>
           </div>
@@ -196,11 +207,21 @@ export default function TechWordsPage({
   }, [])
 
   return (
-    <div className="min-w-0 max-w-full overflow-x-hidden pb-4">
-      <div className="sticky top-0 z-30 -mx-1 mb-5 space-y-3 border-b border-[var(--hub-line)] bg-[var(--hub-bg)]/95 py-3 backdrop-blur-md dark:bg-[var(--hub-bg)]/92 sm:-mx-0 sm:mb-6 sm:border-0 sm:bg-transparent sm:py-0 sm:backdrop-blur-none dark:sm:bg-transparent">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-w-0 max-w-full overflow-x-hidden pb-4"
+    >
+      <WorkspaceHero
+        eyebrow="Technical dictionary"
+        title="Tech words"
+        description="Concise definitions, real examples, and bookmarking — toggle beginner explanations when available."
+      />
+
+      <div className="sticky top-0 z-30 -mx-1 mb-5 space-y-3 rounded-2xl border border-white/15 bg-[var(--hub-bg)]/95 py-3 shadow-sm backdrop-blur-lg dark:border-white/5 dark:bg-[var(--hub-bg)]/90 sm:-mx-0 sm:mb-6 sm:px-1 sm:py-4">
         <div className="relative">
           <svg
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--hub-muted)]"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400 dark:text-cyan-400/80"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -216,17 +237,17 @@ export default function TechWordsPage({
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Search terms, examples, categories…"
-            className="h-12 w-full rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-surface)] py-2 pl-9 pr-3 text-sm text-[var(--hub-text)] shadow-sm outline-none transition-[border-color,box-shadow] focus:border-[var(--hub-tool)] focus:shadow-[0_0_0_3px_var(--hub-tool-dim)] dark:bg-[var(--hub-elevated)]"
+            className="h-12 w-full rounded-2xl border border-white/40 bg-white/80 py-2 pl-11 pr-3 text-sm text-[var(--hub-text)] shadow-inner outline-none transition-[box-shadow,border-color] focus:border-indigo-400/50 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.2)] dark:border-white/10 dark:bg-[var(--hub-surface)]/90 dark:focus:shadow-[0_0_0_3px_rgba(34,211,238,0.15)]"
             aria-label="Search tech dictionary"
           />
         </div>
 
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-[var(--hub-muted)]">
+        <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-200/40 bg-indigo-50/40 px-3 py-2 text-sm font-semibold text-[var(--hub-muted)] dark:border-indigo-500/20 dark:bg-indigo-950/30">
           <input
             type="checkbox"
             checked={explainBeginner}
             onChange={(e) => setExplainBeginner(e.target.checked)}
-            className="h-4 w-4 rounded border-[var(--hub-border2)] text-[var(--hub-tool)] focus:ring-[var(--hub-tool)]"
+            className="h-4 w-4 rounded border-[var(--hub-border2)] text-indigo-600 focus:ring-indigo-500"
           />
           <span>Explain like beginner (when available)</span>
         </label>
@@ -237,43 +258,41 @@ export default function TechWordsPage({
             {TECH_WORD_CATEGORIES.map((c) => {
               const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
               return (
-                <button
+                <FilterChip
                   key={c.id}
-                  type="button"
+                  active={active}
+                  label={c.label}
+                  icon={CAT_ICONS[c.id] || '◇'}
                   onClick={() => onSelectCategory(c.id)}
-                  className={`${pillBase} ${
-                    active
-                      ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
-                      : 'border-[var(--hub-line)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:border-[var(--hub-border2)]'
-                  }`}
-                  aria-pressed={active}
-                >
-                  {c.label}
-                </button>
+                />
               )
             })}
           </div>
         </div>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[min(13rem,32%)_1fr] lg:items-start lg:gap-8">
+      <div className="lg:grid lg:grid-cols-[min(14rem,34%)_1fr] lg:items-start lg:gap-8">
         <aside className="mb-6 hidden lg:sticky lg:top-24 lg:mb-0 lg:block lg:self-start" aria-label="Filter by category">
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Categories</p>
-          <nav className="flex flex-col gap-1 rounded-xl border border-[var(--hub-line)] bg-[var(--hub-surface)] p-2 dark:bg-[var(--hub-elevated)]/40">
+          <nav className="flex flex-col gap-1 rounded-2xl border border-white/20 bg-[var(--hub-surface)]/95 p-2 shadow-[0_8px_30px_-12px_rgba(79,70,229,0.15)] backdrop-blur-md dark:border-white/10 dark:bg-[var(--hub-elevated)]/80">
             {TECH_WORD_CATEGORIES.map((c) => {
               const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
+              const icon = CAT_ICONS[c.id] || '◇'
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => onSelectCategory(c.id)}
-                  className={`rounded-lg px-3 py-2.5 text-left text-sm font-bold transition-colors ${
+                  className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-bold transition-all ${
                     active
-                      ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                      : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20 ring-1 ring-cyan-400/30'
+                      : 'text-[var(--hub-muted)] hover:bg-indigo-50/80 hover:text-[var(--hub-text)] dark:hover:bg-white/5'
                   }`}
                   aria-pressed={active}
                 >
+                  <span className="text-base" aria-hidden>
+                    {icon}
+                  </span>
                   {c.label}
                 </button>
               )
@@ -283,7 +302,7 @@ export default function TechWordsPage({
 
         <div className="min-w-0">
           {recentTerms.length > 0 ? (
-            <section className="mb-6 rounded-xl border border-dashed border-[var(--hub-line)] bg-[var(--hub-surface)]/60 p-3 dark:bg-[var(--hub-elevated)]/20">
+            <section className="mb-6 rounded-2xl border border-indigo-200/40 bg-gradient-to-r from-indigo-50/50 to-cyan-50/30 p-3 dark:border-indigo-500/20 dark:from-indigo-950/40 dark:to-cyan-950/20">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
                 Recently viewed
               </p>
@@ -304,7 +323,9 @@ export default function TechWordsPage({
 
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm text-[var(--hub-sub)]">
-              <span className="font-mono font-bold text-[var(--hub-tool)]">{filtered.length}</span>
+              <span className="font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-cyan-300 dark:to-indigo-300">
+                {filtered.length}
+              </span>
               <span className="ml-1">terms</span>
               {activeCategoryId && activeCategoryId !== 'all' ? (
                 <span className="text-[var(--hub-muted)]"> · {categoryLabelForTechWord(activeCategoryId)}</span>
@@ -316,7 +337,7 @@ export default function TechWordsPage({
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-xl border border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-6 py-12 text-center text-sm text-[var(--hub-sub)]"
+              className="rounded-2xl border border-dashed border-indigo-300/50 bg-gradient-to-br from-white/80 to-indigo-50/40 px-6 py-12 text-center text-sm text-[var(--hub-sub)] dark:border-indigo-500/30 dark:from-[var(--hub-card)]/80 dark:to-indigo-950/30"
             >
               No terms match your search or category. Try clearing filters or different keywords.
             </motion.p>
@@ -342,6 +363,6 @@ export default function TechWordsPage({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

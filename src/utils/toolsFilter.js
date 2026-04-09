@@ -1,4 +1,5 @@
 import { DEVOPS_TOOLS, categoryLabel } from '../data/toolsData'
+import { toolMatchesLifecycleStage } from '../data/toolLifecycleMap'
 
 /**
  * @typedef {{ openSource: boolean, paid: boolean, cloudNative: boolean }} ToolFilterChips
@@ -34,14 +35,16 @@ function matchesChips(tool, chips) {
  * @param {string} query
  * @param {string | null} categoryId — null or 'all' = all categories
  * @param {ToolFilterChips} chips
+ * @param {string | null} [lifecycleStage] — filter by lifecycle stage, or null for all
  */
-export function filterDevopsTools(query, categoryId, chips) {
+export function filterDevopsTools(query, categoryId, chips, lifecycleStage = null) {
   const q = query.trim().toLowerCase()
   const cat = categoryId && categoryId !== 'all' ? categoryId : null
 
   return DEVOPS_TOOLS.filter((tool) => {
     if (cat && tool.categoryId !== cat) return false
     if (!matchesChips(tool, chips)) return false
+    if (lifecycleStage && !toolMatchesLifecycleStage(tool, lifecycleStage)) return false
 
     if (!q) return true
 

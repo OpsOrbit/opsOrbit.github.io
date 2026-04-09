@@ -2,135 +2,20 @@ import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
 import { filterDevopsTools } from '../../utils/toolsFilter'
 import { categoryLabel } from '../../data/toolsData'
+import { DEVOPS_TOOLS } from '../../data/toolsData'
 import ToolCard from './ToolCard'
 import ToolModal from './ToolModal'
 import DomainNavBar from './DomainNavBar'
-
-const LIFECYCLE = [
-  { id: 'plan', label: 'Plan', hint: 'Issues & design' },
-  { id: 'code', label: 'Code', hint: 'SCM & review' },
-  { id: 'build', label: 'Build', hint: 'CI & artifacts' },
-  { id: 'test', label: 'Test', hint: 'Quality & security' },
-  { id: 'release', label: 'Release', hint: 'Deploy & config' },
-  { id: 'operate', label: 'Operate', hint: 'Run & observe' },
-  { id: 'monitor', label: 'Monitor', hint: 'SLOs & incidents' },
-]
-
-const SWIPE_THRESHOLD_PX = 48
-
-function DevOpsLifecycleStrip() {
-  const scrollerRef = useRef(null)
-  const touchRef = useRef({ x: 0, y: 0 })
-
-  const scrollByStep = useCallback((direction) => {
-    const el = scrollerRef.current
-    if (!el) return
-    const delta = direction * Math.min(200, Math.max(120, el.clientWidth * 0.42))
-    el.scrollBy({ left: delta, behavior: 'smooth' })
-  }, [])
-
-  const onTouchStart = useCallback((e) => {
-    const t = e.touches[0]
-    touchRef.current = { x: t.clientX, y: t.clientY }
-  }, [])
-
-  const onTouchEnd = useCallback(
-    (e) => {
-      const t = e.changedTouches[0]
-      const dx = t.clientX - touchRef.current.x
-      const dy = t.clientY - touchRef.current.y
-      if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) return
-      scrollByStep(dx < 0 ? 1 : -1)
-    },
-    [scrollByStep]
-  )
-
-  return (
-    <div className="mb-4 overflow-hidden rounded-xl border border-[var(--hub-line)] bg-[var(--hub-card)]/80 p-3 pb-2 dark:bg-[var(--hub-elevated)]/30 sm:mb-6 sm:p-4 lg:p-6">
-      <div className="mb-1 flex flex-wrap items-center justify-between gap-2 sm:mb-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)]">
-          Where tools sit in the lifecycle
-        </p>
-        <div className="flex shrink-0 items-center gap-1 lg:hidden">
-          <button
-            type="button"
-            onClick={() => scrollByStep(-1)}
-            className="flex h-9 min-w-9 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-text)]"
-            aria-label="Previous lifecycle phases"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollByStep(1)}
-            className="flex h-9 min-w-9 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-text)]"
-            aria-label="Next lifecycle phases"
-          >
-            →
-          </button>
-        </div>
-      </div>
-      <p className="mb-2 text-[10px] text-[var(--hub-faint)] lg:hidden">Swipe or tap arrows to move along the lifecycle</p>
-      <div className="-mx-3 min-w-0 px-3 sm:mx-0 sm:px-0">
-        <div
-          ref={scrollerRef}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-          className="hub-inline-scroll scrollbar-hide w-full min-w-0 max-w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden pb-2 lg:snap-none lg:overflow-x-visible lg:pb-0"
-          tabIndex={0}
-          role="region"
-          aria-label="DevOps lifecycle phases — swipe horizontally or scroll to explore"
-        >
-          <div
-            className="flex w-max min-w-0 flex-nowrap gap-3 lg:w-full lg:max-w-full lg:flex-wrap lg:justify-between lg:gap-2"
-            role="list"
-          >
-            {LIFECYCLE.map((step, i) => (
-              <div
-                key={step.id}
-                className="flex shrink-0 snap-center snap-always items-center gap-2 lg:snap-none lg:min-w-0 lg:flex-1"
-                role="listitem"
-              >
-                <div className="flex min-h-[44px] min-w-[120px] shrink-0 flex-col justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 py-2 text-center dark:bg-[var(--hub-bg)] sm:min-h-0 lg:min-w-0 lg:w-full lg:flex-1">
-                  <span className="whitespace-nowrap text-xs font-extrabold text-[var(--hub-text)] sm:text-[11px]">
-                    {step.label}
-                  </span>
-                  <span className="hidden text-[9px] text-[var(--hub-faint)] lg:block">{step.hint}</span>
-                </div>
-                {i < LIFECYCLE.length - 1 && (
-                  <span className="hidden shrink-0 text-[var(--hub-faint)] lg:inline" aria-hidden>
-                    →
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function FilterChip({ active, label, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`min-h-11 rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] sm:min-h-0 sm:py-1.5 sm:text-sm ${
-        active
-          ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
-          : 'border-[var(--hub-line)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:border-[var(--hub-border2)]'
-      }`}
-      aria-pressed={active}
-    >
-      {label}
-    </button>
-  )
-}
+import FilterChip from './FilterChip'
+import LifecycleStrip from './LifecycleStrip'
+import { RecommendedStack, TopToolsStrip } from './ToolsDiscoverSections'
+import CompareDock from './CompareDock'
+import WorkspaceHero from '../workspace/WorkspaceHero'
 
 /**
  * @param {{
  *   query: string
+ *   onQueryChange?: (q: string) => void
  *   activeCategoryId: string
  *   onSelectCategory: (id: string) => void
  *   isFavorite: (id: string) => boolean
@@ -139,6 +24,7 @@ function FilterChip({ active, label, onClick }) {
  */
 export default function ToolsPage({
   query,
+  onQueryChange,
   activeCategoryId,
   onSelectCategory,
   isFavorite,
@@ -149,7 +35,9 @@ export default function ToolsPage({
     paid: false,
     cloudNative: false,
   })
+  const [lifecycleStage, setLifecycleStage] = useState(/** @type {string | null} */ (null))
   const [selected, setSelected] = useState(null)
+  const [compareIds, setCompareIds] = useState(/** @type {string[]} */ ([]))
   const [filtersCompact, setFiltersCompact] = useState(false)
   const filterSentinelRef = useRef(null)
 
@@ -167,61 +55,113 @@ export default function ToolsPage({
   }, [])
 
   const filtered = useMemo(
-    () => filterDevopsTools(query, activeCategoryId, chips),
-    [query, activeCategoryId, chips]
+    () => filterDevopsTools(query, activeCategoryId, chips, lifecycleStage),
+    [query, activeCategoryId, chips, lifecycleStage]
   )
 
   const categoryTitle =
-    activeCategoryId === 'all' || !activeCategoryId
-      ? 'All domains'
-      : categoryLabel(activeCategoryId)
+    activeCategoryId === 'all' || !activeCategoryId ? 'All domains' : categoryLabel(activeCategoryId)
 
   const toggleChip = (key) => {
     setChips((c) => ({ ...c, [key]: !c[key] }))
   }
 
+  const pickToolById = useCallback((id) => {
+    const t = DEVOPS_TOOLS.find((x) => x.id === id)
+    if (t) setSelected(t)
+  }, [])
+
+  const addCompare = useCallback((tool) => {
+    setCompareIds((prev) => {
+      if (prev.includes(tool.id)) return prev.filter((x) => x !== tool.id)
+      if (prev.length >= 2) return [prev[0], tool.id]
+      return [...prev, tool.id]
+    })
+  }, [])
+
   return (
-    <div className="min-w-0 max-w-full overflow-x-hidden">
-      <DevOpsLifecycleStrip />
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+      className="tools-workspace min-w-0 max-w-full overflow-x-hidden pb-4"
+    >
+      <WorkspaceHero
+        eyebrow="DevOps tools encyclopedia"
+        title="Explore & compare"
+        description="Curated tools across the SDLC — filter by lifecycle stage, domain, and license. Built for learning."
+      >
+        {onQueryChange ? (
+          <div className="relative mt-5 max-w-xl">
+            <svg
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400 dark:text-cyan-400/80"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.2}
+              aria-hidden
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="Search tools, categories, use cases…"
+              className="h-12 w-full rounded-2xl border border-white/40 bg-white/70 pl-11 pr-4 text-sm text-[var(--hub-text)] shadow-inner outline-none ring-cyan-500/0 transition-[box-shadow,border-color] placeholder:text-[var(--hub-muted)] focus:border-indigo-400/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(99,102,241,0.25)] dark:border-white/10 dark:bg-[var(--hub-surface)]/80 dark:focus:shadow-[0_0_0_3px_rgba(34,211,238,0.2)]"
+              aria-label="Search tools"
+            />
+          </div>
+        ) : null}
+      </WorkspaceHero>
+
+      <TopToolsStrip onPickTool={pickToolById} />
+      <RecommendedStack onPickTool={pickToolById} />
+
+      <LifecycleStrip selectedId={lifecycleStage} onSelectStage={setLifecycleStage} />
 
       <DomainNavBar activeCategoryId={activeCategoryId} onSelectCategory={onSelectCategory} />
 
       <div ref={filterSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
       <div
-        className={`sticky top-0 z-20 -mx-1 mb-4 border-b border-[var(--hub-line)] bg-[var(--hub-bg)]/95 backdrop-blur-md transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/90 lg:z-[5] ${
-          filtersCompact ? 'py-2 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] dark:shadow-black/30 sm:py-2.5' : 'py-3 sm:py-4'
+        className={`sticky top-0 z-20 -mx-1 mb-4 rounded-2xl border border-white/10 bg-[var(--hub-bg)]/90 backdrop-blur-lg transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/88 lg:z-[5] ${
+          filtersCompact
+            ? 'py-2 shadow-[0_12px_40px_-8px_rgba(79,70,229,0.18)] dark:shadow-black/40 sm:py-2.5'
+            : 'py-3 sm:py-4'
         }`}
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Filters</p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="hub-inline-scroll scrollbar-hide mt-2 flex w-full max-w-full flex-nowrap gap-2 overflow-x-auto overflow-y-hidden pb-1 sm:flex-wrap">
               <FilterChip
                 active={chips.openSource}
                 label="Open source"
+                icon="◆"
                 onClick={() => toggleChip('openSource')}
               />
-              <FilterChip active={chips.paid} label="Paid" onClick={() => toggleChip('paid')} />
+              <FilterChip active={chips.paid} label="Paid" icon="◆" onClick={() => toggleChip('paid')} />
               <FilterChip
                 active={chips.cloudNative}
                 label="Cloud native"
+                icon="☁"
                 onClick={() => toggleChip('cloudNative')}
               />
             </div>
           </div>
           <p className="text-sm text-[var(--hub-sub)] sm:text-base">
-            <span className="font-mono font-bold text-[var(--hub-tool)]">{filtered.length}</span>
-            <span className="ml-1 break-words">tools in view · {categoryTitle}</span>
+            <span className="font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-cyan-300 dark:to-indigo-300">
+              {filtered.length}
+            </span>
+            <span className="ml-1 break-words">tools · {categoryTitle}</span>
           </p>
         </div>
       </div>
 
       <LayoutGroup id="tools-grid">
-        <motion.div
-          layout
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        <motion.div layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {filtered.map((tool) => (
               <ToolCard
@@ -230,6 +170,7 @@ export default function ToolsPage({
                 isFavorite={isFavorite(tool.id)}
                 onToggleFavorite={() => toggleFavorite(tool.id)}
                 onOpen={() => setSelected(tool)}
+                onCompare={addCompare}
               />
             ))}
           </AnimatePresence>
@@ -240,11 +181,11 @@ export default function ToolsPage({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-xl border border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-4 py-12 text-center sm:px-8 sm:py-16"
+          className="rounded-2xl border border-dashed border-indigo-300/40 bg-gradient-to-br from-white/60 to-indigo-50/30 px-4 py-12 text-center backdrop-blur-sm dark:border-indigo-500/20 dark:from-[var(--hub-card)]/60 dark:to-indigo-950/20 sm:px-8 sm:py-16"
         >
-          <p className="text-sm text-[var(--hub-sub)] sm:text-base">No tools match your search or filters.</p>
+          <p className="text-sm font-medium text-[var(--hub-sub)] sm:text-base">No tools match your search or filters.</p>
           <p className="mt-2 text-xs text-[var(--hub-faint)] sm:text-sm">
-            Try clearing filters or searching by name or category.
+            Clear lifecycle, adjust license chips, or try a shorter search.
           </p>
         </motion.div>
       )}
@@ -258,6 +199,12 @@ export default function ToolsPage({
           onClose={() => setSelected(null)}
         />
       ) : null}
-    </div>
+
+      <CompareDock
+        ids={compareIds}
+        onClear={() => setCompareIds([])}
+        onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
+      />
+    </motion.div>
   )
 }

@@ -10,6 +10,7 @@ import ExpandableSection from './lab/ExpandableSection'
 import CodeBlockPanel from './lab/CodeBlockPanel'
 import LabFlowDiagram from './lab/LabFlowDiagram'
 import LabHandsOnPanel from './lab/LabHandsOnPanel'
+import WorkspaceHero from './workspace/WorkspaceHero'
 
 function renderRichParts(text) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -123,6 +124,12 @@ export default function ScriptingGuides({
   if (guides.length === 0) {
     return (
       <div className="pb-7 sm:pb-8">
+        <WorkspaceHero
+          eyebrow="Hands-on lab"
+          title="Interactive DevOps modules"
+          description="Guided topics with CLI cross-reference, diagrams, and notes — choose another topic in the sidebar when results return."
+          className="mb-4"
+        />
         <ScriptingTopicsNav
           variant="workspace"
           activeId={activeId}
@@ -131,7 +138,7 @@ export default function ScriptingGuides({
           isTopicLearned={labProgress?.isLearned}
         />
         <div className="w-full min-w-0">
-          <Card className="min-w-0 border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-8 py-16 text-center">
+          <Card className="min-w-0 border-dashed border-indigo-300/40 bg-gradient-to-br from-white/90 to-indigo-50/40 px-8 py-16 text-center dark:border-indigo-500/25 dark:from-[var(--hub-card)] dark:to-indigo-950/30">
             <p className="text-base leading-relaxed text-[var(--hub-sub)]">
               No topics match your search. Try different keywords.
             </p>
@@ -143,6 +150,12 @@ export default function ScriptingGuides({
 
   return (
     <div className="pb-7 sm:pb-8">
+      <WorkspaceHero
+        eyebrow="Hands-on lab"
+        title="Interactive DevOps modules"
+        description="Guided walkthroughs with command cross-reference, visual flows, and your notes — use the sidebar to switch topics."
+        className="mb-4"
+      />
       <ScriptingTopicsNav
         variant="workspace"
         activeId={activeId}
@@ -152,12 +165,12 @@ export default function ScriptingGuides({
       />
       <div className="w-full min-w-0">
         <article
-          className="min-w-0 overflow-hidden rounded-2xl border border-hub-line bg-hub-surface shadow-card ring-1 ring-hub-primary/10 sm:p-0 dark:ring-hub-primary/15"
+          className="min-w-0 overflow-hidden rounded-2xl border border-white/25 bg-gradient-to-br from-white/95 via-indigo-50/30 to-violet-50/20 shadow-[0_12px_40px_-12px_rgba(79,70,229,0.12)] backdrop-blur-xl ring-1 ring-indigo-500/10 sm:p-0 dark:border-white/10 dark:from-[var(--hub-surface)] dark:via-indigo-950/25 dark:to-violet-950/20 dark:ring-indigo-400/15"
           aria-labelledby="lab-guide-title"
         >
-          <div className="border-b border-[var(--hub-line)]/80 p-4 sm:p-7">
+          <div className="border-b border-[var(--hub-line)]/60 p-4 sm:p-7">
             <header className="pb-4">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)]">LAB</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-indigo-600 dark:text-cyan-400/90">LAB</p>
               <h2
                 id="lab-guide-title"
                 className="mt-1 text-xl font-extrabold tracking-tight text-[var(--hub-text)] sm:text-2xl"

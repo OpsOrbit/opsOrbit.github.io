@@ -11,6 +11,9 @@ import SidebarNav from './components/SidebarNav'
 import SidebarToolTree from './components/SidebarToolTree'
 import MainWorkspaceHeader from './components/MainWorkspaceHeader'
 import MainLayout from './components/layout/MainLayout'
+import LearningModeBar from './components/layout/LearningModeBar'
+import GlobalSearchModal from './components/search/GlobalSearchModal'
+import FavoritesHubModal from './components/favorites/FavoritesHubModal'
 import Footer from './components/layout/Footer'
 import DockMagnify from './components/DockMagnify'
 import Card from './components/ui/Card'
@@ -31,6 +34,7 @@ import { filterDevopsTools } from './utils/toolsFilter'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
 import TechWordsPage from './components/techwords/TechWordsPage'
+import CommandsHero from './components/commands/CommandsHero'
 import MobileWorkspaceBottomNav from './components/MobileWorkspaceBottomNav'
 import { filterTechWords } from './utils/techWordsFilter'
 import { useTechWordFavorites } from './hooks/useTechWordFavorites'
@@ -130,15 +134,19 @@ export default function App() {
   const [commandsLearnMode, setCommandsLearnMode] = useState('learn')
   const [expandedCommandId, setExpandedCommandId] = useState(null)
   const searchInputRef = useRef(null)
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false)
+  const [favoritesOpen, setFavoritesOpen] = useState(false)
   const labProgress = useLabProgress()
-  const { isFavorite, toggleFavorite } = useCommandFavorites()
+  const { isFavorite, toggleFavorite, favoriteIds: commandFavoriteIds } = useCommandFavorites()
   const {
     isFavorite: isToolFavorite,
     toggleFavorite: toggleToolFavorite,
+    favoriteIds: toolFavoriteIds,
   } = useToolFavorites()
   const {
     isFavorite: isTechWordFavorite,
     toggleFavorite: toggleTechWordFavorite,
+    favoriteIds: techWordFavoriteIds,
   } = useTechWordFavorites()
   const { isLearned, toggleLearned } = useCommandLearned()
 
@@ -175,6 +183,42 @@ export default function App() {
     setSelected(null)
     setBrowseKey(null)
     setPreferredCategory(null)
+  }, [])
+
+  const handleGlobalNavigate = useCallback(({ type, payload }) => {
+    if (type === 'command') {
+      const c = payload
+      setWorkspaceMode('commands')
+      setTool(c.tool || 'all')
+      setQuery('')
+      setBrowseKey(null)
+      setPreferredCategory(null)
+      setSelected(c)
+      return
+    }
+    if (type === 'tool') {
+      const t = payload
+      setWorkspaceMode('tools')
+      setToolsCategoryId(t.categoryId || 'all')
+      setQuery(t.name)
+      setSelected(null)
+      return
+    }
+    if (type === 'lab') {
+      const g = payload
+      setWorkspaceMode('scripting')
+      setScriptingTopicId(g.id)
+      setQuery('')
+      setSelected(null)
+      return
+    }
+    if (type === 'techword') {
+      const w = payload
+      setWorkspaceMode('techwords')
+      setTechWordsCategoryId(w.categoryId || 'all')
+      setQuery(w.term)
+      setSelected(null)
+    }
   }, [])
 
   useEffect(() => {
@@ -235,6 +279,11 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setGlobalSearchOpen(true)
+        return
+      }
       if (
         e.key !== '/' ||
         (workspaceMode !== 'commands' && workspaceMode !== 'tools' && workspaceMode !== 'techwords')
@@ -452,7 +501,11 @@ export default function App() {
         onSelectToolsCategory={setToolsCategoryId}
         techWordsCategoryId={techWordsCategoryId}
         onSelectTechWordsCategory={setTechWordsCategoryId}
+        onOpenGlobalSearch={() => setGlobalSearchOpen(true)}
+        onOpenFavorites={() => setFavoritesOpen(true)}
       />
+
+      <LearningModeBar workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         <aside
@@ -594,6 +647,7 @@ export default function App() {
                 }
                 className="hub-fade-in min-w-0 w-full"
               >
+                {workspaceMode === 'commands' && <CommandsHero />}
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
                     activeId={scriptingTopicId}
@@ -611,6 +665,7 @@ export default function App() {
                 {workspaceMode === 'tools' && (
                   <ToolsPage
                     query={query}
+                    onQueryChange={setQuery}
                     activeCategoryId={toolsCategoryId}
                     onSelectCategory={setToolsCategoryId}
                     isFavorite={isToolFavorite}
@@ -723,6 +778,21 @@ export default function App() {
       <Footer />
 
       <MobileWorkspaceBottomNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
+
+      <GlobalSearchModal
+        open={globalSearchOpen}
+        onClose={() => setGlobalSearchOpen(false)}
+        onNavigate={handleGlobalNavigate}
+      />
+      <FavoritesHubModal
+        open={favoritesOpen}
+        onClose={() => setFavoritesOpen(false)}
+        commandFavoriteIds={commandFavoriteIds}
+        toolFavoriteIds={toolFavoriteIds}
+        techWordFavoriteIds={techWordFavoriteIds}
+        labLearned={labProgress.learned}
+        onNavigate={handleGlobalNavigate}
+      />
 
       <AnimatePresence>
         {selected ? (
