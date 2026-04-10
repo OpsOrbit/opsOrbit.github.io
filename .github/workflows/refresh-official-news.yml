@@ -1,22 +1,18 @@
-# Fetches allowlisted vendor RSS and commits public/official-news.json.
-# Push to default branch triggers Deploy to GitHub Pages (prebuild also refreshes JSON).
-name: Refresh official news
+# Verifies RSS fetch script; JSON is baked at deploy via `npm run build` (prebuild), not committed.
+name: Verify official news fetch
 
 on:
-  schedule:
-    # 06:00 UTC daily (~1 AM US Eastern, depending on DST)
-    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: official-news-refresh
+  group: official-news-verify
   cancel-in-progress: true
 
 jobs:
-  refresh:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,17 +23,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Fetch RSS → public/official-news.json
+      - name: Fetch RSS → public/official-news.json (ephemeral)
         run: node scripts/fetch-official-news.mjs
 
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/official-news.json
-          if git diff --staged --quiet; then
-            echo "No changes to official-news.json"
-          else
-            git commit -m "chore(news): daily refresh of official-news.json"
-            git push
-          fi
+      - name: Assert snapshot exists
+        run: test -f public/official-news.json
