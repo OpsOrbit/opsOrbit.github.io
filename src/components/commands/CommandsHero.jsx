@@ -5,7 +5,7 @@ export default function CommandsHero() {
     <WorkspaceHero
       eyebrow="Command reference"
       title="CLI explorer"
-      description="Use the header search for instant matches, or browse by tool in the sidebar. Expand cards to copy, simulate runs, and bookmark."
+      description="Use the search bar below the header for instant matches, or browse by tool in the sidebar. Expand cards to copy, simulate runs, and bookmark."
     />
   )
 }

@@ -11,11 +11,10 @@ import SidebarNav from './components/SidebarNav'
 import SidebarToolTree from './components/SidebarToolTree'
 import MainWorkspaceHeader from './components/MainWorkspaceHeader'
 import MainLayout from './components/layout/MainLayout'
-import LearningModeBar from './components/layout/LearningModeBar'
-import GlobalSearchModal from './components/search/GlobalSearchModal'
+import ScrollEdgeButtons from './components/layout/ScrollEdgeButtons'
+import WorkspaceModeNav from './components/layout/WorkspaceModeNav'
 import FavoritesHubModal from './components/favorites/FavoritesHubModal'
 import Footer from './components/layout/Footer'
-import DockMagnify from './components/DockMagnify'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
 import ScriptingTopicsNav from './components/ScriptingTopicsNav'
@@ -35,11 +34,31 @@ import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
 import TechWordsPage from './components/techwords/TechWordsPage'
 import CommandsHero from './components/commands/CommandsHero'
+import CommandsDiscoverSections from './components/commands/CommandsDiscoverSections'
 import MobileWorkspaceBottomNav from './components/MobileWorkspaceBottomNav'
 import { filterTechWords } from './utils/techWordsFilter'
+import { filterConcepts } from './utils/conceptsFilter'
 import { useTechWordFavorites } from './hooks/useTechWordFavorites'
+import ConceptsPage from './components/concepts/ConceptsPage'
+import PortsPage from './components/ports/PortsPage'
+import ScenariosPage from './components/scenarios/ScenariosPage'
+import { filterPorts } from './utils/portsFilter'
+import { filterScenarios } from './utils/scenariosFilter'
+import PlaygroundPage from './components/playground/PlaygroundPage'
+import ArchitecturePage from './components/architecture/ArchitecturePage'
+import { ARCHITECTURES } from './data/architectureData'
+import CheatsheetsPage from './components/cheatsheets/CheatsheetsPage'
+import { countCheatsheetRows } from './data/cheatsheetsData'
+import UtilitiesPage from './components/utilities/UtilitiesPage'
+import { countVisibleUtilityTools } from './data/utilitiesData'
+import DailyPage from './components/daily/DailyPage'
+import { stepWorkspaceMode } from './constants/workspaceModes'
 
 const CommandPanel = lazy(() => import('./components/CommandPanel'))
+
+/** Previous workspace: `<` or `,` — next: `>` or `.` (when not typing in a field). */
+const WORKSPACE_PREV_KEYS = new Set(['<', ','])
+const WORKSPACE_NEXT_KEYS = new Set(['>', '.'])
 
 function readInitialWorkspaceState() {
   const defaults = {
@@ -48,6 +67,14 @@ function readInitialWorkspaceState() {
     scriptingTopicId: SCRIPTING_GUIDES[0]?.id ?? 'dockerfile',
     toolsCategoryId: 'all',
     techWordsCategoryId: 'all',
+    conceptsCategoryId: 'all',
+    portsCategoryId: 'all',
+    scenariosCategoryId: 'all',
+    scenariosDifficultyId: 'all',
+    playgroundTabId: 'kubernetes',
+    architectureId: null,
+    cheatsheetTabId: 'git',
+    utilitiesTabId: 'cidr',
   }
   if (typeof window === 'undefined') return defaults
   const parsed = parseWorkspaceHash(window.location.hash)
@@ -55,6 +82,42 @@ function readInitialWorkspaceState() {
   if (parsed.mode === 'roadmap') return { ...defaults, workspaceMode: 'roadmap' }
   if (parsed.mode === 'techwords')
     return { ...defaults, workspaceMode: 'techwords', techWordsCategoryId: parsed.category || 'all' }
+  if (parsed.mode === 'concepts')
+    return { ...defaults, workspaceMode: 'concepts', conceptsCategoryId: parsed.category || 'all' }
+  if (parsed.mode === 'ports')
+    return { ...defaults, workspaceMode: 'ports', portsCategoryId: parsed.category || 'all' }
+  if (parsed.mode === 'scenarios')
+    return {
+      ...defaults,
+      workspaceMode: 'scenarios',
+      scenariosCategoryId: parsed.category || 'all',
+      scenariosDifficultyId: parsed.difficulty || 'all',
+    }
+  if (parsed.mode === 'playground')
+    return {
+      ...defaults,
+      workspaceMode: 'playground',
+      playgroundTabId: parsed.tab || 'kubernetes',
+    }
+  if (parsed.mode === 'architecture')
+    return {
+      ...defaults,
+      workspaceMode: 'architecture',
+      architectureId: parsed.architectureId ?? null,
+    }
+  if (parsed.mode === 'cheatsheets')
+    return {
+      ...defaults,
+      workspaceMode: 'cheatsheets',
+      cheatsheetTabId: parsed.tab || 'git',
+    }
+  if (parsed.mode === 'utilities')
+    return {
+      ...defaults,
+      workspaceMode: 'utilities',
+      utilitiesTabId: parsed.tab || 'cidr',
+    }
+  if (parsed.mode === 'daily') return { ...defaults, workspaceMode: 'daily' }
   if (parsed.mode === 'tools')
     return { ...defaults, workspaceMode: 'tools', toolsCategoryId: parsed.category || 'all' }
   if (parsed.mode === 'scripting') return { ...defaults, workspaceMode: 'scripting', scriptingTopicId: parsed.topic }
@@ -94,6 +157,9 @@ function levelLabel(l) {
   return labels[l] || l
 }
 
+const PLAYGROUND_DEMO_COUNT = 4
+const ARCHITECTURE_PATTERN_COUNT = ARCHITECTURES.length
+
 const COUNT_TOOL_IDS = [
   'all',
   'aws',
@@ -131,10 +197,24 @@ export default function App() {
   const [techWordsCategoryId, setTechWordsCategoryId] = useState(
     () => readInitialWorkspaceState().techWordsCategoryId
   )
+  const [conceptsCategoryId, setConceptsCategoryId] = useState(
+    () => readInitialWorkspaceState().conceptsCategoryId
+  )
+  const [portsCategoryId, setPortsCategoryId] = useState(() => readInitialWorkspaceState().portsCategoryId)
+  const [scenariosCategoryId, setScenariosCategoryId] = useState(
+    () => readInitialWorkspaceState().scenariosCategoryId
+  )
+  const [scenariosDifficultyId, setScenariosDifficultyId] = useState(
+    () => readInitialWorkspaceState().scenariosDifficultyId
+  )
+  const [playgroundTabId, setPlaygroundTabId] = useState(() => readInitialWorkspaceState().playgroundTabId)
+  const [architectureId, setArchitectureId] = useState(() => readInitialWorkspaceState().architectureId)
+  const [cheatsheetTabId, setCheatsheetTabId] = useState(() => readInitialWorkspaceState().cheatsheetTabId)
+  const [utilitiesTabId, setUtilitiesTabId] = useState(() => readInitialWorkspaceState().utilitiesTabId)
   const [commandsLearnMode, setCommandsLearnMode] = useState('learn')
   const [expandedCommandId, setExpandedCommandId] = useState(null)
-  const searchInputRef = useRef(null)
-  const [globalSearchOpen, setGlobalSearchOpen] = useState(false)
+  const searchBarRef = useRef(/** @type {{ focus: () => void } | null} */ (null))
+  const playgroundInputRef = useRef(null)
   const [favoritesOpen, setFavoritesOpen] = useState(false)
   const labProgress = useLabProgress()
   const { isFavorite, toggleFavorite, favoriteIds: commandFavoriteIds } = useCommandFavorites()
@@ -218,6 +298,31 @@ export default function App() {
       setTechWordsCategoryId(w.categoryId || 'all')
       setQuery(w.term)
       setSelected(null)
+      return
+    }
+    if (type === 'concept') {
+      const c = payload
+      setWorkspaceMode('concepts')
+      setConceptsCategoryId(c.categoryId || 'all')
+      setQuery(c.title || '')
+      setSelected(null)
+      return
+    }
+    if (type === 'port') {
+      const p = payload
+      setWorkspaceMode('ports')
+      setPortsCategoryId(p.categoryId || 'all')
+      setQuery(String(p.port))
+      setSelected(null)
+      return
+    }
+    if (type === 'scenario') {
+      const s = payload
+      setWorkspaceMode('scenarios')
+      setScenariosCategoryId(s.categoryId || 'all')
+      setScenariosDifficultyId(s.difficulty || 'all')
+      setQuery(s.title || '')
+      setSelected(null)
     }
   }, [])
 
@@ -238,6 +343,30 @@ export default function App() {
       if (parsed.mode === 'techwords') {
         setTechWordsCategoryId(parsed.category || 'all')
       }
+      if (parsed.mode === 'concepts') {
+        setConceptsCategoryId(parsed.category || 'all')
+      }
+      if (parsed.mode === 'ports') {
+        setPortsCategoryId(parsed.category || 'all')
+      }
+      if (parsed.mode === 'scenarios') {
+        setScenariosCategoryId(parsed.category || 'all')
+        setScenariosDifficultyId(parsed.difficulty || 'all')
+      }
+      if (parsed.mode === 'playground') {
+        setPlaygroundTabId(parsed.tab || 'kubernetes')
+      }
+      if (parsed.mode === 'architecture') {
+        setArchitectureId(parsed.architectureId ?? null)
+      } else {
+        setArchitectureId(null)
+      }
+      if (parsed.mode === 'cheatsheets') {
+        setCheatsheetTabId(parsed.tab || 'git')
+      }
+      if (parsed.mode === 'utilities') {
+        setUtilitiesTabId(parsed.tab || 'cidr')
+      }
       if (parsed.mode === 'scripting' && parsed.topic) {
         setScriptingTopicId(parsed.topic)
       }
@@ -253,6 +382,14 @@ export default function App() {
       topic: scriptingTopicId,
       toolsCategory: toolsCategoryId,
       techWordsCategory: techWordsCategoryId,
+      conceptsCategory: conceptsCategoryId,
+      portsCategory: portsCategoryId,
+      scenariosCategory: scenariosCategoryId,
+      scenariosDifficulty: scenariosDifficultyId,
+      playgroundTab: playgroundTabId,
+      architectureId,
+      cheatsheetTab: cheatsheetTabId,
+      utilitiesTab: utilitiesTabId,
     })
     if (typeof window === 'undefined') return
     const cur = window.location.hash
@@ -263,7 +400,21 @@ export default function App() {
         `${window.location.pathname}${window.location.search}${next}`
       )
     }
-  }, [workspaceMode, tool, scriptingTopicId, toolsCategoryId, techWordsCategoryId])
+  }, [
+    workspaceMode,
+    tool,
+    scriptingTopicId,
+    toolsCategoryId,
+    techWordsCategoryId,
+    conceptsCategoryId,
+    portsCategoryId,
+    scenariosCategoryId,
+    scenariosDifficultyId,
+    playgroundTabId,
+    architectureId,
+    cheatsheetTabId,
+    utilitiesTabId,
+  ])
 
   useEffect(() => {
     setBrowseKey(null)
@@ -274,6 +425,10 @@ export default function App() {
   }, [workspaceMode])
 
   useEffect(() => {
+    if (workspaceMode !== 'architecture') setArchitectureId(null)
+  }, [workspaceMode])
+
+  useEffect(() => {
     setExpandedCommandId(null)
   }, [tool, browseKey, query, workspaceMode])
 
@@ -281,22 +436,45 @@ export default function App() {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        setGlobalSearchOpen(true)
+        searchBarRef.current?.focus()
         return
       }
-      if (
-        e.key !== '/' ||
-        (workspaceMode !== 'commands' && workspaceMode !== 'tools' && workspaceMode !== 'techwords')
-      )
-        return
+
+      if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+        if (WORKSPACE_PREV_KEYS.has(e.key) || WORKSPACE_NEXT_KEYS.has(e.key)) {
+          if (favoritesOpen) return
+          const t = /** @type {HTMLElement | null} */ (e.target)
+          if (t?.closest?.('[role="dialog"]')) return
+          if (t?.closest?.('[data-skip-workspace-hotkeys]')) return
+          const tag = t?.tagName
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t?.isContentEditable) return
+
+          if (WORKSPACE_PREV_KEYS.has(e.key)) {
+            e.preventDefault()
+            setWorkspaceMode((m) => stepWorkspaceMode(m, -1))
+            return
+          }
+          if (WORKSPACE_NEXT_KEYS.has(e.key)) {
+            e.preventDefault()
+            setWorkspaceMode((m) => stepWorkspaceMode(m, 1))
+            return
+          }
+        }
+      }
+
+      if (e.key !== '/') return
       const t = e.target
       if (t?.tagName === 'INPUT' || t?.tagName === 'TEXTAREA' || t?.isContentEditable) return
       e.preventDefault()
-      searchInputRef.current?.focus()
+      if (workspaceMode === 'playground') {
+        playgroundInputRef.current?.focus()
+        return
+      }
+      searchBarRef.current?.focus()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [workspaceMode])
+  }, [workspaceMode, favoritesOpen])
 
   const handleToolChange = useCallback(
     (nextTool) => {
@@ -371,6 +549,28 @@ export default function App() {
     return filterTechWords(query, techWordsCategoryId).length
   }, [workspaceMode, query, techWordsCategoryId])
 
+  const conceptsSearchCount = useMemo(() => {
+    if (workspaceMode !== 'concepts') return 0
+    return filterConcepts(query, conceptsCategoryId).length
+  }, [workspaceMode, query, conceptsCategoryId])
+
+  const portsSearchCount = useMemo(() => {
+    if (workspaceMode !== 'ports') return 0
+    return filterPorts(query, portsCategoryId).length
+  }, [workspaceMode, query, portsCategoryId])
+
+  const scenariosSearchCount = useMemo(() => {
+    if (workspaceMode !== 'scenarios') return 0
+    return filterScenarios(query, scenariosCategoryId, scenariosDifficultyId).length
+  }, [workspaceMode, query, scenariosCategoryId, scenariosDifficultyId])
+
+  const cheatsheetsVisibleCount = useMemo(
+    () => countCheatsheetRows(cheatsheetTabId, query),
+    [cheatsheetTabId, query]
+  )
+
+  const utilitiesVisibleCount = useMemo(() => countVisibleUtilityTools(query), [query])
+
   const toolCounts = useMemo(() => {
     const q = query.trim()
     const base = COMMANDS_DATA.filter((c) => {
@@ -426,6 +626,14 @@ export default function App() {
   const workspaceVisibleCount = useMemo(() => {
     if (workspaceMode === 'tools') return toolsSearchCount
     if (workspaceMode === 'techwords') return techWordsSearchCount
+    if (workspaceMode === 'concepts') return conceptsSearchCount
+    if (workspaceMode === 'ports') return portsSearchCount
+    if (workspaceMode === 'scenarios') return scenariosSearchCount
+    if (workspaceMode === 'playground') return PLAYGROUND_DEMO_COUNT
+    if (workspaceMode === 'architecture') return ARCHITECTURE_PATTERN_COUNT
+    if (workspaceMode === 'cheatsheets') return cheatsheetsVisibleCount
+    if (workspaceMode === 'utilities') return utilitiesVisibleCount
+    if (workspaceMode === 'daily') return 3
     if (workspaceMode === 'scripting') return filteredScriptingGuides.length
     if (workspaceMode === 'roadmap') return filteredRoadmapSteps.length
     if (singleToolSidebarMode) return filtered.length
@@ -435,6 +643,13 @@ export default function App() {
     workspaceMode,
     toolsSearchCount,
     techWordsSearchCount,
+    conceptsSearchCount,
+    portsSearchCount,
+    scenariosSearchCount,
+    PLAYGROUND_DEMO_COUNT,
+    ARCHITECTURE_PATTERN_COUNT,
+    cheatsheetsVisibleCount,
+    utilitiesVisibleCount,
     filteredScriptingGuides.length,
     filteredRoadmapSteps.length,
     singleToolSidebarMode,
@@ -456,11 +671,42 @@ export default function App() {
     if (workspaceMode === 'roadmap') {
       return { count: filteredRoadmapSteps.length, noun: 'modules' }
     }
+    if (workspaceMode === 'concepts') {
+      return { count: conceptsSearchCount, noun: 'ideas' }
+    }
+    if (workspaceMode === 'ports') {
+      return { count: portsSearchCount, noun: 'ports' }
+    }
+    if (workspaceMode === 'scenarios') {
+      return { count: scenariosSearchCount, noun: 'scenarios' }
+    }
+    if (workspaceMode === 'playground') {
+      return { count: PLAYGROUND_DEMO_COUNT, noun: 'demos' }
+    }
+    if (workspaceMode === 'architecture') {
+      return { count: ARCHITECTURE_PATTERN_COUNT, noun: 'patterns' }
+    }
+    if (workspaceMode === 'cheatsheets') {
+      return { count: cheatsheetsVisibleCount, noun: 'cmds' }
+    }
+    if (workspaceMode === 'utilities') {
+      return { count: utilitiesVisibleCount, noun: 'tools' }
+    }
+    if (workspaceMode === 'daily') {
+      return { count: 3, noun: 'picks' }
+    }
     return { count: filtered.length, noun: 'commands' }
   }, [
     workspaceMode,
     toolsSearchCount,
     techWordsSearchCount,
+    conceptsSearchCount,
+    portsSearchCount,
+    scenariosSearchCount,
+    PLAYGROUND_DEMO_COUNT,
+    ARCHITECTURE_PATTERN_COUNT,
+    cheatsheetsVisibleCount,
+    utilitiesVisibleCount,
     filtered.length,
     filteredScriptingGuides.length,
     filteredRoadmapSteps.length,
@@ -485,8 +731,6 @@ export default function App() {
         Skip to main content
       </a>
       <Header
-        query={query}
-        onQueryChange={setQuery}
         tool={tool}
         onToolChange={handleToolChange}
         toolCounts={toolCounts}
@@ -495,123 +739,57 @@ export default function App() {
         headerBadgeNoun={headerBadge.noun}
         workspaceMode={workspaceMode}
         onWorkspaceModeChange={setWorkspaceMode}
-        searchInputRef={searchInputRef}
         onLogoHomeClick={onLogoHomeClick}
         toolsCategoryId={toolsCategoryId}
         onSelectToolsCategory={setToolsCategoryId}
         techWordsCategoryId={techWordsCategoryId}
         onSelectTechWordsCategory={setTechWordsCategoryId}
-        onOpenGlobalSearch={() => setGlobalSearchOpen(true)}
+        conceptsCategoryId={conceptsCategoryId}
+        onSelectConceptsCategory={setConceptsCategoryId}
+        portsCategoryId={portsCategoryId}
+        onSelectPortsCategory={setPortsCategoryId}
+        scenariosCategoryId={scenariosCategoryId}
+        scenariosDifficultyId={scenariosDifficultyId}
+        onSelectScenariosCategory={setScenariosCategoryId}
+        onSelectScenariosDifficulty={setScenariosDifficultyId}
         onOpenFavorites={() => setFavoritesOpen(true)}
+        searchQuery={query}
+        onSearchQueryChange={setQuery}
+        onGlobalSearchNavigate={handleGlobalNavigate}
+        searchBarRef={searchBarRef}
       />
 
-      <LearningModeBar workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
+      <WorkspaceModeNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
-        <aside
-          className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] lg:flex"
-          aria-label={
-            workspaceMode === 'scripting'
-              ? 'LAB workspace'
-              : workspaceMode === 'tools' ||
-                  workspaceMode === 'roadmap' ||
-                  workspaceMode === 'techwords'
-                ? 'Workspace navigation'
-                : 'Commands tools'
-          }
-        >
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
-            <DockMagnify
-              className="mx-2 mb-2 flex min-w-0 shrink-0 flex-col gap-1 overflow-hidden rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-1 lg:mx-3"
-              itemClipClassName="flex w-full min-w-0 overflow-hidden rounded-md"
-              itemWrapperClassName="flex w-full min-w-0 justify-center origin-center"
-              role="group"
-              aria-label="Tools, Commands, LAB, Roadmap, or Tech Words"
-            >
-              <button
-                type="button"
-                onClick={() => setWorkspaceMode('tools')}
-                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                  workspaceMode === 'tools'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={workspaceMode === 'tools'}
-              >
-                Tools
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkspaceMode('commands')}
-                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                  workspaceMode === 'commands'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={workspaceMode === 'commands'}
-              >
-                Commands
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkspaceMode('scripting')}
-                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                  workspaceMode === 'scripting'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={workspaceMode === 'scripting'}
-                title="Interactive lab modules"
-              >
-                LAB
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkspaceMode('roadmap')}
-                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                  workspaceMode === 'roadmap'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={workspaceMode === 'roadmap'}
-              >
-                Roadmap
-              </button>
-              <button
-                type="button"
-                onClick={() => setWorkspaceMode('techwords')}
-                className={`flex min-h-[38px] w-full min-w-0 items-center justify-center rounded-md px-1.5 py-2 text-center text-[10px] font-bold uppercase leading-tight tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                  workspaceMode === 'techwords'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
-                    : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={workspaceMode === 'techwords'}
-                title="Technical dictionary"
-              >
-                Tech Words
-              </button>
-            </DockMagnify>
-            {workspaceMode === 'commands' ? (
-              <SidebarNav
-                tool={tool}
-                onToolChange={handleToolChange}
-                toolCounts={toolCounts}
-                toolLabel={toolLabel}
-              />
-            ) : workspaceMode === 'scripting' ? (
-              <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col lg:mx-3">
-                <ScriptingTopicsNav
-                  variant="asideStack"
-                  guides={filteredScriptingGuides}
-                  activeId={scriptingTopicId}
-                  onSelectTopic={setScriptingTopicId}
-                  isTopicLearned={labProgress.isLearned}
-                  className="min-h-0 flex-1"
+        {(workspaceMode === 'commands' || workspaceMode === 'scripting') && (
+          <aside
+            className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] lg:flex"
+            aria-label={workspaceMode === 'scripting' ? 'LAB workspace' : 'Commands tools'}
+          >
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
+              {workspaceMode === 'commands' ? (
+                <SidebarNav
+                  tool={tool}
+                  onToolChange={handleToolChange}
+                  toolCounts={toolCounts}
+                  toolLabel={toolLabel}
                 />
-              </div>
-            ) : null}
-          </div>
-        </aside>
+              ) : (
+                <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col lg:mx-3">
+                  <ScriptingTopicsNav
+                    variant="asideStack"
+                    guides={filteredScriptingGuides}
+                    activeId={scriptingTopicId}
+                    onSelectTopic={setScriptingTopicId}
+                    isTopicLearned={labProgress.isLearned}
+                    className="min-h-0 flex-1"
+                  />
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <MainWorkspaceHeader
@@ -643,11 +821,35 @@ export default function App() {
                       ? `tools-${toolsCategoryId}`
                       : workspaceMode === 'techwords'
                         ? `techwords-${techWordsCategoryId}`
-                        : mainContentKey
+                        : workspaceMode === 'concepts'
+                          ? `concepts-${conceptsCategoryId}`
+                          : workspaceMode === 'ports'
+                            ? `ports-${portsCategoryId}`
+                            : workspaceMode === 'scenarios'
+                              ? `scenarios-${scenariosCategoryId}-${scenariosDifficultyId}`
+                              : workspaceMode === 'playground'
+                                ? `playground-${playgroundTabId}`
+                                : workspaceMode === 'architecture'
+                                  ? `architecture-${architectureId ?? 'grid'}`
+                                  : workspaceMode === 'cheatsheets'
+                                    ? `cheatsheets-${cheatsheetTabId}`
+                                    : workspaceMode === 'utilities'
+                                      ? `utilities-${utilitiesTabId}`
+                                      : workspaceMode === 'daily'
+                                        ? 'daily'
+                                        : mainContentKey
                 }
                 className="hub-fade-in min-w-0 w-full"
               >
                 {workspaceMode === 'commands' && <CommandsHero />}
+                {workspaceMode === 'commands' && (
+                  <CommandsDiscoverSections
+                    onPickTool={(tid) => {
+                      setBrowseKey(null)
+                      handleToolChange(tid)
+                    }}
+                  />
+                )}
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
                     activeId={scriptingTopicId}
@@ -665,7 +867,6 @@ export default function App() {
                 {workspaceMode === 'tools' && (
                   <ToolsPage
                     query={query}
-                    onQueryChange={setQuery}
                     activeCategoryId={toolsCategoryId}
                     onSelectCategory={setToolsCategoryId}
                     isFavorite={isToolFavorite}
@@ -676,13 +877,68 @@ export default function App() {
                 {workspaceMode === 'techwords' && (
                   <TechWordsPage
                     query={query}
-                    onQueryChange={setQuery}
                     activeCategoryId={techWordsCategoryId}
                     onSelectCategory={setTechWordsCategoryId}
                     isFavorite={isTechWordFavorite}
                     toggleFavorite={toggleTechWordFavorite}
                   />
                 )}
+
+                {workspaceMode === 'concepts' && (
+                  <ConceptsPage
+                    query={query}
+                    activeCategoryId={conceptsCategoryId}
+                    onSelectCategory={setConceptsCategoryId}
+                  />
+                )}
+
+                {workspaceMode === 'ports' && (
+                  <PortsPage
+                    query={query}
+                    activeCategoryId={portsCategoryId}
+                    onSelectCategory={setPortsCategoryId}
+                  />
+                )}
+
+                {workspaceMode === 'scenarios' && (
+                  <ScenariosPage
+                    query={query}
+                    activeCategoryId={scenariosCategoryId}
+                    onSelectCategory={setScenariosCategoryId}
+                    activeDifficultyId={scenariosDifficultyId}
+                    onSelectDifficulty={setScenariosDifficultyId}
+                  />
+                )}
+
+                {workspaceMode === 'playground' && (
+                  <PlaygroundPage
+                    activeTabId={playgroundTabId}
+                    onSelectTab={setPlaygroundTabId}
+                    inputRef={playgroundInputRef}
+                  />
+                )}
+
+                {workspaceMode === 'architecture' && (
+                  <ArchitecturePage selectedArchitectureId={architectureId} onSelectArchitecture={setArchitectureId} />
+                )}
+
+                {workspaceMode === 'cheatsheets' && (
+                  <CheatsheetsPage
+                    query={query}
+                    activeTabId={cheatsheetTabId}
+                    onSelectTab={setCheatsheetTabId}
+                  />
+                )}
+
+                {workspaceMode === 'utilities' && (
+                  <UtilitiesPage
+                    query={query}
+                    activeToolId={utilitiesTabId}
+                    onSelectTool={setUtilitiesTabId}
+                  />
+                )}
+
+                {workspaceMode === 'daily' && <DailyPage toolLabel={toolLabel} />}
 
                 {workspaceMode === 'commands' && showCategoryHub && (
                   <CategoryHub
@@ -777,13 +1033,10 @@ export default function App() {
 
       <Footer />
 
+      <ScrollEdgeButtons />
+
       <MobileWorkspaceBottomNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
-      <GlobalSearchModal
-        open={globalSearchOpen}
-        onClose={() => setGlobalSearchOpen(false)}
-        onNavigate={handleGlobalNavigate}
-      />
       <FavoritesHubModal
         open={favoritesOpen}
         onClose={() => setFavoritesOpen(false)}

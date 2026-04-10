@@ -327,3 +327,27 @@
     background-size: 100% 100%;
   }
 }
+
+/* Architecture page — animated flow arrows */
+@keyframes arch-flow-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+}
+
+.arch-flow-arrow {
+  animation: arch-flow-pulse 1.7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arch-flow-arrow {
+    animation: none;
+    opacity: 0.85;
+  }
+}

@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'motion/react'
 import SidebarNav from './SidebarNav'
 import { DEVOPS_TOOLS, TOOL_CATEGORIES } from '../data/toolsData'
 import { TECH_WORD_CATEGORIES } from '../data/techWordsData'
+import { CONCEPTS, CONCEPT_CATEGORIES } from '../data/conceptsData'
+import { PORTS, PORT_FILTER_CATEGORIES } from '../data/portsData'
+import { SCENARIOS, SCENARIO_CATEGORY_OPTIONS, SCENARIO_DIFFICULTY_OPTIONS } from '../data/scenariosData'
 import { techWordsCountForCategory } from '../utils/techWordsFilter'
 
 function buildToolsDomainCounts() {
@@ -26,6 +29,14 @@ export default function MobileMenuDrawer({
   onSelectToolsCategory,
   techWordsCategoryId = 'all',
   onSelectTechWordsCategory,
+  conceptsCategoryId = 'all',
+  onSelectConceptsCategory,
+  portsCategoryId = 'all',
+  onSelectPortsCategory,
+  scenariosCategoryId = 'all',
+  scenariosDifficultyId = 'all',
+  onSelectScenariosCategory,
+  onSelectScenariosDifficulty,
 }) {
   const domainCounts = useMemo(() => buildToolsDomainCounts(), [])
   useEffect(() => {
@@ -75,7 +86,9 @@ export default function MobileMenuDrawer({
                   ? 'Menu and tool domains'
                   : workspaceMode === 'techwords'
                     ? 'Menu and tech dictionary categories'
-                    : 'Select tool'
+                    : workspaceMode === 'concepts'
+                      ? 'Menu and concept categories'
+                      : 'Select tool'
             }
             className="absolute bottom-0 left-0 top-0 z-10 flex w-full max-w-full min-h-0 flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
             initial={{ x: '-100%' }}
@@ -91,7 +104,9 @@ export default function MobileMenuDrawer({
                     ? 'Browse domains'
                     : workspaceMode === 'techwords'
                       ? 'Tech Words'
-                      : 'Select tool'}
+                      : workspaceMode === 'concepts'
+                        ? 'Concepts'
+                        : 'Select tool'}
               </span>
               <button
                 type="button"
@@ -107,7 +122,7 @@ export default function MobileMenuDrawer({
                 <div
                   className="mx-3 mb-3 min-w-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-2"
                   role="group"
-                  aria-label="Workspace: Tools, Commands, LAB, Roadmap, or Tech Words"
+                  aria-label="Workspace: Tools, Commands, LAB, Roadmap, Concepts, Ports, Scenarios, Playground, Architecture, Cheatsheets, Utilities, Daily, or Tech Words"
                 >
                   {/* Full-width column: 2×2 grid clipped labels on narrow drawers; stack reads clearly on all phones */}
                   <div className="flex min-w-0 flex-col gap-1.5">
@@ -171,6 +186,132 @@ export default function MobileMenuDrawer({
                       aria-pressed={workspaceMode === 'roadmap'}
                     >
                       Roadmap
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('concepts')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'concepts'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'concepts'}
+                    >
+                      Concepts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('ports')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'ports'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'ports'}
+                    >
+                      Ports
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('scenarios')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'scenarios'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'scenarios'}
+                      title="Troubleshooting walkthroughs"
+                    >
+                      Scenarios
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('playground')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'playground'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'playground'}
+                      title="Simulated CLI"
+                    >
+                      Playground
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('architecture')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'architecture'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'architecture'}
+                      title="Cloud & DevOps architecture diagrams"
+                    >
+                      Architecture
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('cheatsheets')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'cheatsheets'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'cheatsheets'}
+                      title="Quick command cheatsheets"
+                    >
+                      Cheatsheets
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('utilities')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'utilities'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'utilities'}
+                      title="CIDR, Base64, JSON, port check"
+                    >
+                      Utilities
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onWorkspaceModeChange('daily')
+                        onClose()
+                      }}
+                      className={`min-w-0 rounded-md px-3 py-3 text-left text-[13px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                        workspaceMode === 'daily'
+                          ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-[inset_0_0_0_1.5px_var(--hub-tool)]'
+                          : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                      }`}
+                      aria-pressed={workspaceMode === 'daily'}
+                      title="Concept, command, and quiz of the day"
+                    >
+                      Daily
                     </button>
                     <button
                       type="button"
@@ -243,6 +384,150 @@ export default function MobileMenuDrawer({
                           <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">
                             {domainCounts[c.id] ?? 0}
                           </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {workspaceMode === 'concepts' && onSelectConceptsCategory ? (
+                <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
+                    Category filter
+                  </p>
+                  <div className="flex flex-col gap-1 pr-0.5">
+                    {CONCEPT_CATEGORIES.map((c) => {
+                      const active =
+                        conceptsCategoryId === c.id ||
+                        (c.id === 'all' && (!conceptsCategoryId || conceptsCategoryId === 'all'))
+                      const count =
+                        c.id === 'all' || !c.id
+                          ? CONCEPTS.length
+                          : CONCEPTS.filter((x) => x.categoryId === c.id).length
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            onSelectConceptsCategory(c.id)
+                            onClose()
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                            active
+                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
+                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                          }`}
+                          aria-pressed={active}
+                        >
+                          <span className="min-w-0 pr-2">{c.label}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {workspaceMode === 'ports' && onSelectPortsCategory ? (
+                <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
+                    Category filter
+                  </p>
+                  <div className="flex flex-col gap-1 pr-0.5">
+                    {PORT_FILTER_CATEGORIES.map((c) => {
+                      const active =
+                        portsCategoryId === c.id ||
+                        (c.id === 'all' && (!portsCategoryId || portsCategoryId === 'all'))
+                      const count =
+                        c.id === 'all' || !c.id
+                          ? PORTS.length
+                          : PORTS.filter((x) => x.categoryId === c.id).length
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            onSelectPortsCategory(c.id)
+                            onClose()
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                            active
+                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
+                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                          }`}
+                          aria-pressed={active}
+                        >
+                          <span className="min-w-0 pr-2">{c.label}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : null}
+              {workspaceMode === 'scenarios' && onSelectScenariosCategory && onSelectScenariosDifficulty ? (
+                <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
+                    Category filter
+                  </p>
+                  <div className="flex flex-col gap-1 pr-0.5">
+                    {SCENARIO_CATEGORY_OPTIONS.map((c) => {
+                      const active =
+                        scenariosCategoryId === c.id ||
+                        (c.id === 'all' && (!scenariosCategoryId || scenariosCategoryId === 'all'))
+                      const count =
+                        c.id === 'all' || !c.id
+                          ? SCENARIOS.length
+                          : SCENARIOS.filter((x) => x.categoryId === c.id).length
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            onSelectScenariosCategory(c.id)
+                            onClose()
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                            active
+                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
+                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                          }`}
+                          aria-pressed={active}
+                        >
+                          <span className="min-w-0 pr-2">{c.label}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p className="mb-2 mt-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
+                    Difficulty filter
+                  </p>
+                  <div className="flex flex-col gap-1 pr-0.5">
+                    {SCENARIO_DIFFICULTY_OPTIONS.map((d) => {
+                      const active =
+                        scenariosDifficultyId === d.id ||
+                        (d.id === 'all' && (!scenariosDifficultyId || scenariosDifficultyId === 'all'))
+                      const count =
+                        d.id === 'all' || !d.id
+                          ? SCENARIOS.length
+                          : SCENARIOS.filter((x) => x.difficulty === d.id).length
+                      return (
+                        <button
+                          key={d.id}
+                          type="button"
+                          onClick={() => {
+                            onSelectScenariosDifficulty(d.id)
+                            onClose()
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
+                            active
+                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
+                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
+                          }`}
+                          aria-pressed={active}
+                        >
+                          <span className="min-w-0 pr-2">{d.label}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
                         </button>
                       )
                     })}

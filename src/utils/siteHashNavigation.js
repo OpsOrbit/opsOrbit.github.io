@@ -1,6 +1,13 @@
 import { SCRIPTING_GUIDES } from '../data/scriptingGuides'
 import { TOOL_CATEGORY_IDS } from '../data/toolsData'
 import { TECH_WORD_CATEGORY_IDS } from '../data/techWordsData'
+import { CONCEPT_CATEGORY_IDS } from '../data/conceptsData'
+import { PORT_CATEGORY_IDS } from '../data/portsData'
+import { SCENARIO_CATEGORY_IDS, SCENARIO_DIFFICULTY_IDS } from '../data/scenariosData'
+import { PLAYGROUND_TAB_IDS } from '../data/playgroundData'
+import { ARCHITECTURE_IDS } from '../data/architectureData'
+import { CHEATSHEET_TAB_IDS } from '../data/cheatsheetsData'
+import { UTILITIES_TOOL_IDS } from '../data/utilitiesData'
 
 /** Tools that appear in Commands sidebar (excludes `all`). */
 export const HASH_COMMAND_TOOLS = new Set([
@@ -31,12 +38,78 @@ const SCRIPTING_IDS = new Set(SCRIPTING_GUIDES.map((g) => g.id))
 const DEFAULT_SCRIPTING_TOPIC = SCRIPTING_GUIDES[0]?.id ?? 'dockerfile'
 
 /**
- * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | { mode: 'techwords', category: string } | null}
+ * @param {string | undefined} a
+ * @param {string | undefined} b
+ */
+function parseScenariosCategoryDifficulty(a, b) {
+  if (!a && !b) return { category: 'all', difficulty: 'all' }
+  if (a && !b) {
+    if (a === 'all') return { category: 'all', difficulty: 'all' }
+    if (SCENARIO_CATEGORY_IDS.has(a)) return { category: a, difficulty: 'all' }
+    if (SCENARIO_DIFFICULTY_IDS.has(a)) return { category: 'all', difficulty: a }
+    return { category: 'all', difficulty: 'all' }
+  }
+  if (a && b) {
+    const catA = a === 'all' || SCENARIO_CATEGORY_IDS.has(a)
+    const catB = b === 'all' || SCENARIO_CATEGORY_IDS.has(b)
+    const diffA = a === 'all' || SCENARIO_DIFFICULTY_IDS.has(a)
+    const diffB = b === 'all' || SCENARIO_DIFFICULTY_IDS.has(b)
+    if (catA && diffB)
+      return {
+        category: a === 'all' ? 'all' : a,
+        difficulty: b === 'all' ? 'all' : b,
+      }
+    if (diffA && catB)
+      return {
+        category: b === 'all' ? 'all' : b,
+        difficulty: a === 'all' ? 'all' : a,
+      }
+    if (catA && catB) return { category: a === 'all' ? 'all' : a, difficulty: 'all' }
+    if (diffA && diffB) return { category: 'all', difficulty: a === 'all' ? 'all' : a }
+  }
+  return { category: 'all', difficulty: 'all' }
+}
+
+/**
+ * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | { mode: 'techwords', category: string } | { mode: 'concepts', category: string } | { mode: 'ports', category: string } | { mode: 'scenarios', category: string, difficulty: string } | { mode: 'playground', tab: string } | { mode: 'architecture', architectureId: string | null } | { mode: 'cheatsheets', tab: string } | { mode: 'utilities', tab: string } | { mode: 'daily' } | null}
  */
 export function parseWorkspaceHash(hash) {
   if (hash == null || hash === '' || hash === '#') return null
   const trimmed = String(hash).replace(/^#/, '')
-  const match = trimmed.match(/^\/?(commands|scripting|roadmap|tools|techwords)(?:\/([^/?#]+))?\/?$/)
+  const sc = trimmed.match(/^\/?scenarios(?:\/([^/?#]+))?(?:\/([^/?#]+))?\/?$/)
+  if (sc) {
+    const { category, difficulty } = parseScenariosCategoryDifficulty(sc[1], sc[2])
+    return { mode: 'scenarios', category, difficulty }
+  }
+  const pg = trimmed.match(/^\/?playground(?:\/([^/?#]+))?\/?$/)
+  if (pg) {
+    const seg = pg[1]
+    const tab = seg && PLAYGROUND_TAB_IDS.has(seg) ? seg : 'kubernetes'
+    return { mode: 'playground', tab }
+  }
+  const arch = trimmed.match(/^\/?architecture(?:\/([^/?#]+))?\/?$/)
+  if (arch) {
+    const seg = arch[1]
+    if (!seg) return { mode: 'architecture', architectureId: null }
+    if (ARCHITECTURE_IDS.has(seg)) return { mode: 'architecture', architectureId: seg }
+    return { mode: 'architecture', architectureId: null }
+  }
+  const ch = trimmed.match(/^\/?cheatsheets(?:\/([^/?#]+))?\/?$/)
+  if (ch) {
+    const seg = ch[1]
+    if (!seg) return { mode: 'cheatsheets', tab: 'git' }
+    if (CHEATSHEET_TAB_IDS.has(seg)) return { mode: 'cheatsheets', tab: seg }
+    return { mode: 'cheatsheets', tab: 'git' }
+  }
+  const ut = trimmed.match(/^\/?utilities(?:\/([^/?#]+))?\/?$/)
+  if (ut) {
+    const seg = ut[1]
+    if (!seg) return { mode: 'utilities', tab: 'cidr' }
+    if (UTILITIES_TOOL_IDS.has(seg)) return { mode: 'utilities', tab: seg }
+    return { mode: 'utilities', tab: 'cidr' }
+  }
+  if (/^\/?daily\/?$/.test(trimmed)) return { mode: 'daily' }
+  const match = trimmed.match(/^\/?(commands|scripting|roadmap|tools|techwords|concepts|ports)(?:\/([^/?#]+))?\/?$/)
   if (!match) return null
   const [, mode, segment] = match
   if (mode === 'roadmap') return { mode: 'roadmap' }
@@ -60,11 +133,21 @@ export function parseWorkspaceHash(hash) {
     if (HASH_COMMAND_TOOLS.has(segment)) return { mode: 'commands', tool: segment }
     return { mode: 'commands', tool: 'all' }
   }
+  if (mode === 'concepts') {
+    if (!segment || segment === 'all') return { mode: 'concepts', category: 'all' }
+    if (CONCEPT_CATEGORY_IDS.has(segment)) return { mode: 'concepts', category: segment }
+    return { mode: 'concepts', category: 'all' }
+  }
+  if (mode === 'ports') {
+    if (!segment || segment === 'all') return { mode: 'ports', category: 'all' }
+    if (PORT_CATEGORY_IDS.has(segment)) return { mode: 'ports', category: segment }
+    return { mode: 'ports', category: 'all' }
+  }
   return null
 }
 
 /**
- * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string }} p
+ * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string, conceptsCategory?: string, portsCategory?: string, scenariosCategory?: string, scenariosDifficulty?: string, playgroundTab?: string, architectureId?: string | null, cheatsheetTab?: string, utilitiesTab?: string }} p
  * @returns {string} Hash starting with #/…
  */
 export function buildWorkspaceHash({
@@ -73,6 +156,14 @@ export function buildWorkspaceHash({
   topic,
   toolsCategory = 'all',
   techWordsCategory = 'all',
+  conceptsCategory = 'all',
+  portsCategory = 'all',
+  scenariosCategory = 'all',
+  scenariosDifficulty = 'all',
+  playgroundTab = 'kubernetes',
+  architectureId = null,
+  cheatsheetTab = 'git',
+  utilitiesTab = 'cidr',
 }) {
   if (mode === 'roadmap') return '#/roadmap'
   if (mode === 'techwords') {
@@ -94,6 +185,48 @@ export function buildWorkspaceHash({
     if (HASH_COMMAND_TOOLS.has(tool)) return `#/commands/${tool}`
     return '#/commands/all'
   }
+  if (mode === 'concepts') {
+    if (!conceptsCategory || conceptsCategory === 'all') return '#/concepts'
+    if (CONCEPT_CATEGORY_IDS.has(conceptsCategory)) return `#/concepts/${conceptsCategory}`
+    return '#/concepts'
+  }
+  if (mode === 'ports') {
+    if (!portsCategory || portsCategory === 'all') return '#/ports'
+    if (PORT_CATEGORY_IDS.has(portsCategory)) return `#/ports/${portsCategory}`
+    return '#/ports'
+  }
+  if (mode === 'scenarios') {
+    const c = scenariosCategory || 'all'
+    const d = scenariosDifficulty || 'all'
+    if (c === 'all' && d === 'all') return '#/scenarios'
+    if (c !== 'all' && d === 'all') return `#/scenarios/${c}`
+    if (c === 'all' && d !== 'all') return `#/scenarios/${d}`
+    return `#/scenarios/${c}/${d}`
+  }
+  if (mode === 'playground') {
+    const t = playgroundTab || 'kubernetes'
+    const safe = PLAYGROUND_TAB_IDS.has(t) ? t : 'kubernetes'
+    if (safe === 'kubernetes') return '#/playground'
+    return `#/playground/${safe}`
+  }
+  if (mode === 'architecture') {
+    const id = architectureId
+    if (!id || !ARCHITECTURE_IDS.has(id)) return '#/architecture'
+    return `#/architecture/${id}`
+  }
+  if (mode === 'cheatsheets') {
+    const t = cheatsheetTab || 'git'
+    const safe = CHEATSHEET_TAB_IDS.has(t) ? t : 'git'
+    if (safe === 'git') return '#/cheatsheets'
+    return `#/cheatsheets/${safe}`
+  }
+  if (mode === 'utilities') {
+    const t = utilitiesTab || 'cidr'
+    const safe = UTILITIES_TOOL_IDS.has(t) ? t : 'cidr'
+    if (safe === 'cidr') return '#/utilities'
+    return `#/utilities/${safe}`
+  }
+  if (mode === 'daily') return '#/daily'
   return '#/tools'
 }
 

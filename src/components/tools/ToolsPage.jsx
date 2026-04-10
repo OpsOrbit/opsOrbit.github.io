@@ -1,21 +1,19 @@
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
 import { filterDevopsTools } from '../../utils/toolsFilter'
 import { categoryLabel } from '../../data/toolsData'
-import { DEVOPS_TOOLS } from '../../data/toolsData'
 import ToolCard from './ToolCard'
 import ToolModal from './ToolModal'
 import DomainNavBar from './DomainNavBar'
 import FilterChip from './FilterChip'
 import LifecycleStrip from './LifecycleStrip'
-import { RecommendedStack, TopToolsStrip } from './ToolsDiscoverSections'
 import CompareDock from './CompareDock'
 import WorkspaceHero from '../workspace/WorkspaceHero'
+import { useStickyCompact } from '../../hooks/useStickyCompact'
 
 /**
  * @param {{
  *   query: string
- *   onQueryChange?: (q: string) => void
  *   activeCategoryId: string
  *   onSelectCategory: (id: string) => void
  *   isFavorite: (id: string) => boolean
@@ -24,7 +22,6 @@ import WorkspaceHero from '../workspace/WorkspaceHero'
  */
 export default function ToolsPage({
   query,
-  onQueryChange,
   activeCategoryId,
   onSelectCategory,
   isFavorite,
@@ -38,21 +35,7 @@ export default function ToolsPage({
   const [lifecycleStage, setLifecycleStage] = useState(/** @type {string | null} */ (null))
   const [selected, setSelected] = useState(null)
   const [compareIds, setCompareIds] = useState(/** @type {string[]} */ ([]))
-  const [filtersCompact, setFiltersCompact] = useState(false)
-  const filterSentinelRef = useRef(null)
-
-  useEffect(() => {
-    const el = filterSentinelRef.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        setFiltersCompact(!entry.isIntersecting)
-      },
-      { root: null, rootMargin: '0px 0px -1px 0px', threshold: 0 }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
+  const { sentinelRef: filterSentinelRef, compact: filtersCompact } = useStickyCompact()
 
   const filtered = useMemo(
     () => filterDevopsTools(query, activeCategoryId, chips, lifecycleStage),
@@ -65,11 +48,6 @@ export default function ToolsPage({
   const toggleChip = (key) => {
     setChips((c) => ({ ...c, [key]: !c[key] }))
   }
-
-  const pickToolById = useCallback((id) => {
-    const t = DEVOPS_TOOLS.find((x) => x.id === id)
-    if (t) setSelected(t)
-  }, [])
 
   const addCompare = useCallback((tool) => {
     setCompareIds((prev) => {
@@ -87,41 +65,15 @@ export default function ToolsPage({
       className="tools-workspace min-w-0 max-w-full overflow-x-hidden pb-4"
     >
       <WorkspaceHero
+        compact
         eyebrow="DevOps tools encyclopedia"
         title="Explore & compare"
-        description="Curated tools across the SDLC — filter by lifecycle stage, domain, and license. Built for learning."
-      >
-        {onQueryChange ? (
-          <div className="relative mt-5 max-w-xl">
-            <svg
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400 dark:text-cyan-400/80"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.2}
-              aria-hidden
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder="Search tools, categories, use cases…"
-              className="h-12 w-full rounded-2xl border border-white/40 bg-white/70 pl-11 pr-4 text-sm text-[var(--hub-text)] shadow-inner outline-none ring-cyan-500/0 transition-[box-shadow,border-color] placeholder:text-[var(--hub-muted)] focus:border-indigo-400/50 focus:bg-white focus:shadow-[0_0_0_3px_rgba(99,102,241,0.25)] dark:border-white/10 dark:bg-[var(--hub-surface)]/80 dark:focus:shadow-[0_0_0_3px_rgba(34,211,238,0.2)]"
-              aria-label="Search tools"
-            />
-          </div>
-        ) : null}
-      </WorkspaceHero>
-
-      <TopToolsStrip onPickTool={pickToolById} />
-      <RecommendedStack onPickTool={pickToolById} />
-
-      <LifecycleStrip selectedId={lifecycleStage} onSelectStage={setLifecycleStage} />
+        description="Search from the header, then pick a domain — lifecycle and license filters sit below."
+      />
 
       <DomainNavBar activeCategoryId={activeCategoryId} onSelectCategory={onSelectCategory} />
+
+      <LifecycleStrip compact selectedId={lifecycleStage} onSelectStage={setLifecycleStage} />
 
       <div ref={filterSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 

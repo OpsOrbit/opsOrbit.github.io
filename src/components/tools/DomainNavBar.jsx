@@ -255,16 +255,18 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
     <>
       {sheet}
 
-      <div className="mb-4 lg:hidden">
+      <div className="mb-3 lg:hidden">
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex w-full min-h-[3rem] items-center justify-between gap-3 rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-surface)] px-4 py-3 text-left shadow-[var(--hub-shadow-card)] transition-colors hover:border-[var(--hub-tool)]/40 dark:bg-[var(--hub-elevated)]/40"
+          className="flex w-full min-h-[3rem] items-center justify-between gap-3 rounded-2xl border border-indigo-200/60 bg-[var(--hub-surface)] px-4 py-3 text-left shadow-[var(--hub-shadow-card)] transition-colors hover:border-[var(--hub-tool)]/50 dark:border-indigo-500/25 dark:bg-[var(--hub-elevated)]/40"
           aria-haspopup="dialog"
           aria-expanded={sheetOpen}
         >
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)]">Browse by domain</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-indigo-600 dark:text-cyan-400/90">
+              Browse by domain
+            </p>
             <p className="mt-0.5 truncate text-sm font-bold text-[var(--hub-text)]">{categoryTitle}</p>
           </div>
           <span className="shrink-0 text-lg leading-none text-[var(--hub-muted)]" aria-hidden>
@@ -274,10 +276,10 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
       </div>
 
       <nav
-        className="mb-4 hidden overflow-hidden rounded-2xl border border-white/25 bg-[var(--hub-surface)]/95 p-3 shadow-[0_12px_40px_-12px_rgba(79,70,229,0.18)] ring-1 ring-indigo-500/10 backdrop-blur-xl dark:border-white/10 dark:bg-[var(--hub-elevated)]/85 dark:shadow-black/40 dark:ring-indigo-400/15 sm:mb-6 sm:p-4 lg:mb-6 lg:block lg:p-6"
+        className="mb-3 hidden overflow-hidden rounded-2xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-3 shadow-[0_12px_36px_-12px_rgba(79,70,229,0.22)] ring-2 ring-indigo-500/15 backdrop-blur-xl dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/85 dark:shadow-black/40 dark:ring-indigo-400/20 sm:mb-4 sm:p-4 lg:mb-4 lg:block lg:p-4"
         aria-label="Browse tools by domain"
       >
-        <p className="mb-2 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)] sm:mb-3">
+        <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-[0.14em] text-indigo-600 dark:text-cyan-400/90 sm:mb-2.5">
           Browse by domain
         </p>
         <div className="mb-3 flex flex-wrap justify-center gap-2 sm:gap-2.5">

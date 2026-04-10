@@ -10,6 +10,7 @@ import ExpandableSection from './lab/ExpandableSection'
 import CodeBlockPanel from './lab/CodeBlockPanel'
 import LabFlowDiagram from './lab/LabFlowDiagram'
 import LabHandsOnPanel from './lab/LabHandsOnPanel'
+import LabDiscoverSections from './lab/LabDiscoverSections'
 import WorkspaceHero from './workspace/WorkspaceHero'
 
 function renderRichParts(text) {
@@ -130,6 +131,7 @@ export default function ScriptingGuides({
           description="Guided topics with CLI cross-reference, diagrams, and notes — choose another topic in the sidebar when results return."
           className="mb-4"
         />
+        <LabDiscoverSections guides={guides} onSelectTopic={onSelectTopic} />
         <ScriptingTopicsNav
           variant="workspace"
           activeId={activeId}
@@ -156,6 +158,7 @@ export default function ScriptingGuides({
         description="Guided walkthroughs with command cross-reference, visual flows, and your notes — use the sidebar to switch topics."
         className="mb-4"
       />
+      <LabDiscoverSections guides={guides} onSelectTopic={onSelectTopic} />
       <ScriptingTopicsNav
         variant="workspace"
         activeId={activeId}

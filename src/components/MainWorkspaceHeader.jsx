@@ -25,6 +25,22 @@ const TOOL_DESC = {
   shell: 'Bash & scripting',
 }
 
+/** Workspaces whose page already has a hero or top intro — skip the duplicate strip. */
+const PAGE_HAS_OWN_INTRO = new Set([
+  'tools',
+  'techwords',
+  'concepts',
+  'ports',
+  'scenarios',
+  'scripting',
+  'roadmap',
+  'playground',
+  'architecture',
+  'cheatsheets',
+  'utilities',
+  'daily',
+])
+
 export default function MainWorkspaceHeader({
   tool,
   toolLabel,
@@ -42,100 +58,17 @@ export default function MainWorkspaceHeader({
   const countPillClass =
     'hidden shrink-0 rounded-full border border-[var(--hub-border2)] px-3 py-1 font-mono text-[11px] font-semibold sm:block'
 
-  if (workspaceMode === 'scripting') {
-    return (
-      <header className={headerShellClass}>
-        <div className={iconBoxClass}>
-          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
-            ⚡
-          </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
-            LAB
-          </h2>
-          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
-            Interactive DevOps modules — IaC, CI/CD, containers
-          </p>
-        </div>
-        <div className={countPillClass}>
-          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
-          <span className="ml-1 text-[var(--hub-muted)]">topics</span>
-        </div>
-      </header>
-    )
+  if (PAGE_HAS_OWN_INTRO.has(workspaceMode)) {
+    return null
   }
 
-  if (workspaceMode === 'roadmap') {
-    return (
-      <header className={headerShellClass}>
-        <div className={iconBoxClass}>
-          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
-            ⚡
-          </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
-            Roadmap
-          </h2>
-          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
-            Suggested learning path across DevOps topics
-          </p>
-        </div>
-        <div className={countPillClass}>
-          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
-          <span className="ml-1 text-[var(--hub-muted)]">modules</span>
-        </div>
-      </header>
-    )
-  }
-
-  if (workspaceMode === 'tools') {
-    return (
-      <header className={headerShellClass}>
-        <div className={iconBoxClass}>
-          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
-            🧰
-          </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
-            DevOps Tools
-          </h2>
-          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
-            Encyclopedia across SCM, CI/CD, cloud, security, observability, and more
-          </p>
-        </div>
-        <div className={countPillClass}>
-          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
-          <span className="ml-1 text-[var(--hub-muted)]">tools</span>
-        </div>
-      </header>
-    )
-  }
-
-  if (workspaceMode === 'techwords') {
-    return (
-      <header className={headerShellClass}>
-        <div className={iconBoxClass}>
-          <span className="font-mono text-[var(--hub-tool)]" aria-hidden>
-            📖
-          </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-brand)] sm:text-lg lg:text-xl">
-            Tech Words
-          </h2>
-          <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">
-            Explore essential technical terms across Cloud, DevOps, and Networking
-          </p>
-        </div>
-        <div className={countPillClass}>
-          <span className="text-[var(--hub-tool)]">{visibleCount}</span>
-          <span className="ml-1 text-[var(--hub-muted)]">terms</span>
-        </div>
-      </header>
-    )
+  if (
+    workspaceMode === 'commands' &&
+    tool === 'all' &&
+    browseKey == null &&
+    !commandsSearchGlobal
+  ) {
+    return null
   }
 
   const title = commandsSearchGlobal
@@ -145,9 +78,6 @@ export default function MainWorkspaceHeader({
       : tool === 'all'
         ? BRAND_NAME
         : toolLabel(tool)
-
-  const isBrandHomeTitle =
-    workspaceMode === 'commands' && tool === 'all' && browseKey == null && !commandsSearchGlobal
 
   const subtitle = commandsSearchGlobal
     ? 'Matches across every CLI tool — clear the search box to narrow by the sidebar again'
@@ -169,11 +99,7 @@ export default function MainWorkspaceHeader({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h2
-          className={`text-base font-extrabold leading-tight tracking-tight sm:text-lg lg:text-xl ${
-            isBrandHomeTitle ? 'text-[var(--hub-brand)]' : 'text-[var(--hub-text)]'
-          }`}
-        >
+        <h2 className="text-base font-extrabold leading-tight tracking-tight text-[var(--hub-text)] sm:text-lg lg:text-xl">
           {title}
         </h2>
         <p className="mt-1 text-sm text-[var(--hub-muted)] sm:text-[13px]">{subtitle}</p>

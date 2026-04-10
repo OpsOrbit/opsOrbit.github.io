@@ -9,6 +9,8 @@ import { filterTechWords } from '../../utils/techWordsFilter'
 import { useTechWordRecent } from '../../hooks/useTechWordRecent'
 import WorkspaceHero from '../workspace/WorkspaceHero'
 import FilterChip from '../tools/FilterChip'
+import { EssentialTermsStrip, FoundationConceptChain } from './TechWordsDiscoverSections'
+import { useStickyCompact } from '../../hooks/useStickyCompact'
 
 const CAT_ICONS = {
   all: '✦',
@@ -161,7 +163,6 @@ function TechWordCard({
 /**
  * @param {{
  *   query: string
- *   onQueryChange: (q: string) => void
  *   activeCategoryId: string
  *   onSelectCategory: (id: string) => void
  *   isFavorite: (id: string) => boolean
@@ -170,7 +171,6 @@ function TechWordCard({
  */
 export default function TechWordsPage({
   query,
-  onQueryChange,
   activeCategoryId,
   onSelectCategory,
   isFavorite,
@@ -179,6 +179,7 @@ export default function TechWordsPage({
   const { recentIds, recordView } = useTechWordRecent()
   const [expandedIds, setExpandedIds] = useState(() => new Set())
   const [explainBeginner, setExplainBeginner] = useState(false)
+  const { sentinelRef, compact } = useStickyCompact()
 
   const filtered = useMemo(
     () => filterTechWords(query, activeCategoryId),
@@ -215,34 +216,9 @@ export default function TechWordsPage({
       <WorkspaceHero
         eyebrow="Technical dictionary"
         title="Tech words"
-        description="Concise definitions, real examples, and bookmarking — toggle beginner explanations when available."
-      />
-
-      <div className="sticky top-0 z-30 -mx-1 mb-5 space-y-3 rounded-2xl border border-white/15 bg-[var(--hub-bg)]/95 py-3 shadow-sm backdrop-blur-lg dark:border-white/5 dark:bg-[var(--hub-bg)]/90 sm:-mx-0 sm:mb-6 sm:px-1 sm:py-4">
-        <div className="relative">
-          <svg
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-indigo-400 dark:text-cyan-400/80"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.3}
-            aria-hidden
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="search"
-            enterKeyHint="search"
-            value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Search terms, examples, categories…"
-            className="h-12 w-full rounded-2xl border border-white/40 bg-white/80 py-2 pl-11 pr-3 text-sm text-[var(--hub-text)] shadow-inner outline-none transition-[box-shadow,border-color] focus:border-indigo-400/50 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.2)] dark:border-white/10 dark:bg-[var(--hub-surface)]/90 dark:focus:shadow-[0_0_0_3px_rgba(34,211,238,0.15)]"
-            aria-label="Search tech dictionary"
-          />
-        </div>
-
-        <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-200/40 bg-indigo-50/40 px-3 py-2 text-sm font-semibold text-[var(--hub-muted)] dark:border-indigo-500/20 dark:bg-indigo-950/30">
+        description="Concise definitions, real examples, and bookmarking — use the search bar under the header to find terms. Toggle beginner explanations when available."
+      >
+        <label className="mt-5 flex max-w-xl cursor-pointer items-center gap-2 rounded-xl border border-indigo-200/40 bg-indigo-50/40 px-3 py-2 text-sm font-semibold text-[var(--hub-muted)] dark:border-indigo-500/20 dark:bg-indigo-950/30">
           <input
             type="checkbox"
             checked={explainBeginner}
@@ -251,23 +227,32 @@ export default function TechWordsPage({
           />
           <span>Explain like beginner (when available)</span>
         </label>
+      </WorkspaceHero>
 
-        <div className="lg:hidden">
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Category</p>
-          <div className="hub-inline-scroll scrollbar-hide flex gap-2 overflow-x-auto pb-1">
-            {TECH_WORD_CATEGORIES.map((c) => {
-              const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
-              return (
-                <FilterChip
-                  key={c.id}
-                  active={active}
-                  label={c.label}
-                  icon={CAT_ICONS[c.id] || '◇'}
-                  onClick={() => onSelectCategory(c.id)}
-                />
-              )
-            })}
-          </div>
+      <EssentialTermsStrip onPickTerm={scrollToTerm} />
+      <FoundationConceptChain onPickTerm={scrollToTerm} />
+
+      <div ref={sentinelRef} className="h-px w-full shrink-0 lg:hidden" aria-hidden />
+
+      <div
+        className={`sticky top-0 z-30 -mx-1 mb-5 rounded-2xl border border-white/10 bg-[var(--hub-bg)]/90 backdrop-blur-lg transition-[padding,box-shadow] duration-200 dark:border-white/5 dark:bg-[var(--hub-bg)]/88 sm:-mx-0 sm:mb-6 lg:hidden ${
+          compact ? 'py-2 shadow-[0_12px_40px_-8px_rgba(79,70,229,0.18)] dark:shadow-black/40 sm:py-2.5' : 'space-y-3 py-3 sm:px-1 sm:py-4'
+        }`}
+      >
+        <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Category</p>
+        <div className="hub-inline-scroll scrollbar-hide flex gap-2 overflow-x-auto overflow-y-hidden pb-1">
+          {TECH_WORD_CATEGORIES.map((c) => {
+            const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
+            return (
+              <FilterChip
+                key={c.id}
+                active={active}
+                label={c.label}
+                icon={CAT_ICONS[c.id] || '◇'}
+                onClick={() => onSelectCategory(c.id)}
+              />
+            )
+          })}
         </div>
       </div>
 

@@ -36,6 +36,14 @@ export default function MobileWorkspaceBottomNav({ workspaceMode, onWorkspaceMod
         <Item mode="commands" label="Commands" icon="⌘" />
         <Item mode="scripting" label="Lab" icon="⚡" />
         <Item mode="roadmap" label="Roadmap" icon="🗺" />
+        <Item mode="concepts" label="Concepts" icon="💡" />
+        <Item mode="ports" label="Ports" icon="🔌" />
+        <Item mode="scenarios" label="Scenarios" icon="🧩" />
+        <Item mode="playground" label="Play" icon="⌨" />
+        <Item mode="architecture" label="Arch" icon="⬡" />
+        <Item mode="cheatsheets" label="Sheets" icon="📋" />
+        <Item mode="utilities" label="Utils" icon="🔧" />
+        <Item mode="daily" label="Daily" icon="📅" />
         <Item mode="techwords" label="Tech Words" icon="📖" />
       </div>
     </nav>

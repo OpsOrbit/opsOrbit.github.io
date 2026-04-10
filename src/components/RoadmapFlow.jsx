@@ -4,6 +4,7 @@ import Card from './ui/Card'
 import { ROADMAP_FINAL_ORDER, ROADMAP_FLOW_STEPS } from '../data/roadmapData'
 import RoadmapModuleCard from './roadmap/RoadmapModuleCard'
 import RoadmapMobileDock from './roadmap/RoadmapMobileDock'
+import RoadmapPathHighlights from './roadmap/RoadmapPathHighlights'
 import WorkspaceHero from './workspace/WorkspaceHero'
 
 /** Connectors between modules: horizontal chevron on mobile, vertical pipeline-style arrow on desktop. */
@@ -84,6 +85,7 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
         description="Follow the journey in order — expand modules for topics and deep links into Commands, LAB, and Tools."
         className="mb-2"
       />
+      {!showEmptySearch ? <RoadmapPathHighlights steps={displaySteps} /> : null}
       {showEmptySearch ? (
         <Card className="border-dashed border-indigo-300/40 bg-gradient-to-br from-white/90 to-indigo-50/40 px-8 py-14 text-center dark:border-indigo-500/25 dark:from-[var(--hub-card)] dark:to-indigo-950/30">
           <p className="text-base leading-relaxed text-[var(--hub-sub)]">
@@ -116,7 +118,10 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
               {displaySteps.map((step, index) => (
                 <Fragment key={step.id}>
                   {index > 0 ? <FlowConnectorBetweenModules /> : null}
-                  <li className="relative max-md:min-w-[min(100%,420px)] max-md:shrink-0 max-md:snap-center md:w-full md:pb-10 md:last:pb-3 sm:pb-12">
+                  <li
+                    id={`roadmap-step-${step.id}`}
+                    className="relative max-md:min-w-[min(100%,420px)] max-md:shrink-0 max-md:snap-center md:w-full md:pb-10 md:last:pb-3 sm:pb-12"
+                  >
                     <span
                       className="absolute left-[11px] top-[1.125rem] z-[2] hidden h-2.5 w-2.5 rounded-full border-[2.5px] border-indigo-500 bg-[var(--hub-bg)] shadow-[0_0_12px_2px_rgba(99,102,241,0.55)] dark:border-cyan-400 dark:bg-[var(--hub-bg)] md:block sm:left-[13px] sm:top-[1.2rem]"
                       aria-hidden

@@ -3,10 +3,9 @@ import BrandLogoMark from './BrandLogoMark'
 import ThemeToggle from './ThemeToggle'
 import MobileMenuDrawer from './MobileMenuDrawer'
 import HeaderNewsBanner from './HeaderNewsBanner'
+import GlobalSearchBar from './search/GlobalSearchBar'
 
 export default function Header({
-  query,
-  onQueryChange,
   tool,
   onToolChange,
   toolCounts,
@@ -15,14 +14,24 @@ export default function Header({
   headerBadgeNoun,
   workspaceMode = 'commands',
   onWorkspaceModeChange,
-  searchInputRef,
   onLogoHomeClick,
   toolsCategoryId,
   onSelectToolsCategory,
   techWordsCategoryId,
   onSelectTechWordsCategory,
-  onOpenGlobalSearch,
+  conceptsCategoryId,
+  onSelectConceptsCategory,
+  portsCategoryId,
+  onSelectPortsCategory,
+  scenariosCategoryId,
+  scenariosDifficultyId,
+  onSelectScenariosCategory,
+  onSelectScenariosDifficulty,
   onOpenFavorites,
+  searchQuery,
+  onSearchQueryChange,
+  onGlobalSearchNavigate,
+  searchBarRef,
 }) {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false)
 
@@ -50,69 +59,20 @@ export default function Header({
         </a>
       </div>
 
-      <div className="relative z-[1] hidden min-h-0 min-w-0 flex-1 overflow-hidden px-1 sm:px-2 lg:flex">
-        <HeaderNewsBanner />
+      <div className="relative z-[1] flex min-h-0 min-w-0 flex-1 items-center gap-2 overflow-visible px-1 sm:gap-3 sm:px-2">
+        <div className="hidden min-h-0 min-w-0 flex-1 overflow-hidden lg:block">
+          <HeaderNewsBanner />
+        </div>
+        <GlobalSearchBar
+          ref={searchBarRef}
+          query={searchQuery}
+          onQueryChange={onSearchQueryChange}
+          onNavigate={onGlobalSearchNavigate}
+        />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2 pl-2 sm:flex-row sm:items-center sm:justify-end sm:gap-2.5 sm:border-l sm:border-[var(--hub-line)]/60 sm:bg-[var(--hub-topbar)] sm:pl-3 lg:max-w-none lg:flex-initial">
-        <div className="relative w-full min-w-0 sm:w-[min(100%,12rem)] sm:max-w-[12rem] md:max-w-[13rem] lg:w-[min(100%,13rem)]">
-          <svg
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--hub-muted)]"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.3}
-            aria-hidden
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            ref={searchInputRef}
-            type="search"
-            enterKeyHint="search"
-            className="h-11 min-h-[44px] w-full rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] py-2 pl-9 pr-2 text-sm text-[var(--hub-text)] outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[var(--hub-muted)] focus:border-[var(--hub-tool)] focus:shadow-[0_0_0_3px_var(--hub-tool-dim)] sm:h-9 sm:min-h-0 sm:text-[13px]"
-            placeholder={
-              workspaceMode === 'scripting'
-                ? 'Search lab topics…'
-                : workspaceMode === 'roadmap'
-                  ? 'Search modules…'
-                  : workspaceMode === 'tools'
-                    ? 'Search tools & categories…'
-                    : workspaceMode === 'techwords'
-                      ? 'Search tech dictionary…'
-                      : 'Search…'
-            }
-            value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
-            aria-label={
-              workspaceMode === 'scripting'
-                ? 'Search LAB topics'
-                : workspaceMode === 'roadmap'
-                  ? 'Search roadmap modules'
-                  : workspaceMode === 'tools'
-                    ? 'Search DevOps tools encyclopedia'
-                    : workspaceMode === 'techwords'
-                      ? 'Search technical dictionary'
-                      : 'Search commands'
-            }
-          />
-        </div>
         <div className="flex shrink-0 items-center justify-end gap-2">
-          {onOpenGlobalSearch ? (
-            <button
-              type="button"
-              onClick={() => onOpenGlobalSearch()}
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-tool)] sm:min-h-9 sm:min-w-9"
-              title="Search everywhere (⌘K)"
-              aria-label="Open global search"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          ) : null}
           {onOpenFavorites ? (
             <button
               type="button"
@@ -149,6 +109,14 @@ export default function Header({
         onSelectToolsCategory={onSelectToolsCategory}
         techWordsCategoryId={techWordsCategoryId}
         onSelectTechWordsCategory={onSelectTechWordsCategory}
+        conceptsCategoryId={conceptsCategoryId}
+        onSelectConceptsCategory={onSelectConceptsCategory}
+        portsCategoryId={portsCategoryId}
+        onSelectPortsCategory={onSelectPortsCategory}
+        scenariosCategoryId={scenariosCategoryId}
+        scenariosDifficultyId={scenariosDifficultyId}
+        onSelectScenariosCategory={onSelectScenariosCategory}
+        onSelectScenariosDifficulty={onSelectScenariosDifficulty}
       />
     </header>
   )
