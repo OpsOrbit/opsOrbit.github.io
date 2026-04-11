@@ -45,6 +45,7 @@ import ScenariosPage from './components/scenarios/ScenariosPage'
 import { filterPorts } from './utils/portsFilter'
 import { filterScenarios } from './utils/scenariosFilter'
 import PlaygroundPage from './components/playground/PlaygroundPage'
+import { PLAYGROUND_SIMULATION_COUNT } from './data/playgroundData'
 import ArchitecturePage from './components/architecture/ArchitecturePage'
 import { ARCHITECTURES } from './data/architectureData'
 import CheatsheetsPage from './components/cheatsheets/CheatsheetsPage'
@@ -157,7 +158,6 @@ function levelLabel(l) {
   return labels[l] || l
 }
 
-const PLAYGROUND_DEMO_COUNT = 4
 const ARCHITECTURE_PATTERN_COUNT = ARCHITECTURES.length
 
 const COUNT_TOOL_IDS = [
@@ -629,7 +629,7 @@ export default function App() {
     if (workspaceMode === 'concepts') return conceptsSearchCount
     if (workspaceMode === 'ports') return portsSearchCount
     if (workspaceMode === 'scenarios') return scenariosSearchCount
-    if (workspaceMode === 'playground') return PLAYGROUND_DEMO_COUNT
+    if (workspaceMode === 'playground') return PLAYGROUND_SIMULATION_COUNT
     if (workspaceMode === 'architecture') return ARCHITECTURE_PATTERN_COUNT
     if (workspaceMode === 'cheatsheets') return cheatsheetsVisibleCount
     if (workspaceMode === 'utilities') return utilitiesVisibleCount
@@ -646,7 +646,7 @@ export default function App() {
     conceptsSearchCount,
     portsSearchCount,
     scenariosSearchCount,
-    PLAYGROUND_DEMO_COUNT,
+    PLAYGROUND_SIMULATION_COUNT,
     ARCHITECTURE_PATTERN_COUNT,
     cheatsheetsVisibleCount,
     utilitiesVisibleCount,
@@ -681,7 +681,7 @@ export default function App() {
       return { count: scenariosSearchCount, noun: 'scenarios' }
     }
     if (workspaceMode === 'playground') {
-      return { count: PLAYGROUND_DEMO_COUNT, noun: 'demos' }
+      return { count: PLAYGROUND_SIMULATION_COUNT, noun: 'commands' }
     }
     if (workspaceMode === 'architecture') {
       return { count: ARCHITECTURE_PATTERN_COUNT, noun: 'patterns' }
@@ -703,7 +703,7 @@ export default function App() {
     conceptsSearchCount,
     portsSearchCount,
     scenariosSearchCount,
-    PLAYGROUND_DEMO_COUNT,
+    PLAYGROUND_SIMULATION_COUNT,
     ARCHITECTURE_PATTERN_COUNT,
     cheatsheetsVisibleCount,
     utilitiesVisibleCount,
@@ -804,7 +804,7 @@ export default function App() {
           <main
             id="main-content"
             tabIndex={-1}
-            className="min-h-0 min-w-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] pt-3 outline-none [-webkit-overflow-scrolling:touch] sm:pl-[max(1.5rem,env(safe-area-inset-left,0px))] sm:pr-[max(1.5rem,env(safe-area-inset-right,0px))] sm:pt-4 lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
+            className="min-h-0 min-w-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] pt-2.5 outline-none [-webkit-overflow-scrolling:touch] sm:pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-3 md:pl-[max(1.25rem,env(safe-area-inset-left,0px))] md:pr-[max(1.25rem,env(safe-area-inset-right,0px))] lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
           >
             <div
               className={

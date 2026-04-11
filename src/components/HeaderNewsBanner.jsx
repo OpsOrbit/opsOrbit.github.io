@@ -341,7 +341,7 @@ function linkClassMarquee() {
 }
 
 function linkClassCompact() {
-  return 'inline-flex min-w-0 max-w-[min(92vw,18rem)] shrink-0 items-center gap-1.5 text-[11px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:max-w-[22rem] sm:text-xs'
+  return 'inline-flex min-w-0 max-w-[min(calc(100vw-5rem),20rem)] shrink-0 items-center gap-1.5 text-[11px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:max-w-[22rem] sm:text-xs'
 }
 
 function SourceBadge({ source }) {
@@ -397,14 +397,28 @@ export default function HeaderNewsBanner() {
 
   if (status === 'loading' && items.length === 0) {
     return (
-      <div className="flex min-h-0 min-w-0 w-full max-w-full flex-1 items-center justify-center px-1" aria-hidden>
-        <div className="h-3 w-full max-w-full animate-pulse rounded-md bg-[var(--hub-line)]/80" />
+      <div
+        className="flex h-10 w-full min-w-0 max-w-full flex-1 items-center justify-center px-0.5 sm:h-11"
+        aria-busy="true"
+        aria-label="Loading headlines"
+      >
+        <div className="flex h-full w-full max-w-full items-center gap-2 rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] px-2 py-1.5 dark:bg-[var(--hub-elevated)]">
+          <div className="h-6 w-14 shrink-0 animate-pulse rounded bg-[var(--hub-line)]/90 sm:w-16" />
+          <div className="h-3 min-w-0 flex-1 animate-pulse rounded-md bg-[var(--hub-line)]/70" />
+          <div className="hidden h-3 w-24 animate-pulse rounded-md bg-[var(--hub-line)]/50 sm:block" />
+        </div>
       </div>
     )
   }
 
   if (status !== 'ready' || items.length === 0) {
-    return null
+    return (
+      <div className="flex h-10 w-full min-w-0 items-center justify-center rounded-lg border border-dashed border-[var(--hub-line)] bg-[var(--hub-bg)]/60 px-2 text-center sm:h-11">
+        <p className="text-[10px] font-medium leading-tight text-[var(--hub-muted)] sm:text-[11px]">
+          News feed unavailable — check connection or try later
+        </p>
+      </div>
+    )
   }
 
   const renderStrip = (keySuffix) => (
@@ -438,9 +452,9 @@ export default function HeaderNewsBanner() {
   )
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-1 items-center px-0.5 sm:px-1">
+    <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-1 items-center overflow-hidden px-0.5 sm:px-1">
       <div
-        className="flex min-h-[34px] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)]"
+        className="flex min-h-[2.25rem] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)] sm:min-h-[2.125rem]"
         role="region"
         aria-label="Latest cloud news from official AWS, Azure, and GCP blogs by category, plus community posts"
       >

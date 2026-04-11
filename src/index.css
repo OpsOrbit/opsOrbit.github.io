@@ -89,6 +89,13 @@
     overflow-x: hidden;
   }
 
+  /* Stacked header (toolbar + news + workspace strip) on phones — anchor links clear the fold */
+  @media (max-width: 1023px) {
+    html {
+      scroll-padding-top: min(11rem, 28vh);
+    }
+  }
+
   html.dark {
     -webkit-tap-highlight-color: rgb(74 222 128 / 0.16);
   }

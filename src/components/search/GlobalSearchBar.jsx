@@ -63,13 +63,13 @@ const GlobalSearchBar = forwardRef(function GlobalSearchBar({ query, onQueryChan
   return (
     <div
       ref={wrapRef}
-      className={`relative z-[102] min-w-0 ${showField ? 'max-w-md flex-1' : 'shrink-0'}`}
+      className={`relative z-[102] min-w-0 ${showField ? 'w-full max-w-none flex-1 sm:max-w-md lg:max-w-lg' : 'shrink-0'}`}
       role="search"
     >
       {!showField ? (
         <button
           type="button"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-tool)]"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] transition-colors hover:border-[var(--hub-tool)] hover:text-[var(--hub-tool)] sm:h-11 sm:w-11"
           aria-label="Open search"
           title="Search ( / )"
           onClick={() => {
@@ -82,7 +82,7 @@ const GlobalSearchBar = forwardRef(function GlobalSearchBar({ query, onQueryChan
       ) : (
         <div className="relative w-full min-w-0">
           <div className="relative">
-            <SearchGlyph className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--hub-muted)]" />
+            <SearchGlyph className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--hub-muted)] sm:left-3.5 sm:h-4 sm:w-4" />
             <input
               ref={inputRef}
               id="global-primary-search"
@@ -93,7 +93,7 @@ const GlobalSearchBar = forwardRef(function GlobalSearchBar({ query, onQueryChan
               aria-label="Search commands, tools, concepts, and ports"
               aria-expanded={showPanel}
               aria-controls="global-search-suggestions"
-              className="h-11 w-full rounded-2xl border border-[var(--hub-border2)] bg-[var(--hub-surface)]/95 py-2 pl-11 pr-20 text-sm text-[var(--hub-text)] shadow-[0_4px_20px_-8px_rgba(0,0,0,0.12)] outline-none ring-[var(--hub-tool)] placeholder:text-[var(--hub-muted)] focus:border-[var(--hub-tool)] focus:shadow-[0_0_0_3px_var(--hub-tool-dim)] dark:shadow-black/20"
+              className="h-10 w-full min-w-0 rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-surface)]/95 py-2 pl-10 pr-16 text-[13px] text-[var(--hub-text)] shadow-[0_4px_20px_-8px_rgba(0,0,0,0.12)] outline-none ring-[var(--hub-tool)] placeholder:text-[var(--hub-muted)] focus:border-[var(--hub-tool)] focus:shadow-[0_0_0_3px_var(--hub-tool-dim)] dark:shadow-black/20 sm:h-11 sm:rounded-2xl sm:pl-11 sm:pr-20 sm:text-sm"
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
               onFocus={() => setOpen(true)}
@@ -133,7 +133,7 @@ const GlobalSearchBar = forwardRef(function GlobalSearchBar({ query, onQueryChan
           {showPanel ? (
             <div
               id="global-search-suggestions"
-              className="absolute left-0 right-0 top-full z-[120] mt-1 max-h-[min(70vh,28rem)] overflow-y-auto rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-surface)]/98 p-2 shadow-2xl backdrop-blur-md dark:bg-[var(--hub-elevated)]/98"
+              className="absolute left-0 right-0 top-full z-[120] mt-1 max-h-[min(50dvh,22rem)] w-full min-w-0 overflow-y-auto overscroll-contain rounded-xl border border-[var(--hub-line)] bg-[var(--hub-surface)]/98 p-2 shadow-2xl backdrop-blur-md dark:bg-[var(--hub-elevated)]/98 sm:max-h-[min(70vh,28rem)] sm:rounded-2xl"
               role="listbox"
               aria-label="Search suggestions"
             >

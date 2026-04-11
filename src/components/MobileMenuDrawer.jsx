@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import SidebarNav from './SidebarNav'
+import ThemeToggle from './ThemeToggle'
 import { DEVOPS_TOOLS, TOOL_CATEGORIES } from '../data/toolsData'
 import { TECH_WORD_CATEGORIES } from '../data/techWordsData'
 import { CONCEPTS, CONCEPT_CATEGORIES } from '../data/conceptsData'
@@ -37,6 +38,7 @@ export default function MobileMenuDrawer({
   scenariosDifficultyId = 'all',
   onSelectScenariosCategory,
   onSelectScenariosDifficulty,
+  onOpenFavorites,
 }) {
   const domainCounts = useMemo(() => buildToolsDomainCounts(), [])
   useEffect(() => {
@@ -111,11 +113,33 @@ export default function MobileMenuDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--hub-border2)] text-[var(--hub-muted)] transition-colors hover:bg-[var(--hub-surface)] hover:text-[var(--hub-text)]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] text-[var(--hub-muted)] transition-colors hover:bg-[var(--hub-surface)] hover:text-[var(--hub-text)]"
                 aria-label="Close"
               >
                 ✕
               </button>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 border-b border-[var(--hub-line)] bg-[var(--hub-bg)]/80 px-3 py-2">
+              {typeof onOpenFavorites === 'function' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenFavorites()
+                    onClose()
+                  }}
+                  className="flex min-h-[40px] min-w-0 flex-1 items-center justify-center gap-2 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] px-3 text-[13px] font-semibold text-[var(--hub-text)] transition-colors hover:border-[var(--hub-tool)]"
+                >
+                  <span className="text-base" aria-hidden>
+                    ★
+                  </span>
+                  Favorites
+                </button>
+              ) : null}
+              <div
+                className={`flex shrink-0 items-center justify-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-0.5 ${typeof onOpenFavorites === 'function' ? '' : 'ml-auto'}`}
+              >
+                <ThemeToggle />
+              </div>
             </div>
             <nav className="flex min-h-0 flex-1 touch-pan-y flex-col overflow-y-auto overscroll-y-contain py-2 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] [-webkit-overflow-scrolling:touch]">
               {onWorkspaceModeChange && (

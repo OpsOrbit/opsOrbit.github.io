@@ -12,12 +12,12 @@ function LinkedInIcon({ className = 'h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]' })
 export default function Footer() {
   return (
     <footer
-      className="shrink-0 border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/90 pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] pt-4 backdrop-blur-md dark:bg-[var(--hub-elevated)]/50 lg:pb-5"
+      className="shrink-0 border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/90 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-md dark:bg-[var(--hub-elevated)]/50 sm:pb-[calc(4.85rem+env(safe-area-inset-bottom,0px))] sm:pt-4 lg:pb-5"
       role="contentinfo"
     >
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-center gap-1 text-center sm:gap-1.5">
-          <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-sm text-[var(--hub-muted)] sm:text-[15px]">
+      <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-center gap-1.5 text-center sm:gap-2">
+          <p className="flex max-w-md flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-[13px] leading-snug text-[var(--hub-muted)] sm:max-w-none sm:text-sm sm:text-[15px]">
             <span className="text-[var(--hub-sub)]">Developed by</span>
             <a
               href={CREATOR_LINKEDIN_URL}

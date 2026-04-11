@@ -52,7 +52,7 @@ export default function MainWorkspaceHeader({
   commandsSearchGlobal = false,
 }) {
   const headerShellClass =
-    'flex shrink-0 items-center gap-3 overflow-visible border-b border-[var(--hub-line)] px-4 pb-3 pt-4 sm:gap-4 sm:px-6 sm:pb-4 sm:pt-5 lg:px-8'
+    'flex shrink-0 items-center gap-2 overflow-visible border-b border-[var(--hub-line)] px-3 pb-2.5 pt-3 sm:gap-3 sm:px-5 sm:pb-3 sm:pt-4 md:gap-4 lg:px-8'
   const iconBoxClass =
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-lg font-black sm:h-11 sm:w-11'
   const countPillClass =
