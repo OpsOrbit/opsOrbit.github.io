@@ -7,9 +7,7 @@ import {
 } from '../../data/techWordsData'
 import { filterTechWords } from '../../utils/techWordsFilter'
 import { useTechWordRecent } from '../../hooks/useTechWordRecent'
-import WorkspaceHero from '../workspace/WorkspaceHero'
 import FilterChip from '../tools/FilterChip'
-import { EssentialTermsStrip, FoundationConceptChain } from './TechWordsDiscoverSections'
 import { useStickyCompact } from '../../hooks/useStickyCompact'
 
 const CAT_ICONS = {
@@ -207,85 +205,95 @@ export default function TechWordsPage({
     })
   }, [])
 
+  const normalizedCategoryId =
+    activeCategoryId && activeCategoryId !== 'all' ? activeCategoryId : null
+  const allCategoriesActive = !normalizedCategoryId
+
+  const pickCategory = useCallback(
+    (id) => {
+      if (id === 'all' || !id) {
+        onSelectCategory('all')
+        return
+      }
+      if (id === normalizedCategoryId) {
+        onSelectCategory('all')
+        return
+      }
+      onSelectCategory(id)
+    },
+    [normalizedCategoryId, onSelectCategory]
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-w-0 max-w-full overflow-x-hidden pb-4"
     >
-      <WorkspaceHero
-        eyebrow="Technical dictionary"
-        title="Tech words"
-        description="Concise definitions, real examples, and bookmarking — use the search bar under the header to find terms. Toggle beginner explanations when available."
-      >
-        <label className="mt-5 flex max-w-xl cursor-pointer items-center gap-2 rounded-xl border border-indigo-200/40 bg-indigo-50/40 px-3 py-2 text-sm font-semibold text-[var(--hub-muted)] dark:border-indigo-500/20 dark:bg-indigo-950/30">
-          <input
-            type="checkbox"
-            checked={explainBeginner}
-            onChange={(e) => setExplainBeginner(e.target.checked)}
-            className="h-4 w-4 rounded border-[var(--hub-border2)] text-indigo-600 focus:ring-indigo-500"
-          />
-          <span>Explain like beginner (when available)</span>
-        </label>
-      </WorkspaceHero>
-
-      <EssentialTermsStrip onPickTerm={scrollToTerm} />
-      <FoundationConceptChain onPickTerm={scrollToTerm} />
-
-      <div ref={sentinelRef} className="h-px w-full shrink-0 lg:hidden" aria-hidden />
+      <div ref={sentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
       <div
-        className={`sticky top-0 z-30 -mx-1 mb-5 rounded-2xl border border-white/10 bg-[var(--hub-bg)]/90 backdrop-blur-lg transition-[padding,box-shadow] duration-200 dark:border-white/5 dark:bg-[var(--hub-bg)]/88 sm:-mx-0 sm:mb-6 lg:hidden ${
-          compact ? 'py-2 shadow-[0_12px_40px_-8px_rgba(79,70,229,0.18)] dark:shadow-black/40 sm:py-2.5' : 'space-y-3 py-3 sm:px-1 sm:py-4'
+        className={`sticky top-0 z-[12] -mx-0.5 mb-2 bg-[var(--hub-bg)]/95 pb-0.5 backdrop-blur-md dark:bg-[var(--hub-bg)]/90 ${
+          compact ? 'shadow-[0_8px_24px_-10px_rgba(79,70,229,0.12)] dark:shadow-black/20' : ''
         }`}
       >
-        <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Category</p>
-        <div className="hub-inline-scroll scrollbar-hide flex gap-2 overflow-x-auto overflow-y-hidden pb-1">
-          {TECH_WORD_CATEGORIES.map((c) => {
-            const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
-            return (
-              <FilterChip
-                key={c.id}
-                active={active}
-                label={c.label}
-                icon={CAT_ICONS[c.id] || '◇'}
-                onClick={() => onSelectCategory(c.id)}
-              />
-            )
-          })}
+        <div
+          className="rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_10px_24px_-12px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5"
+          aria-label="Filter by category"
+        >
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold sm:text-sm" aria-label="Tech words path">
+              <button
+                type="button"
+                onClick={() => onSelectCategory('all')}
+                className="shrink-0 rounded-md px-1 py-0.5 text-[var(--hub-muted)] underline-offset-2 transition-colors hover:text-[var(--hub-text)] hover:underline"
+              >
+                Tech words
+              </button>
+              {normalizedCategoryId ? (
+                <>
+                  <span className="shrink-0 text-[var(--hub-muted)]" aria-hidden>
+                    ›
+                  </span>
+                  <span className="min-w-0 truncate text-[var(--hub-text)]">
+                    {categoryLabelForTechWord(normalizedCategoryId)}
+                  </span>
+                </>
+              ) : null}
+            </div>
+            {!allCategoriesActive ? (
+              <button
+                type="button"
+                onClick={() => onSelectCategory('all')}
+                className="shrink-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-bg)]/60 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--hub-muted)] transition-colors hover:border-indigo-400/50 hover:text-[var(--hub-text)] dark:bg-[var(--hub-bg)]/40"
+                aria-label="Clear category filter"
+              >
+                ✕ Clear
+              </button>
+            ) : null}
+          </div>
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Categories</p>
+          <div className="flex min-w-0 flex-wrap justify-center gap-1.5 sm:gap-2">
+            {TECH_WORD_CATEGORIES.map((c) => {
+              const active =
+                c.id === 'all'
+                  ? allCategoriesActive
+                  : normalizedCategoryId === c.id
+              return (
+                <FilterChip
+                  key={c.id}
+                  active={active}
+                  label={c.id === 'all' ? 'All' : c.label}
+                  icon={CAT_ICONS[c.id] || '◇'}
+                  onClick={() => pickCategory(c.id)}
+                />
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[min(14rem,34%)_1fr] lg:items-start lg:gap-8">
-        <aside className="mb-6 hidden lg:sticky lg:top-24 lg:mb-0 lg:block lg:self-start" aria-label="Filter by category">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Categories</p>
-          <nav className="flex flex-col gap-1 rounded-2xl border border-white/20 bg-[var(--hub-surface)]/95 p-2 shadow-[0_8px_30px_-12px_rgba(79,70,229,0.15)] backdrop-blur-md dark:border-white/10 dark:bg-[var(--hub-elevated)]/80">
-            {TECH_WORD_CATEGORIES.map((c) => {
-              const active = activeCategoryId === c.id || (c.id === 'all' && (!activeCategoryId || activeCategoryId === 'all'))
-              const icon = CAT_ICONS[c.id] || '◇'
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => onSelectCategory(c.id)}
-                  className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-bold transition-all ${
-                    active
-                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20 ring-1 ring-cyan-400/30'
-                      : 'text-[var(--hub-muted)] hover:bg-indigo-50/80 hover:text-[var(--hub-text)] dark:hover:bg-white/5'
-                  }`}
-                  aria-pressed={active}
-                >
-                  <span className="text-base" aria-hidden>
-                    {icon}
-                  </span>
-                  {c.label}
-                </button>
-              )
-            })}
-          </nav>
-        </aside>
-
-        <div className="min-w-0">
+      <div className="min-w-0">
           {recentTerms.length > 0 ? (
             <section className="mb-6 rounded-2xl border border-indigo-200/40 bg-gradient-to-r from-indigo-50/50 to-cyan-50/30 p-3 dark:border-indigo-500/20 dark:from-indigo-950/40 dark:to-cyan-950/20">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
@@ -306,7 +314,7 @@ export default function TechWordsPage({
             </section>
           ) : null}
 
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <p className="text-sm text-[var(--hub-sub)]">
               <span className="font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-cyan-300 dark:to-indigo-300">
                 {filtered.length}
@@ -316,6 +324,15 @@ export default function TechWordsPage({
                 <span className="text-[var(--hub-muted)]"> · {categoryLabelForTechWord(activeCategoryId)}</span>
               ) : null}
             </p>
+            <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-indigo-200/40 bg-indigo-50/40 px-2.5 py-1.5 text-xs font-semibold text-[var(--hub-muted)] dark:border-indigo-500/20 dark:bg-indigo-950/30">
+              <input
+                type="checkbox"
+                checked={explainBeginner}
+                onChange={(e) => setExplainBeginner(e.target.checked)}
+                className="h-3.5 w-3.5 shrink-0 rounded border-[var(--hub-border2)] text-indigo-600 focus:ring-indigo-500"
+              />
+              <span>Beginner explanations (when available)</span>
+            </label>
           </div>
 
           {filtered.length === 0 ? (
@@ -346,7 +363,6 @@ export default function TechWordsPage({
               </motion.div>
             </LayoutGroup>
           )}
-        </div>
       </div>
     </motion.div>
   )

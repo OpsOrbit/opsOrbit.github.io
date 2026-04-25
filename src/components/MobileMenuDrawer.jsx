@@ -1,12 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import SidebarNav from './SidebarNav'
 import ThemeToggle from './ThemeToggle'
 import { DEVOPS_TOOLS, TOOL_CATEGORIES } from '../data/toolsData'
 import { TECH_WORD_CATEGORIES } from '../data/techWordsData'
 import { CONCEPTS, CONCEPT_CATEGORIES } from '../data/conceptsData'
 import { PORTS, PORT_FILTER_CATEGORIES } from '../data/portsData'
-import { SCENARIOS, SCENARIO_CATEGORY_OPTIONS, SCENARIO_DIFFICULTY_OPTIONS } from '../data/scenariosData'
 import { techWordsCountForCategory } from '../utils/techWordsFilter'
 
 function buildToolsDomainCounts() {
@@ -34,10 +32,6 @@ export default function MobileMenuDrawer({
   onSelectConceptsCategory,
   portsCategoryId = 'all',
   onSelectPortsCategory,
-  scenariosCategoryId = 'all',
-  scenariosDifficultyId = 'all',
-  onSelectScenariosCategory,
-  onSelectScenariosDifficulty,
   onOpenFavorites,
 }) {
   const domainCounts = useMemo(() => buildToolsDomainCounts(), [])
@@ -90,7 +84,9 @@ export default function MobileMenuDrawer({
                     ? 'Menu and tech dictionary categories'
                     : workspaceMode === 'concepts'
                       ? 'Menu and concept categories'
-                      : 'Select tool'
+                      : workspaceMode === 'commands'
+                        ? 'Menu'
+                        : 'Select tool'
             }
             className="absolute bottom-0 left-0 top-0 z-10 flex w-full max-w-full min-h-0 flex-col overflow-hidden border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] shadow-2xl sm:w-[min(22rem,calc(100vw-1rem))] sm:max-w-none"
             initial={{ x: '-100%' }}
@@ -108,7 +104,9 @@ export default function MobileMenuDrawer({
                       ? 'Tech Words'
                       : workspaceMode === 'concepts'
                         ? 'Concepts'
-                        : 'Select tool'}
+                        : workspaceMode === 'commands'
+                          ? 'Menu'
+                          : 'Select tool'}
               </span>
               <button
                 type="button"
@@ -356,14 +354,9 @@ export default function MobileMenuDrawer({
                 </div>
               )}
               {workspaceMode === 'commands' ? (
-                <SidebarNav
-                  layout="stack"
-                  tool={tool}
-                  onToolChange={onToolChange}
-                  toolCounts={toolCounts}
-                  toolLabel={toolLabel}
-                  onNavigate={onClose}
-                />
+                <p className="mx-3.5 mt-3 text-[12px] leading-relaxed text-[var(--hub-muted)]">
+                  Switch tools from the chips on the Commands page.
+                </p>
               ) : null}
               {workspaceMode === 'tools' && onSelectToolsCategory ? (
                 <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
@@ -394,7 +387,7 @@ export default function MobileMenuDrawer({
                           key={c.id}
                           type="button"
                           onClick={() => {
-                            onSelectToolsCategory(c.id)
+                            onSelectToolsCategory(active ? 'all' : c.id)
                             onClose()
                           }}
                           className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
@@ -481,76 +474,6 @@ export default function MobileMenuDrawer({
                           aria-pressed={active}
                         >
                           <span className="min-w-0 pr-2">{c.label}</span>
-                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : null}
-              {workspaceMode === 'scenarios' && onSelectScenariosCategory && onSelectScenariosDifficulty ? (
-                <div className="mx-3.5 mt-3 border-t border-[var(--hub-line)] pt-3">
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
-                    Category filter
-                  </p>
-                  <div className="flex flex-col gap-1 pr-0.5">
-                    {SCENARIO_CATEGORY_OPTIONS.map((c) => {
-                      const active =
-                        scenariosCategoryId === c.id ||
-                        (c.id === 'all' && (!scenariosCategoryId || scenariosCategoryId === 'all'))
-                      const count =
-                        c.id === 'all' || !c.id
-                          ? SCENARIOS.length
-                          : SCENARIOS.filter((x) => x.categoryId === c.id).length
-                      return (
-                        <button
-                          key={c.id}
-                          type="button"
-                          onClick={() => {
-                            onSelectScenariosCategory(c.id)
-                            onClose()
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                            active
-                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
-                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
-                          }`}
-                          aria-pressed={active}
-                        >
-                          <span className="min-w-0 pr-2">{c.label}</span>
-                          <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <p className="mb-2 mt-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">
-                    Difficulty filter
-                  </p>
-                  <div className="flex flex-col gap-1 pr-0.5">
-                    {SCENARIO_DIFFICULTY_OPTIONS.map((d) => {
-                      const active =
-                        scenariosDifficultyId === d.id ||
-                        (d.id === 'all' && (!scenariosDifficultyId || scenariosDifficultyId === 'all'))
-                      const count =
-                        d.id === 'all' || !d.id
-                          ? SCENARIOS.length
-                          : SCENARIOS.filter((x) => x.difficulty === d.id).length
-                      return (
-                        <button
-                          key={d.id}
-                          type="button"
-                          onClick={() => {
-                            onSelectScenariosDifficulty(d.id)
-                            onClose()
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-sidebar)] ${
-                            active
-                              ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
-                              : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]'
-                          }`}
-                          aria-pressed={active}
-                        >
-                          <span className="min-w-0 pr-2">{d.label}</span>
                           <span className="shrink-0 font-mono text-[11px] text-[var(--hub-tool)]">{count}</span>
                         </button>
                       )

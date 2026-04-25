@@ -1,8 +1,7 @@
-import { Fragment, useMemo, useState, useCallback } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { CONCEPT_CATEGORIES, CONCEPTS, QUICK_LEARN_IDS, categoryLabelForConcept } from '../../data/conceptsData'
+import { CONCEPT_CATEGORIES, CONCEPTS, categoryLabelForConcept } from '../../data/conceptsData'
 import { filterConcepts } from '../../utils/conceptsFilter'
-import WorkspaceHero from '../workspace/WorkspaceHero'
 import Modal from '../ui/Modal'
 import FilterChip from '../tools/FilterChip'
 
@@ -74,23 +73,11 @@ function FlowDiagramRow({ flow }) {
 export default function ConceptsPage({ query, activeCategoryId, onSelectCategory }) {
   const filtered = useMemo(() => filterConcepts(query, activeCategoryId), [query, activeCategoryId])
   const [flowConceptId, setFlowConceptId] = useState(/** @type {string | null} */ (null))
-  const [quickLearnOpen, setQuickLearnOpen] = useState(false)
-  const [quickIndex, setQuickIndex] = useState(0)
 
   const flowConcept = useMemo(
     () => (flowConceptId ? CONCEPTS.find((c) => c.id === flowConceptId) : null),
     [flowConceptId]
   )
-
-  const quickConcept = useMemo(() => {
-    const id = QUICK_LEARN_IDS[quickIndex]
-    return id ? CONCEPTS.find((c) => c.id === id) : null
-  }, [quickIndex])
-
-  const startQuickLearn = useCallback(() => {
-    setQuickIndex(0)
-    setQuickLearnOpen(true)
-  }, [])
 
   const categoryTitle =
     activeCategoryId === 'all' || !activeCategoryId ? 'All concepts' : categoryLabelForConcept(activeCategoryId)
@@ -101,37 +88,6 @@ export default function ConceptsPage({ query, activeCategoryId, onSelectCategory
       animate={{ opacity: 1 }}
       className="concepts-workspace min-w-0 max-w-full overflow-x-hidden pb-6"
     >
-      <WorkspaceHero
-        eyebrow="Visual learning"
-        title="Concepts"
-        description="Core ideas in networking, security, backends, DevOps, and cloud — use the search bar under the header to filter."
-      />
-
-      <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-6 rounded-2xl border border-white/25 bg-gradient-to-r from-violet-600/10 via-indigo-600/10 to-cyan-500/10 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 sm:p-5"
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-bold text-[var(--hub-text)]">Quick Learn mode</h2>
-            <p className="mt-1 text-xs text-[var(--hub-muted)]">
-              Walk the concepts in order — one screen at a time with the full flow diagram.
-            </p>
-          </div>
-          <motion.button
-            type="button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={startQuickLearn}
-            className="shrink-0 rounded-xl border border-indigo-400/50 bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25"
-          >
-            Start guided path
-          </motion.button>
-        </div>
-        <p className="mt-3 text-[11px] text-[var(--hub-muted)]">{QUICK_LEARN_IDS.length} concepts in order — networking through cloud architecture</p>
-      </motion.section>
-
       <div className="mb-4">
         <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Category</p>
         <div className="hub-inline-scroll scrollbar-hide flex flex-wrap gap-2">
@@ -234,59 +190,6 @@ export default function ConceptsPage({ query, activeCategoryId, onSelectCategory
         ) : null}
       </Modal>
 
-      <Modal
-        open={quickLearnOpen && quickConcept != null}
-        onClose={() => setQuickLearnOpen(false)}
-        title={quickConcept ? `Quick Learn: ${quickConcept.title}` : ''}
-        titleId="quick-learn-title"
-        panelClassName="max-w-lg sm:max-w-xl"
-      >
-        {quickConcept ? (
-          <div className="p-4">
-            <div className="mb-4 flex items-center justify-between gap-2 text-xs text-[var(--hub-muted)]">
-              <span>
-                Step {quickIndex + 1} / {QUICK_LEARN_IDS.length}
-              </span>
-              <span>{categoryLabelForConcept(quickConcept.categoryId)}</span>
-            </div>
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-4xl" aria-hidden>
-                {quickConcept.icon}
-              </span>
-              <p className="text-sm leading-relaxed text-[var(--hub-sub)]">{quickConcept.summary.join(' ')}</p>
-            </div>
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)]">Flow</p>
-            <FlowDiagram flow={quickConcept.flow} />
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--hub-line)] pt-4">
-              <button
-                type="button"
-                disabled={quickIndex === 0}
-                onClick={() => setQuickIndex((i) => Math.max(0, i - 1))}
-                className="min-h-[44px] rounded-xl border border-[var(--hub-border2)] px-4 py-2 text-sm font-bold text-[var(--hub-text)] disabled:opacity-40"
-              >
-                ← Previous
-              </button>
-              {quickIndex < QUICK_LEARN_IDS.length - 1 ? (
-                <button
-                  type="button"
-                  onClick={() => setQuickIndex((i) => i + 1)}
-                  className="min-h-[44px] rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2 text-sm font-bold text-white shadow-md"
-                >
-                  Next →
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setQuickLearnOpen(false)}
-                  className="min-h-[44px] rounded-xl border border-emerald-500/50 bg-emerald-500/10 px-5 py-2 text-sm font-bold text-emerald-800 dark:text-emerald-300"
-                >
-                  Done
-                </button>
-              )}
-            </div>
-          </div>
-        ) : null}
-      </Modal>
     </motion.div>
   )
 }

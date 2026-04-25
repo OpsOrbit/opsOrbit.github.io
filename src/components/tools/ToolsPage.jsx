@@ -8,7 +8,6 @@ import DomainNavBar from './DomainNavBar'
 import FilterChip from './FilterChip'
 import LifecycleStrip from './LifecycleStrip'
 import CompareDock from './CompareDock'
-import WorkspaceHero from '../workspace/WorkspaceHero'
 import { useStickyCompact } from '../../hooks/useStickyCompact'
 
 /**
@@ -62,15 +61,8 @@ export default function ToolsPage({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35 }}
-      className="tools-workspace min-w-0 max-w-full overflow-x-hidden pb-4"
+      className="tools-workspace min-w-0 max-w-full overflow-x-hidden pb-3"
     >
-      <WorkspaceHero
-        compact
-        eyebrow="DevOps tools encyclopedia"
-        title="Explore & compare"
-        description="Search from the header, then pick a domain — lifecycle and license filters sit below."
-      />
-
       <DomainNavBar activeCategoryId={activeCategoryId} onSelectCategory={onSelectCategory} />
 
       <LifecycleStrip compact selectedId={lifecycleStage} onSelectStage={setLifecycleStage} />
@@ -78,16 +70,16 @@ export default function ToolsPage({
       <div ref={filterSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
       <div
-        className={`sticky top-0 z-20 -mx-1 mb-4 rounded-2xl border border-white/10 bg-[var(--hub-bg)]/90 backdrop-blur-lg transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/88 lg:z-[5] ${
+        className={`sticky top-0 z-20 -mx-0.5 mb-2 rounded-xl border border-white/10 bg-[var(--hub-bg)]/92 backdrop-blur-md transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/90 lg:z-[5] ${
           filtersCompact
-            ? 'py-2 shadow-[0_12px_40px_-8px_rgba(79,70,229,0.18)] dark:shadow-black/40 sm:py-2.5'
-            : 'py-3 sm:py-4'
+            ? 'py-1.5 shadow-[0_10px_30px_-10px_rgba(79,70,229,0.16)] dark:shadow-black/35 sm:py-2'
+            : 'py-2 sm:py-2.5'
         }`}
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Filters</p>
-            <div className="hub-inline-scroll scrollbar-hide mt-2 flex w-full max-w-full flex-nowrap gap-2 overflow-x-auto overflow-y-hidden pb-1 sm:flex-wrap">
+            <div className="hub-inline-scroll scrollbar-hide mt-1.5 flex w-full max-w-full flex-nowrap gap-1.5 overflow-x-auto overflow-y-hidden pb-0.5 sm:flex-wrap">
               <FilterChip
                 active={chips.openSource}
                 label="Open source"
@@ -103,7 +95,7 @@ export default function ToolsPage({
               />
             </div>
           </div>
-          <p className="text-sm text-[var(--hub-sub)] sm:text-base">
+          <p className="text-xs text-[var(--hub-sub)] sm:text-sm">
             <span className="font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-cyan-300 dark:to-indigo-300">
               {filtered.length}
             </span>
@@ -113,7 +105,7 @@ export default function ToolsPage({
       </div>
 
       <LayoutGroup id="tools-grid">
-        <motion.div layout className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div layout className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           <AnimatePresence mode="popLayout">
             {filtered.map((tool) => (
               <ToolCard

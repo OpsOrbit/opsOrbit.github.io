@@ -4,10 +4,8 @@ import { COMMANDS_DATA } from './data/commands'
 import { COMMAND_EXTRAS } from './data/commandExtras'
 import { orderedCategorySummaries } from './data/categoryOrder'
 import CommandListByLevel from './components/CommandListByLevel'
-import CategoryHub from './components/CategoryHub'
 import CategoryBreadcrumb from './components/CategoryBreadcrumb'
 import Header from './components/Header'
-import SidebarNav from './components/SidebarNav'
 import SidebarToolTree from './components/SidebarToolTree'
 import MainWorkspaceHeader from './components/MainWorkspaceHeader'
 import MainLayout from './components/layout/MainLayout'
@@ -17,7 +15,7 @@ import FavoritesHubModal from './components/favorites/FavoritesHubModal'
 import Footer from './components/layout/Footer'
 import Card from './components/ui/Card'
 import ScriptingGuides from './components/ScriptingGuides'
-import ScriptingTopicsNav from './components/ScriptingTopicsNav'
+import LabTopicChipBar from './components/lab/LabTopicChipBar'
 import RoadmapFlow from './components/RoadmapFlow'
 import { SCRIPTING_GUIDES } from './data/scriptingGuides'
 import { ROADMAP_FLOW_STEPS, ROADMAP_FINAL_ORDER } from './data/roadmapData'
@@ -30,11 +28,12 @@ import { parseWorkspaceHash, buildWorkspaceHash } from './utils/siteHashNavigati
 import { commandMatchesQuery } from './utils/commandIntentSearch'
 import { mergeRelatedIds } from './utils/commandPanelBreakdown'
 import { filterDevopsTools } from './utils/toolsFilter'
+import { TOOL_CATEGORY_IDS } from './data/toolsData'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
 import TechWordsPage from './components/techwords/TechWordsPage'
-import CommandsHero from './components/commands/CommandsHero'
-import CommandsDiscoverSections from './components/commands/CommandsDiscoverSections'
+import CommandsExplorerHub from './components/commands/CommandsExplorerHub'
+import CommandsToolChipBar from './components/commands/CommandsToolChipBar'
 import MobileWorkspaceBottomNav from './components/MobileWorkspaceBottomNav'
 import { filterTechWords } from './utils/techWordsFilter'
 import { filterConcepts } from './utils/conceptsFilter'
@@ -70,8 +69,6 @@ function readInitialWorkspaceState() {
     techWordsCategoryId: 'all',
     conceptsCategoryId: 'all',
     portsCategoryId: 'all',
-    scenariosCategoryId: 'all',
-    scenariosDifficultyId: 'all',
     playgroundTabId: 'kubernetes',
     architectureId: null,
     cheatsheetTabId: 'git',
@@ -87,13 +84,7 @@ function readInitialWorkspaceState() {
     return { ...defaults, workspaceMode: 'concepts', conceptsCategoryId: parsed.category || 'all' }
   if (parsed.mode === 'ports')
     return { ...defaults, workspaceMode: 'ports', portsCategoryId: parsed.category || 'all' }
-  if (parsed.mode === 'scenarios')
-    return {
-      ...defaults,
-      workspaceMode: 'scenarios',
-      scenariosCategoryId: parsed.category || 'all',
-      scenariosDifficultyId: parsed.difficulty || 'all',
-    }
+  if (parsed.mode === 'scenarios') return { ...defaults, workspaceMode: 'scenarios' }
   if (parsed.mode === 'playground')
     return {
       ...defaults,
@@ -119,8 +110,19 @@ function readInitialWorkspaceState() {
       utilitiesTabId: parsed.tab || 'cidr',
     }
   if (parsed.mode === 'daily') return { ...defaults, workspaceMode: 'daily' }
-  if (parsed.mode === 'tools')
-    return { ...defaults, workspaceMode: 'tools', toolsCategoryId: parsed.category || 'all' }
+  if (parsed.mode === 'tools') {
+    let toolsCategoryId = parsed.category || 'all'
+    const sp = new URLSearchParams(window.location.search || '')
+    const qDomain = (sp.get('domain') || '').toLowerCase()
+    if (
+      (!toolsCategoryId || toolsCategoryId === 'all') &&
+      qDomain &&
+      TOOL_CATEGORY_IDS.has(qDomain)
+    ) {
+      toolsCategoryId = qDomain
+    }
+    return { ...defaults, workspaceMode: 'tools', toolsCategoryId }
+  }
   if (parsed.mode === 'scripting') return { ...defaults, workspaceMode: 'scripting', scriptingTopicId: parsed.topic }
   return { ...defaults, workspaceMode: 'commands', tool: parsed.tool }
 }
@@ -201,12 +203,6 @@ export default function App() {
     () => readInitialWorkspaceState().conceptsCategoryId
   )
   const [portsCategoryId, setPortsCategoryId] = useState(() => readInitialWorkspaceState().portsCategoryId)
-  const [scenariosCategoryId, setScenariosCategoryId] = useState(
-    () => readInitialWorkspaceState().scenariosCategoryId
-  )
-  const [scenariosDifficultyId, setScenariosDifficultyId] = useState(
-    () => readInitialWorkspaceState().scenariosDifficultyId
-  )
   const [playgroundTabId, setPlaygroundTabId] = useState(() => readInitialWorkspaceState().playgroundTabId)
   const [architectureId, setArchitectureId] = useState(() => readInitialWorkspaceState().architectureId)
   const [cheatsheetTabId, setCheatsheetTabId] = useState(() => readInitialWorkspaceState().cheatsheetTabId)
@@ -319,8 +315,6 @@ export default function App() {
     if (type === 'scenario') {
       const s = payload
       setWorkspaceMode('scenarios')
-      setScenariosCategoryId(s.categoryId || 'all')
-      setScenariosDifficultyId(s.difficulty || 'all')
       setQuery(s.title || '')
       setSelected(null)
     }
@@ -349,10 +343,6 @@ export default function App() {
       if (parsed.mode === 'ports') {
         setPortsCategoryId(parsed.category || 'all')
       }
-      if (parsed.mode === 'scenarios') {
-        setScenariosCategoryId(parsed.category || 'all')
-        setScenariosDifficultyId(parsed.difficulty || 'all')
-      }
       if (parsed.mode === 'playground') {
         setPlaygroundTabId(parsed.tab || 'kubernetes')
       }
@@ -376,7 +366,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const next = buildWorkspaceHash({
+    const nextHash = buildWorkspaceHash({
       mode: workspaceMode,
       tool,
       topic: scriptingTopicId,
@@ -384,21 +374,27 @@ export default function App() {
       techWordsCategory: techWordsCategoryId,
       conceptsCategory: conceptsCategoryId,
       portsCategory: portsCategoryId,
-      scenariosCategory: scenariosCategoryId,
-      scenariosDifficulty: scenariosDifficultyId,
       playgroundTab: playgroundTabId,
       architectureId,
       cheatsheetTab: cheatsheetTabId,
       utilitiesTab: utilitiesTabId,
     })
     if (typeof window === 'undefined') return
-    const cur = window.location.hash
+    const url = new URL(window.location.href)
+    if (workspaceMode === 'tools') {
+      if (!toolsCategoryId || toolsCategoryId === 'all') {
+        url.searchParams.delete('domain')
+      } else if (TOOL_CATEGORY_IDS.has(toolsCategoryId)) {
+        url.searchParams.set('domain', toolsCategoryId)
+      }
+    } else {
+      url.searchParams.delete('domain')
+    }
+    url.hash = nextHash
+    const next = `${url.pathname}${url.search}${url.hash}`
+    const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`
     if (cur !== next) {
-      window.history.replaceState(
-        null,
-        '',
-        `${window.location.pathname}${window.location.search}${next}`
-      )
+      window.history.replaceState(null, '', next)
     }
   }, [
     workspaceMode,
@@ -408,8 +404,6 @@ export default function App() {
     techWordsCategoryId,
     conceptsCategoryId,
     portsCategoryId,
-    scenariosCategoryId,
-    scenariosDifficultyId,
     playgroundTabId,
     architectureId,
     cheatsheetTabId,
@@ -478,12 +472,21 @@ export default function App() {
 
   const handleToolChange = useCallback(
     (nextTool) => {
-      if (nextTool === tool && browseKey != null) {
+      const normalized = !nextTool || nextTool === 'all' ? 'all' : nextTool
+      if (normalized === tool && browseKey != null) {
         setBrowseKey(null)
         return
       }
+      if (normalized === tool && tool !== 'all' && browseKey == null) {
+        setPreferredCategory(null)
+        setTool('all')
+        return
+      }
+      if (normalized !== tool) {
+        setBrowseKey(null)
+      }
       setPreferredCategory(null)
-      setTool(nextTool)
+      setTool(normalized)
     },
     [tool, browseKey]
   )
@@ -561,8 +564,8 @@ export default function App() {
 
   const scenariosSearchCount = useMemo(() => {
     if (workspaceMode !== 'scenarios') return 0
-    return filterScenarios(query, scenariosCategoryId, scenariosDifficultyId).length
-  }, [workspaceMode, query, scenariosCategoryId, scenariosDifficultyId])
+    return filterScenarios(query, 'all', 'all').length
+  }, [workspaceMode, query])
 
   const cheatsheetsVisibleCount = useMemo(
     () => countCheatsheetRows(cheatsheetTabId, query),
@@ -748,10 +751,6 @@ export default function App() {
         onSelectConceptsCategory={setConceptsCategoryId}
         portsCategoryId={portsCategoryId}
         onSelectPortsCategory={setPortsCategoryId}
-        scenariosCategoryId={scenariosCategoryId}
-        scenariosDifficultyId={scenariosDifficultyId}
-        onSelectScenariosCategory={setScenariosCategoryId}
-        onSelectScenariosDifficulty={setScenariosDifficultyId}
         onOpenFavorites={() => setFavoritesOpen(true)}
         searchQuery={query}
         onSearchQueryChange={setQuery}
@@ -761,62 +760,50 @@ export default function App() {
 
       <WorkspaceModeNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
-        {(workspaceMode === 'commands' || workspaceMode === 'scripting') && (
-          <aside
-            className="hidden h-full min-h-0 w-[min(220px,30vw)] max-w-[260px] shrink-0 flex-col overflow-x-hidden overflow-y-visible border-r border-[var(--hub-line)] bg-[var(--hub-sidebar)] lg:flex"
-            aria-label={workspaceMode === 'scripting' ? 'LAB workspace' : 'Commands tools'}
-          >
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-visible py-2.5">
-              {workspaceMode === 'commands' ? (
-                <SidebarNav
-                  tool={tool}
-                  onToolChange={handleToolChange}
-                  toolCounts={toolCounts}
-                  toolLabel={toolLabel}
-                />
-              ) : (
-                <div className="mx-2 flex min-h-0 min-w-0 flex-1 flex-col lg:mx-3">
-                  <ScriptingTopicsNav
-                    variant="asideStack"
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <MainWorkspaceHeader
+          tool={tool}
+          toolLabel={toolLabel}
+          visibleCount={workspaceVisibleCount}
+          browseKey={effectiveBrowseKey}
+          workspaceMode={workspaceMode}
+          onBackToAllTools={backToAllTools}
+          commandsSearchGlobal={searchCommandsGlobal}
+        />
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-h-0 min-w-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] pt-2.5 outline-none [-webkit-overflow-scrolling:touch] sm:pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-3 md:pl-[max(1.25rem,env(safe-area-inset-left,0px))] md:pr-[max(1.25rem,env(safe-area-inset-right,0px))] lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
+        >
+            <div
+              className={
+                workspaceMode === 'roadmap' ? 'w-full min-w-0' : 'mx-auto w-full min-w-0 max-w-[1600px]'
+              }
+            >
+              {workspaceMode === 'scripting' ? (
+                <div className="sticky top-0 z-[12] -mx-0.5 mb-1 bg-[var(--hub-bg)]/95 pb-0.5 backdrop-blur-md dark:bg-[var(--hub-bg)]/90">
+                  <LabTopicChipBar
                     guides={filteredScriptingGuides}
                     activeId={scriptingTopicId}
                     onSelectTopic={setScriptingTopicId}
                     isTopicLearned={labProgress.isLearned}
-                    className="min-h-0 flex-1"
                   />
                 </div>
-              )}
-            </div>
-          </aside>
-        )}
-
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <MainWorkspaceHeader
-            tool={tool}
-            toolLabel={toolLabel}
-            visibleCount={workspaceVisibleCount}
-            browseKey={effectiveBrowseKey}
-            workspaceMode={workspaceMode}
-            onBackToAllTools={backToAllTools}
-            commandsSearchGlobal={searchCommandsGlobal}
-          />
-          <main
-            id="main-content"
-            tabIndex={-1}
-            className="min-h-0 min-w-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] pt-2.5 outline-none [-webkit-overflow-scrolling:touch] sm:pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-3 md:pl-[max(1.25rem,env(safe-area-inset-left,0px))] md:pr-[max(1.25rem,env(safe-area-inset-right,0px))] lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
-          >
-            <div
-              className={
-                workspaceMode === 'scripting' || workspaceMode === 'roadmap'
-                  ? 'w-full min-w-0'
-                  : 'mx-auto w-full min-w-0 max-w-[1600px]'
-              }
-            >
+              ) : null}
+              {workspaceMode === 'commands' ? (
+                <div className="sticky top-0 z-[12] -mx-0.5 mb-1 bg-[var(--hub-bg)]/95 pb-0.5 backdrop-blur-md dark:bg-[var(--hub-bg)]/90">
+                  <CommandsToolChipBar
+                    activeToolId={tool}
+                    toolCounts={toolCounts}
+                    toolLabel={toolLabel}
+                    onSelectTool={handleToolChange}
+                  />
+                </div>
+              ) : null}
               <div
                 key={
                   workspaceMode === 'scripting'
-                    ? 'scripting'
+                    ? `scripting-${scriptingTopicId}`
                     : workspaceMode === 'tools'
                       ? `tools-${toolsCategoryId}`
                       : workspaceMode === 'techwords'
@@ -826,7 +813,7 @@ export default function App() {
                           : workspaceMode === 'ports'
                             ? `ports-${portsCategoryId}`
                             : workspaceMode === 'scenarios'
-                              ? `scenarios-${scenariosCategoryId}-${scenariosDifficultyId}`
+                              ? 'scenarios'
                               : workspaceMode === 'playground'
                                 ? `playground-${playgroundTabId}`
                                 : workspaceMode === 'architecture'
@@ -841,15 +828,6 @@ export default function App() {
                 }
                 className="hub-fade-in min-w-0 w-full"
               >
-                {workspaceMode === 'commands' && <CommandsHero />}
-                {workspaceMode === 'commands' && (
-                  <CommandsDiscoverSections
-                    onPickTool={(tid) => {
-                      setBrowseKey(null)
-                      handleToolChange(tid)
-                    }}
-                  />
-                )}
                 {workspaceMode === 'scripting' && (
                   <ScriptingGuides
                     activeId={scriptingTopicId}
@@ -900,15 +878,7 @@ export default function App() {
                   />
                 )}
 
-                {workspaceMode === 'scenarios' && (
-                  <ScenariosPage
-                    query={query}
-                    activeCategoryId={scenariosCategoryId}
-                    onSelectCategory={setScenariosCategoryId}
-                    activeDifficultyId={scenariosDifficultyId}
-                    onSelectDifficulty={setScenariosDifficultyId}
-                  />
-                )}
+                {workspaceMode === 'scenarios' && <ScenariosPage query={query} />}
 
                 {workspaceMode === 'playground' && (
                   <PlaygroundPage
@@ -941,13 +911,7 @@ export default function App() {
                 {workspaceMode === 'daily' && <DailyPage toolLabel={toolLabel} />}
 
                 {workspaceMode === 'commands' && showCategoryHub && (
-                  <CategoryHub
-                    summaries={categorySummaries}
-                    onPickCategory={handlePickCategoryFromHub}
-                    toolLabel={toolLabel}
-                    toolFilter={tool}
-                    onBackToAllTools={backToAllTools}
-                  />
+                  <CommandsExplorerHub summaries={categorySummaries} toolLabel={toolLabel} onSelectTool={handleToolChange} />
                 )}
 
                 {workspaceMode === 'commands' &&
@@ -1028,7 +992,6 @@ export default function App() {
               </div>
             </div>
           </main>
-        </div>
       </div>
 
       <Footer />

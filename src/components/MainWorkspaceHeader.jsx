@@ -1,29 +1,6 @@
 import ToolIcon from './ToolIcon'
 import { BRAND_NAME } from '../brand'
-
-const TOOL_DESC = {
-  aws: 'Amazon Web Services CLI',
-  helm: 'Kubernetes package manager',
-  ansible: 'Config management & automation',
-  azure: 'Microsoft Azure CLI',
-  gcp: 'Google Cloud CLI',
-  git: 'Version control & collaboration',
-  linux: 'Shell & system utilities',
-  nginx: 'Web server & reverse proxy',
-  apache: 'Apache HTTP Server',
-  haproxy: 'Load balancing & TCP/HTTP proxy',
-  tomcat: 'Java servlet container',
-  postgresql: 'psql, pg_dump, and maintenance',
-  redis: 'redis-cli & cache operations',
-  'github-actions': 'CI/CD (GitHub Actions)',
-  kubernetes: 'Container orchestration',
-  terraform: 'Infrastructure as code',
-  docker: 'Containers & images',
-  prometheus: 'Metrics & PromQL',
-  grafana: 'Dashboards & observability UI',
-  maven: 'Java build & dependencies',
-  shell: 'Bash & scripting',
-}
+import { COMMAND_TOOL_SHORT_DESC } from '../data/commandToolDescriptions'
 
 /** Workspaces whose page already has a hero or top intro — skip the duplicate strip. */
 const PAGE_HAS_OWN_INTRO = new Set([
@@ -39,6 +16,7 @@ const PAGE_HAS_OWN_INTRO = new Set([
   'cheatsheets',
   'utilities',
   'daily',
+  'commands',
 ])
 
 export default function MainWorkspaceHeader({
@@ -85,7 +63,7 @@ export default function MainWorkspaceHeader({
       ? 'Filtered category — pick commands below'
       : tool === 'all'
         ? 'Searchable CLI reference across tools'
-        : TOOL_DESC[tool] || 'Command reference'
+        : COMMAND_TOOL_SHORT_DESC[tool] || 'Command reference'
 
   return (
     <header className={headerShellClass}>

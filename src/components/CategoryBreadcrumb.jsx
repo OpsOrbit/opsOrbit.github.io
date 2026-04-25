@@ -11,12 +11,12 @@ export default function CategoryBreadcrumb({
   const showAllToolsBack = toolFilter !== 'all'
 
   return (
-    <nav className="mb-8 flex flex-col gap-3 text-sm" aria-label="Category path">
+    <nav className="mb-3 flex flex-col gap-2 text-sm" aria-label="Category path">
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={onBackToCategories}
-          className="min-h-[48px] rounded-lg border border-hub-line bg-hub-bg px-4 py-2.5 font-medium leading-snug text-hub-text transition-all duration-200 hover:border-hub-primary/40 hover:bg-hub-elevated active:scale-[0.99] active:bg-hub-elevated/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary focus-visible:ring-offset-2 focus-visible:ring-offset-hub-bg dark:bg-hub-elevated/60"
+          className="min-h-9 rounded-lg border border-hub-line bg-hub-bg px-3 py-2 text-xs font-semibold leading-snug text-hub-text transition-all duration-200 hover:border-hub-primary/40 hover:bg-hub-elevated active:scale-[0.99] active:bg-hub-elevated/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary focus-visible:ring-offset-2 focus-visible:ring-offset-hub-bg dark:bg-hub-elevated/60"
         >
           ← Back to {toolLabel(browseKey.tool)} modules
         </button>
@@ -24,14 +24,14 @@ export default function CategoryBreadcrumb({
           <button
             type="button"
             onClick={onBackToAllTools}
-            className="min-h-[48px] rounded-lg border border-hub-line bg-hub-surface px-4 py-2.5 font-medium leading-snug text-hub-sub transition-all duration-200 hover:border-hub-primary/40 hover:bg-hub-elevated hover:text-hub-text active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary focus-visible:ring-offset-2 focus-visible:ring-offset-hub-bg dark:bg-hub-elevated/40"
+            className="min-h-9 rounded-lg border border-hub-line bg-hub-surface px-3 py-2 text-xs font-semibold leading-snug text-hub-sub transition-all duration-200 hover:border-hub-primary/40 hover:bg-hub-elevated hover:text-hub-text active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary focus-visible:ring-offset-2 focus-visible:ring-offset-hub-bg dark:bg-hub-elevated/40"
           >
             ← All tools
           </button>
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="inline-flex min-h-[48px] items-center rounded-lg bg-hub-primary/10 px-4 py-2.5 text-sm font-medium leading-snug text-hub-primary dark:bg-hub-primary/20 dark:text-emerald-200/90">
+        <span className="inline-flex min-h-9 items-center rounded-lg bg-hub-primary/10 px-3 py-2 text-xs font-semibold leading-snug text-hub-primary dark:bg-hub-primary/20 dark:text-emerald-200/90">
           {toolLabel(browseKey.tool)}
           <span className="mx-1.5 text-hub-muted">·</span>
           {browseKey.category}

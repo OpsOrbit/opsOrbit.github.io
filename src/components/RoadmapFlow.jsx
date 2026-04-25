@@ -4,8 +4,6 @@ import Card from './ui/Card'
 import { ROADMAP_FINAL_ORDER, ROADMAP_FLOW_STEPS } from '../data/roadmapData'
 import RoadmapModuleCard from './roadmap/RoadmapModuleCard'
 import RoadmapMobileDock from './roadmap/RoadmapMobileDock'
-import RoadmapPathHighlights from './roadmap/RoadmapPathHighlights'
-import WorkspaceHero from './workspace/WorkspaceHero'
 
 /** Connectors between modules: horizontal chevron on mobile, vertical pipeline-style arrow on desktop. */
 function FlowConnectorBetweenModules() {
@@ -79,13 +77,6 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
 
   return (
     <section className="relative space-y-8 pb-8 max-md:pb-24">
-      <WorkspaceHero
-        eyebrow="Structured learning"
-        title="OpsOrbit roadmap"
-        description="Follow the journey in order — expand modules for topics and deep links into Commands, LAB, and Tools."
-        className="mb-2"
-      />
-      {!showEmptySearch ? <RoadmapPathHighlights steps={displaySteps} /> : null}
       {showEmptySearch ? (
         <Card className="border-dashed border-indigo-300/40 bg-gradient-to-br from-white/90 to-indigo-50/40 px-8 py-14 text-center dark:border-indigo-500/25 dark:from-[var(--hub-card)] dark:to-indigo-950/30">
           <p className="text-base leading-relaxed text-[var(--hub-sub)]">
@@ -93,16 +84,7 @@ export default function RoadmapFlow({ steps = [], finalOrderLines = ROADMAP_FINA
           </p>
         </Card>
       ) : (
-        <div className="relative w-full min-w-0 px-3 sm:px-5">
-          <header id="roadmap-modules-top" className="mb-6 scroll-mt-4 text-center">
-            <h2 className="mx-auto inline-block rounded-2xl border border-white/30 bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-center text-[15px] font-extrabold leading-snug tracking-tight text-white shadow-lg shadow-indigo-500/25 sm:text-lg">
-              Learning path modules
-            </h2>
-            <p className="mt-3 text-[12px] text-[var(--hub-muted)]">
-              Swipe horizontally on mobile — vertical flow on desktop with the animated pipeline.
-            </p>
-          </header>
-
+        <div id="roadmap-modules-top" className="scroll-mt-4 relative w-full min-w-0 px-3 sm:px-5">
           <div className="relative max-md:-mx-1 max-md:px-1 md:pl-11">
             <div
               className="roadmap-pipeline-line pointer-events-none absolute bottom-2 left-[15px] top-2 hidden w-[3px] overflow-hidden rounded-full md:block sm:left-[17px]"

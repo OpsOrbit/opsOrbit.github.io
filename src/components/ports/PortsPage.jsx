@@ -1,13 +1,7 @@
 import { Fragment, useMemo, useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import {
-  PORT_FILTER_CATEGORIES,
-  PORTS,
-  QUICK_LEARN_PORT_GROUPS,
-  categoryLabelForPort,
-} from '../../data/portsData'
+import { PORT_FILTER_CATEGORIES, categoryLabelForPort } from '../../data/portsData'
 import { filterPorts } from '../../utils/portsFilter'
-import WorkspaceHero from '../workspace/WorkspaceHero'
 import FilterChip from '../tools/FilterChip'
 
 /** @type {Record<string, string>} */
@@ -126,27 +120,12 @@ function ExpandedBody({ port, onClose }) {
 export default function PortsPage({ query, activeCategoryId, onSelectCategory }) {
   const filtered = useMemo(() => filterPorts(query, activeCategoryId), [query, activeCategoryId])
   const isLg = useLgUp()
-  /** @type {['table' | 'card' | null, (v: 'table' | 'card' | null) => void]} */
-  const [viewOverride, setViewOverride] = useState(null)
-  const viewMode = viewOverride ?? (isLg ? 'table' : 'card')
+  const viewMode = isLg ? 'table' : 'card'
   const [expandedId, setExpandedId] = useState(/** @type {string | null} */ (null))
-  const [quickLearn, setQuickLearn] = useState(false)
-
-  const setTableView = useCallback(() => setViewOverride('table'), [])
-  const setCardView = useCallback(() => setViewOverride('card'), [])
-  const resetView = useCallback(() => setViewOverride(null), [])
 
   const toggleExpand = useCallback((id) => {
     setExpandedId((cur) => (cur === id ? null : id))
   }, [])
-
-  const quickGroups = useMemo(() => {
-    const byPort = new Map(filtered.map((p) => [p.port, p]))
-    return QUICK_LEARN_PORT_GROUPS.map((g) => ({
-      ...g,
-      entries: g.ports.map((n) => byPort.get(n)).filter(Boolean),
-    })).filter((g) => g.entries.length > 0)
-  }, [filtered])
 
   return (
     <motion.div
@@ -155,64 +134,6 @@ export default function PortsPage({ query, activeCategoryId, onSelectCategory })
       transition={{ duration: 0.35 }}
       className="min-w-0 pb-8"
     >
-      <WorkspaceHero
-        eyebrow="Reference"
-        title="Ports"
-        description="Understand common port numbers and their real-world usage — filter with the search bar under the header."
-      >
-        <div className="mt-4 flex min-w-0 flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--hub-muted)]">View</span>
-            <div className="flex rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-surface)] p-0.5">
-              <button
-                type="button"
-                onClick={setTableView}
-                className={`rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-                  viewMode === 'table'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-sm'
-                    : 'text-[var(--hub-muted)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={viewMode === 'table'}
-              >
-                Table
-              </button>
-              <button
-                type="button"
-                onClick={setCardView}
-                className={`rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-                  viewMode === 'card'
-                    ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] shadow-sm'
-                    : 'text-[var(--hub-muted)] hover:text-[var(--hub-text)]'
-                }`}
-                aria-pressed={viewMode === 'card'}
-              >
-                Cards
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={resetView}
-              className="rounded-lg border border-dashed border-[var(--hub-line)] px-2 py-1.5 text-[10px] font-semibold text-[var(--hub-muted)] hover:border-[var(--hub-tool)] hover:text-[var(--hub-text)]"
-              title="Use screen default: table on desktop, cards on mobile"
-            >
-              Auto
-            </button>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setQuickLearn((q) => !q)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-colors ${
-              quickLearn
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm dark:border-cyan-500/50 dark:bg-indigo-950/60 dark:text-cyan-100'
-                : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:border-[var(--hub-tool)] hover:text-[var(--hub-text)]'
-            }`}
-            aria-pressed={quickLearn}
-          >
-            Quick Learn
-          </button>
-        </div>
-      </WorkspaceHero>
-
       <div className="mb-4 flex min-w-0 flex-wrap gap-2">
         {PORT_FILTER_CATEGORIES.map((c) => {
           const active = activeCategoryId === c.id || (!activeCategoryId && c.id === 'all')
@@ -239,59 +160,7 @@ export default function PortsPage({ query, activeCategoryId, onSelectCategory })
         })}
       </div>
 
-      {quickLearn ? (
-        <motion.section
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          <p className="text-sm text-[var(--hub-muted)]">
-            Grouped by common interview clusters. Filtered by your search and category tabs.
-          </p>
-          {quickGroups.map((group) => (
-            <div key={group.id} className="rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-card)] p-4 shadow-sm sm:p-5">
-              <h2 className="text-lg font-extrabold text-[var(--hub-text)]">{group.label}</h2>
-              <p className="text-xs text-[var(--hub-muted)]">{group.subtitle}</p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {group.entries.map((p) => (
-                  <motion.button
-                    key={p.id}
-                    type="button"
-                    layout
-                    whileHover={{ y: -2 }}
-                    onClick={() => toggleExpand(p.id)}
-                    className={`rounded-xl border p-3 text-left transition-shadow ${
-                      p.highlight
-                        ? 'border-indigo-300/60 bg-gradient-to-br from-indigo-50/90 to-violet-50/50 shadow-md dark:border-indigo-500/30 dark:from-indigo-950/50 dark:to-violet-950/35'
-                        : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] hover:shadow-md'
-                    } ${expandedId === p.id ? 'ring-2 ring-[var(--hub-tool)]' : ''}`}
-                  >
-                    <span className="font-mono text-xl font-black text-indigo-600 dark:text-cyan-400">{p.port}</span>
-                    <p className="mt-1 text-sm font-bold text-[var(--hub-text)]">{p.service}</p>
-                    <p className="text-[11px] text-[var(--hub-muted)]">{p.protocol}</p>
-                  </motion.button>
-                ))}
-              </div>
-              {group.entries.some((p) => expandedId === p.id) ? (
-                <div className="mt-4">
-                  <AnimatePresence mode="wait">
-                    {group.entries
-                      .filter((p) => expandedId === p.id)
-                      .map((p) => (
-                        <ExpandedBody key={p.id} port={p} onClose={() => setExpandedId(null)} />
-                      ))}
-                  </AnimatePresence>
-                </div>
-              ) : null}
-            </div>
-          ))}
-          {quickGroups.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-[var(--hub-line)] px-4 py-8 text-center text-sm text-[var(--hub-muted)]">
-              No ports in Quick Learn groups match your filters. Clear search or pick All.
-            </p>
-          ) : null}
-        </motion.section>
-      ) : viewMode === 'table' ? (
+      {viewMode === 'table' ? (
         <div className="overflow-x-auto rounded-2xl border border-[var(--hub-line)] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.12)] dark:shadow-black/30">
           <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <thead className="sticky top-0 z-10 bg-[var(--hub-elevated)] shadow-sm backdrop-blur-sm">

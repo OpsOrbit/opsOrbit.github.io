@@ -48,7 +48,7 @@ const DOMAIN_ICONS = {
 }
 
 const pillBase =
-  'inline-flex min-h-11 max-w-full shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-left text-xs font-bold uppercase leading-snug tracking-[0.05em] shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:min-h-10 sm:py-1.5 sm:text-sm motion-safe:transition-transform'
+  'inline-flex min-h-8 max-w-full shrink-0 items-center gap-1 rounded-lg border px-2 py-0.5 text-left text-[11px] font-bold uppercase leading-snug tracking-[0.04em] shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:text-sm motion-safe:transition-transform'
 
 const pillIdle =
   'border-[var(--hub-border2)] bg-[var(--hub-surface)]/90 text-[var(--hub-tool)] backdrop-blur-sm hover:border-indigo-400/45 hover:bg-gradient-to-r hover:from-indigo-50/80 hover:to-violet-50/40 hover:shadow-md dark:bg-[var(--hub-elevated)]/50 dark:hover:from-indigo-950/40 dark:hover:to-violet-950/20'
@@ -63,7 +63,8 @@ const categoryById = Object.fromEntries(TOOL_CATEGORIES.map((c) => [c.id, c]))
  */
 export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
   const counts = useMemo(() => buildCounts(), [])
-  const allActive = activeCategoryId === 'all' || !activeCategoryId
+  const normalizedId = activeCategoryId && activeCategoryId !== 'all' ? activeCategoryId : null
+  const allActive = !normalizedId
   const [sheetOpen, setSheetOpen] = useState(false)
   const dragControls = useDragControls()
 
@@ -88,20 +89,41 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
     }
   }, [sheetOpen])
 
+  /** Single-select domains; repeat click or "ALL" clears filter and syncs hash to #/tools. */
+  const pickCategory = useCallback(
+    (id) => {
+      if (id === 'all' || !id) {
+        onSelectCategory('all')
+        return
+      }
+      if (id === normalizedId) {
+        onSelectCategory('all')
+        return
+      }
+      onSelectCategory(id)
+    },
+    [normalizedId, onSelectCategory]
+  )
+
   const pickDomain = useCallback(
     (id) => {
-      onSelectCategory(id)
+      pickCategory(id)
       setSheetOpen(false)
     },
-    [onSelectCategory]
+    [pickCategory]
   )
 
   const categoryTitle =
     activeCategoryId === 'all' || !activeCategoryId ? 'All domains' : categoryLabel(activeCategoryId)
 
+  const breadcrumbSegment =
+    normalizedId && categoryById[normalizedId]
+      ? categoryById[normalizedId].shortLabel || categoryById[normalizedId].label
+      : null
+
   const Pill = ({ id, label, count, onPick }) => {
-    const active = id === 'all' ? allActive : activeCategoryId === id
-    const go = onPick ?? onSelectCategory
+    const active = id === 'all' ? allActive : normalizedId === id
+    const go = onPick ?? pickCategory
     const icon = DOMAIN_ICONS[id] || '◇'
     return (
       <button
@@ -176,7 +198,7 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
                     />
                     <div className="flex w-full min-w-0 items-center justify-between gap-3">
                       <h2 id="domain-sheet-title" className="text-sm font-extrabold text-[var(--hub-text)]">
-                        Browse domains
+                        Domains
                       </h2>
                       <button
                         type="button"
@@ -193,7 +215,7 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
                       Pick a domain to filter tools
                     </p>
                     <div className="mb-4 flex flex-wrap justify-center gap-2">
-                      <Pill id="all" label="All" count={counts.all} onPick={pickDomain} />
+                      <Pill id="all" label="ALL" count={counts.all} onPick={pickDomain} />
                     </div>
                     <div className="space-y-2">
                       {DOMAIN_SECTIONS.map((section) => {
@@ -255,37 +277,97 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
     <>
       {sheet}
 
-      <div className="mb-3 lg:hidden">
+      <div className="mb-2 lg:hidden">
+        <div className="mb-1.5 flex items-center justify-between gap-2">
+          <nav className="flex min-w-0 items-center gap-1 text-[11px] font-semibold sm:text-xs" aria-label="Tools location">
+            <button
+              type="button"
+              onClick={() => pickCategory('all')}
+              className="shrink-0 rounded-md px-1 py-0.5 text-[var(--hub-muted)] underline-offset-2 transition-colors hover:text-[var(--hub-text)] hover:underline"
+            >
+              Tools
+            </button>
+            {breadcrumbSegment ? (
+              <>
+                <span className="shrink-0 text-[var(--hub-muted)]" aria-hidden>
+                  ›
+                </span>
+                <span className="min-w-0 truncate text-[var(--hub-text)]">{breadcrumbSegment}</span>
+              </>
+            ) : null}
+          </nav>
+          {!allActive ? (
+            <button
+              type="button"
+              onClick={() => pickCategory('all')}
+              className="shrink-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--hub-muted)] transition-colors hover:border-indigo-400/50 hover:text-[var(--hub-text)] dark:bg-[var(--hub-elevated)]/60"
+              aria-label="Clear domain filter"
+            >
+              ✕ Clear
+            </button>
+          ) : null}
+        </div>
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex w-full min-h-[3rem] items-center justify-between gap-3 rounded-2xl border border-indigo-200/60 bg-[var(--hub-surface)] px-4 py-3 text-left shadow-[var(--hub-shadow-card)] transition-colors hover:border-[var(--hub-tool)]/50 dark:border-indigo-500/25 dark:bg-[var(--hub-elevated)]/40"
+          className="flex w-full min-h-[2.5rem] items-center justify-between gap-2 rounded-xl border border-indigo-200/60 bg-[var(--hub-surface)] px-3 py-2 text-left shadow-[var(--hub-shadow-card)] transition-colors hover:border-[var(--hub-tool)]/50 dark:border-indigo-500/25 dark:bg-[var(--hub-elevated)]/40"
           aria-haspopup="dialog"
           aria-expanded={sheetOpen}
         >
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-indigo-600 dark:text-cyan-400/90">
-              Browse by domain
-            </p>
-            <p className="mt-0.5 truncate text-sm font-bold text-[var(--hub-text)]">{categoryTitle}</p>
+            <p className="truncate text-sm font-bold text-[var(--hub-text)]">{categoryTitle}</p>
           </div>
-          <span className="shrink-0 text-lg leading-none text-[var(--hub-muted)]" aria-hidden>
+          <span className="shrink-0 text-base leading-none text-[var(--hub-muted)]" aria-hidden>
             ▾
           </span>
         </button>
+        <div className="mt-1.5 flex min-w-0 items-stretch gap-1.5">
+          <div className="sticky left-0 z-[1] shrink-0 self-center bg-[var(--hub-bg)] pr-1 shadow-[6px_0_12px_-4px_rgba(0,0,0,0.12)] dark:shadow-[6px_0_12px_-4px_rgba(0,0,0,0.35)]">
+            <Pill id="all" label="ALL" count={counts.all} />
+          </div>
+          <div className="hub-inline-scroll scrollbar-hide flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto overflow-y-hidden pb-0.5">
+            {TOOL_CATEGORIES.map((c) => (
+              <Pill key={c.id} id={c.id} label={c.shortLabel || c.label} count={counts[c.id] ?? 0} />
+            ))}
+          </div>
+        </div>
       </div>
 
       <nav
-        className="mb-3 hidden overflow-hidden rounded-2xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-3 shadow-[0_12px_36px_-12px_rgba(79,70,229,0.22)] ring-2 ring-indigo-500/15 backdrop-blur-xl dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/85 dark:shadow-black/40 dark:ring-indigo-400/20 sm:mb-4 sm:p-4 lg:mb-4 lg:block lg:p-4"
+        className="mb-2 hidden overflow-hidden rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_10px_24px_-12px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5 lg:mb-2 lg:block lg:p-2.5"
         aria-label="Browse tools by domain"
       >
-        <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-[0.14em] text-indigo-600 dark:text-cyan-400/90 sm:mb-2.5">
-          Browse by domain
-        </p>
-        <div className="mb-3 flex flex-wrap justify-center gap-2 sm:gap-2.5">
-          <Pill id="all" label="All" count={counts.all} />
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold sm:text-sm" aria-label="Tools path">
+            <button
+              type="button"
+              onClick={() => pickCategory('all')}
+              className="shrink-0 rounded-md px-1 py-0.5 text-[var(--hub-muted)] underline-offset-2 transition-colors hover:text-[var(--hub-text)] hover:underline"
+            >
+              Tools
+            </button>
+            {breadcrumbSegment ? (
+              <>
+                <span className="shrink-0 text-[var(--hub-muted)]" aria-hidden>
+                  ›
+                </span>
+                <span className="min-w-0 truncate text-[var(--hub-text)]">{breadcrumbSegment}</span>
+              </>
+            ) : null}
+          </div>
+          {!allActive ? (
+            <button
+              type="button"
+              onClick={() => pickCategory('all')}
+              className="shrink-0 rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-bg)]/60 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--hub-muted)] transition-colors hover:border-indigo-400/50 hover:text-[var(--hub-text)] dark:bg-[var(--hub-bg)]/40"
+              aria-label="Clear domain filter"
+            >
+              ✕ Clear
+            </button>
+          ) : null}
         </div>
-        <div className="flex min-w-0 flex-wrap justify-center gap-2 sm:gap-2.5">
+        <div className="flex min-w-0 flex-wrap justify-center gap-1.5">
+          <Pill id="all" label="ALL" count={counts.all} />
           {TOOL_CATEGORIES.map((c) => (
             <Pill key={c.id} id={c.id} label={c.shortLabel || c.label} count={counts[c.id] ?? 0} />
           ))}

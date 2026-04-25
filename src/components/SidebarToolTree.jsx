@@ -1,12 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
+import { motion } from 'motion/react'
 import { useCommandsWorkspace } from '../context/CommandsWorkspaceContext'
 import { orderedCategorySummaries, compareCategories } from '../data/categoryOrder'
-import {
-  CATEGORY_PILL_BUTTON_CLASS,
-  CATEGORY_PILL_SCROLL_INNER_CLASS,
-  CATEGORY_PILL_SCROLL_OUTER_CLASS,
-} from './categoryPillStyles'
-import DockMagnify from './DockMagnify'
 import { getToolExplanation } from '../data/toolExplanations'
 import { getToolInstall } from '../data/toolInstallInfo'
 
@@ -20,12 +15,8 @@ const INSTALL_TABS = [
   { id: 'windows', label: 'Windows' },
 ]
 
-function categoryPillClass(active) {
-  if (!active) return CATEGORY_PILL_BUTTON_CLASS
-  // Base pill class includes text-[var(--hub-tool)]; without !, that can win over text-white and hide
-  // label + count on the default-selected first pill (green-on-green).
-  return `${CATEGORY_PILL_BUTTON_CLASS} !border-transparent !bg-[var(--hub-primary)] !text-white shadow-md hover:!border-transparent hover:!bg-[var(--hub-primary-hover)] hover:!text-white dark:!text-[#0d1117] dark:hover:!text-[#0d1117]`
-}
+const CATEGORY_VIEW_BTN =
+  'inline-flex min-h-[34px] w-full items-center justify-center gap-1 rounded-lg border border-indigo-200/70 bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-md shadow-indigo-500/25 transition hover:brightness-110 dark:border-indigo-500/40'
 
 const LEVEL_RANK = { beginner: 0, intermediate: 1, advanced: 2 }
 
@@ -248,11 +239,11 @@ export default function SidebarToolTree({
 
   const shell =
     isMain
-      ? `rounded-xl border border-[var(--hub-line)] bg-[var(--hub-card)] shadow-[var(--hub-shadow-card)] ${className}`
+      ? `rounded-xl border border-white/25 bg-gradient-to-br from-white/90 via-white/75 to-indigo-50/25 shadow-[0_4px_20px_-6px_rgba(79,70,229,0.12)] backdrop-blur-md dark:border-white/10 dark:from-[var(--hub-elevated)]/90 dark:via-[var(--hub-card)]/82 dark:to-indigo-950/20 dark:shadow-black/25 ${className}`
       : `mt-1 border-t border-[var(--hub-line)] pt-2 ${className}`
 
   const headingCls = isMain
-    ? 'px-3 pb-2 pt-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--hub-faint)] sm:px-4 sm:pt-4'
+    ? 'px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--hub-faint)] sm:px-3 sm:pt-2.5'
     : 'sidebar-label px-3.5 pb-1.5 pt-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--hub-faint)]'
 
   const catTitle = 'text-[11px]'
@@ -272,97 +263,113 @@ export default function SidebarToolTree({
 
   return (
     <div className={shell}>
-      <p className={headingCls}>Categories &amp; commands</p>
+      <p className={headingCls}>Categories</p>
       {isMain ? (
         <>
-          <div className="border-t border-hub-line/60 bg-hub-bg/40 px-3 py-3 dark:border-hub-line/60 dark:bg-hub-bg/20 sm:px-4 sm:py-3.5">
-            <div className={CATEGORY_PILL_SCROLL_OUTER_CLASS}>
-              <DockMagnify
-                as="nav"
-                className={CATEGORY_PILL_SCROLL_INNER_CLASS}
-                itemClipClassName="inline-flex max-w-full shrink-0 overflow-hidden rounded-full"
-                itemWrapperClassName="inline-flex max-w-full shrink-0 origin-center"
-                aria-label="Select a category"
+          <div className="border-t border-[var(--hub-line)]/60 px-2 py-2 dark:border-[var(--hub-line)]/50 sm:px-3 sm:py-2.5">
+            {(explanation || installInfo) && (
+              <div className="mb-2 flex flex-wrap gap-1.5">
+                {explanation ? (
+                  <button
+                    type="button"
+                    aria-pressed={activeCategory === ABOUT_KEY}
+                    onClick={() => setActiveCategory(ABOUT_KEY)}
+                    className={`rounded-lg border px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition ${
+                      activeCategory === ABOUT_KEY
+                        ? 'border-hub-primary bg-hub-primary text-white dark:text-[#0d1117]'
+                        : 'border-[var(--hub-border2)] bg-[var(--hub-surface)]/80 text-[var(--hub-muted)] hover:border-indigo-400/45 hover:text-[var(--hub-text)] dark:bg-white/5'
+                    }`}
+                  >
+                    About
+                  </button>
+                ) : null}
+                {installInfo ? (
+                  <button
+                    type="button"
+                    aria-pressed={activeCategory === INSTALL_KEY}
+                    onClick={() => setActiveCategory(INSTALL_KEY)}
+                    className={`rounded-lg border px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition ${
+                      activeCategory === INSTALL_KEY
+                        ? 'border-hub-primary bg-hub-primary text-white dark:text-[#0d1117]'
+                        : 'border-[var(--hub-border2)] bg-[var(--hub-surface)]/80 text-[var(--hub-muted)] hover:border-indigo-400/45 hover:text-[var(--hub-text)] dark:bg-white/5'
+                    }`}
+                  >
+                    Install
+                  </button>
+                ) : null}
+              </div>
+            )}
+            <div
+              className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+              role="list"
+              aria-label="Command categories"
+            >
+              <motion.div
+                layout
+                role="listitem"
+                className={`flex flex-col rounded-xl border bg-[var(--hub-surface)]/90 p-2.5 shadow-sm dark:bg-[var(--hub-elevated)]/60 ${
+                  activeCategory === ALL_KEY
+                    ? 'border-cyan-400/55 ring-2 ring-cyan-400/35'
+                    : 'border-[var(--hub-line)]/80'
+                }`}
               >
-              <button
-                type="button"
-                aria-pressed={activeCategory === ALL_KEY}
-                className={categoryPillClass(activeCategory === ALL_KEY)}
-                title={`All — ${totalToolCount} commands`}
-                onClick={() => setActiveCategory(ALL_KEY)}
-              >
-                <span className="whitespace-nowrap">All</span>
-                <span
-                  className={`ml-1 shrink-0 font-mono text-[0.95em] font-bold tabular-nums ${
-                    activeCategory === ALL_KEY ? 'opacity-95' : 'opacity-90'
+                <h3 className="text-[14px] font-extrabold leading-tight text-[var(--hub-text)]">All</h3>
+                <p className="mt-0.5 font-mono text-[11px] font-bold tabular-nums text-[var(--hub-muted)]">
+                  {totalToolCount} commands
+                </p>
+                <p className="mb-2 mt-1 line-clamp-2 flex-1 text-[11px] leading-snug text-[var(--hub-sub)]">
+                  Every command for this tool, grouped by level below.
+                </p>
+                <button type="button" className={CATEGORY_VIEW_BTN} onClick={() => setActiveCategory(ALL_KEY)}>
+                  <span aria-hidden>🔍</span> View commands
+                </button>
+              </motion.div>
+              {sections.map(({ category, count }) => (
+                <motion.div
+                  key={category}
+                  layout
+                  role="listitem"
+                  className={`flex flex-col rounded-xl border bg-[var(--hub-surface)]/90 p-2.5 shadow-sm dark:bg-[var(--hub-elevated)]/60 ${
+                    activeCategory === category
+                      ? 'border-cyan-400/55 ring-2 ring-cyan-400/35'
+                      : 'border-[var(--hub-line)]/80'
                   }`}
                 >
-                  ({totalToolCount})
-                </span>
-              </button>
-              {sections.map(({ category, count }) => (
-                <button
-                  key={category}
-                  type="button"
-                  aria-pressed={activeCategory === category}
-                  className={categoryPillClass(activeCategory === category)}
-                  title={`${category} — ${count} commands`}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  <span className="whitespace-nowrap">{category}</span>
-                  <span
-                    className={`ml-1 shrink-0 font-mono text-[0.95em] font-bold tabular-nums ${
-                      activeCategory === category ? 'opacity-95' : 'opacity-90'
-                    }`}
-                  >
-                    ({count})
-                  </span>
-                </button>
+                  <h3 className="line-clamp-2 text-[13px] font-extrabold leading-snug text-[var(--hub-text)]">{category}</h3>
+                  <p className="mt-0.5 font-mono text-[11px] font-bold tabular-nums text-[var(--hub-muted)]">{count} commands</p>
+                  <p className="mb-2 mt-1 line-clamp-2 flex-1 text-[11px] leading-snug text-[var(--hub-sub)]">
+                    Browse commands in this category.
+                  </p>
+                  <button type="button" className={CATEGORY_VIEW_BTN} onClick={() => setActiveCategory(category)}>
+                    <span aria-hidden>🔍</span> View commands
+                  </button>
+                </motion.div>
               ))}
-              {uncategorized.length > 0 && (
-                <button
-                  type="button"
-                  aria-pressed={activeCategory === OTHER_KEY}
-                  className={categoryPillClass(activeCategory === OTHER_KEY)}
-                  title={`Other — ${uncategorized.length} commands`}
-                  onClick={() => setActiveCategory(OTHER_KEY)}
+              {uncategorized.length > 0 ? (
+                <motion.div
+                  layout
+                  role="listitem"
+                  className={`flex flex-col rounded-xl border bg-[var(--hub-surface)]/90 p-2.5 shadow-sm dark:bg-[var(--hub-elevated)]/60 ${
+                    activeCategory === OTHER_KEY
+                      ? 'border-cyan-400/55 ring-2 ring-cyan-400/35'
+                      : 'border-[var(--hub-line)]/80'
+                  }`}
                 >
-                  <span className="whitespace-nowrap">Other</span>
-                  <span
-                    className={`ml-1 shrink-0 font-mono text-[0.95em] font-bold tabular-nums ${
-                      activeCategory === OTHER_KEY ? 'opacity-95' : 'opacity-90'
-                    }`}
-                  >
-                    ({uncategorized.length})
-                  </span>
-                </button>
-              )}
-              {explanation && (
-                <button
-                  type="button"
-                  aria-pressed={activeCategory === ABOUT_KEY}
-                  className={categoryPillClass(activeCategory === ABOUT_KEY)}
-                  title={`About — ${tool}`}
-                  onClick={() => setActiveCategory(ABOUT_KEY)}
-                >
-                  <span className="whitespace-nowrap">About</span>
-                </button>
-              )}
-              {installInfo && (
-                <button
-                  type="button"
-                  aria-pressed={activeCategory === INSTALL_KEY}
-                  className={categoryPillClass(activeCategory === INSTALL_KEY)}
-                  title={`Install — ${tool}`}
-                  onClick={() => setActiveCategory(INSTALL_KEY)}
-                >
-                  <span className="whitespace-nowrap">Install</span>
-                </button>
-              )}
-              </DockMagnify>
+                  <h3 className="text-[14px] font-extrabold leading-tight text-[var(--hub-text)]">Other</h3>
+                  <p className="mt-0.5 font-mono text-[11px] font-bold tabular-nums text-[var(--hub-muted)]">
+                    {uncategorized.length} commands
+                  </p>
+                  <p className="mb-2 mt-1 line-clamp-2 flex-1 text-[11px] leading-snug text-[var(--hub-sub)]">
+                    Commands without a category label.
+                  </p>
+                  <button type="button" className={CATEGORY_VIEW_BTN} onClick={() => setActiveCategory(OTHER_KEY)}>
+                    <span aria-hidden>🔍</span> View commands
+                  </button>
+                </motion.div>
+              ) : null}
             </div>
           </div>
-          <div className="px-2 pb-4 pt-4 sm:px-3 sm:pb-5">
+          <div className="px-2 pb-3 pt-2 sm:px-3 sm:pb-4">
             {activeSection && (
               <section aria-labelledby="main-cat-active">
                 {activeSection.kind === 'commands' ? (
@@ -372,7 +379,7 @@ export default function SidebarToolTree({
                       category={activeSection.category}
                       count={activeSection.count}
                     />
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                       {activeSection.items.map((cmd) => (
                         <MainCommandCard key={cmd.id} cmd={cmd} onPick={pick} levelLabel={levelLabel} />
                       ))}

@@ -9,7 +9,7 @@ const viewport = { once: true, margin: '-32px' }
 
 export default function CommandListByLevel({ commandsByLevel, onSelect, toolLabel, levelLabel }) {
   return (
-    <div className="space-y-14 sm:space-y-16">
+    <div className="space-y-6 sm:space-y-8">
       {LEVEL_ORDER.map((level, sectionIndex) => {
         const list = commandsByLevel[level] || []
         if (list.length === 0) return null
@@ -24,13 +24,13 @@ export default function CommandListByLevel({ commandsByLevel, onSelect, toolLabe
           >
             <h2
               id={`level-section-${level}`}
-              className="section-title mb-6 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)] sm:text-sm"
+              className="section-title mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--hub-muted)] sm:text-sm"
             >
               <span className="h-px flex-1 bg-[var(--hub-line)]" aria-hidden />
               <span className="shrink-0">{levelLabel(level)}</span>
               <span className="h-px flex-1 bg-[var(--hub-line)]" aria-hidden />
             </h2>
-            <ul className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 md:gap-5 xl:grid-cols-3 xl:gap-6">
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-4 xl:gap-4">
               {list.map((cmd, i) => {
                 const extras = COMMAND_EXTRAS[cmd.id] || {}
                 const enriched = enrichCommand(cmd)

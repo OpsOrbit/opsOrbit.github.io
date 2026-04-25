@@ -48,29 +48,26 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
   }
 
   const shell = compact
-    ? 'mb-3 p-2 pb-1.5 shadow-[0_6px_24px_-8px_rgba(79,70,229,0.12)] sm:p-3 sm:pb-2 lg:p-3'
-    : 'mb-4 p-3 pb-2 shadow-[0_8px_32px_-8px_rgba(79,70,229,0.15)] sm:mb-6 sm:p-4 lg:p-6'
+    ? 'mb-2 p-1.5 shadow-[0_6px_18px_-10px_rgba(79,70,229,0.12)] sm:p-2'
+    : 'mb-3 p-2 shadow-[0_8px_24px_-10px_rgba(79,70,229,0.14)] sm:mb-4 sm:p-3'
 
   return (
     <div
-      className={`tools-glass overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-slate-50/90 via-white/80 to-indigo-50/40 backdrop-blur-xl dark:border-white/10 dark:from-slate-900/80 dark:via-[var(--hub-elevated)]/90 dark:to-indigo-950/40 dark:shadow-black/40 ${shell}`}
+      className={`tools-glass overflow-hidden rounded-xl border border-white/20 bg-gradient-to-br from-slate-50/90 via-white/80 to-indigo-50/35 backdrop-blur-md dark:border-white/10 dark:from-slate-900/80 dark:via-[var(--hub-elevated)]/90 dark:to-indigo-950/35 dark:shadow-black/30 ${shell}`}
     >
-      <div className={`flex flex-wrap items-center justify-between gap-2 ${compact ? 'mb-1 sm:mb-1.5' : 'mb-1 sm:mb-3'}`}>
+      <div className={`flex items-center justify-between gap-1.5 ${compact ? 'mb-1' : 'mb-1.5 sm:mb-2'}`}>
         <div className="min-w-0">
           <p
-            className={`font-bold uppercase tracking-[0.14em] text-indigo-600/90 dark:text-cyan-300/90 ${compact ? 'text-[9px] tracking-[0.1em]' : 'text-[10px]'}`}
+            className={`font-bold uppercase tracking-[0.12em] text-indigo-600/90 dark:text-cyan-300/90 ${compact ? 'text-[9px]' : 'text-[10px]'}`}
           >
             DevOps lifecycle
-          </p>
-          <p className={`text-[var(--hub-muted)] ${compact ? 'text-[10px] leading-tight sm:text-[11px]' : 'text-xs'}`}>
-            Tap a stage to filter · tap again to clear
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1 lg:hidden">
           <button
             type="button"
             onClick={() => scrollByStep(-1)}
-            className={`flex items-center justify-center rounded-xl border border-white/30 bg-white/50 text-[var(--hub-muted)] backdrop-blur-sm transition-colors hover:border-indigo-400/50 hover:text-indigo-600 dark:border-white/10 dark:bg-white/5 dark:hover:text-cyan-300 ${compact ? 'h-8 min-w-8 text-sm' : 'h-9 min-w-9'}`}
+            className={`flex items-center justify-center rounded-lg border border-white/30 bg-white/50 text-[var(--hub-muted)] backdrop-blur-sm transition-colors hover:border-indigo-400/50 hover:text-indigo-600 dark:border-white/10 dark:bg-white/5 dark:hover:text-cyan-300 ${compact ? 'h-7 min-w-7 text-xs' : 'h-8 min-w-8 text-sm'}`}
             aria-label="Previous lifecycle phases"
           >
             ←
@@ -78,30 +75,25 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
           <button
             type="button"
             onClick={() => scrollByStep(1)}
-            className={`flex items-center justify-center rounded-xl border border-white/30 bg-white/50 text-[var(--hub-muted)] backdrop-blur-sm transition-colors hover:border-indigo-400/50 hover:text-indigo-600 dark:border-white/10 dark:bg-white/5 dark:hover:text-cyan-300 ${compact ? 'h-8 min-w-8 text-sm' : 'h-9 min-w-9'}`}
+            className={`flex items-center justify-center rounded-lg border border-white/30 bg-white/50 text-[var(--hub-muted)] backdrop-blur-sm transition-colors hover:border-indigo-400/50 hover:text-indigo-600 dark:border-white/10 dark:bg-white/5 dark:hover:text-cyan-300 ${compact ? 'h-7 min-w-7 text-xs' : 'h-8 min-w-8 text-sm'}`}
             aria-label="Next lifecycle phases"
           >
             →
           </button>
         </div>
       </div>
-      {!compact ? (
-        <p className="mb-2 text-[10px] text-[var(--hub-faint)] lg:hidden">Swipe or use arrows to explore stages</p>
-      ) : (
-        <p className="mb-1.5 text-[9px] text-[var(--hub-faint)] lg:hidden">Swipe to scroll stages</p>
-      )}
-      <div className="-mx-3 min-w-0 px-3 sm:mx-0 sm:px-0">
+      <div className="-mx-1 min-w-0 px-1 sm:mx-0 sm:px-0">
         <div
           ref={scrollerRef}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
-          className="hub-inline-scroll scrollbar-hide w-full min-w-0 max-w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden pb-2 lg:snap-none lg:overflow-x-visible lg:pb-0"
+          className="hub-inline-scroll scrollbar-hide w-full min-w-0 max-w-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden pb-1 lg:snap-none lg:overflow-x-visible lg:pb-0"
           tabIndex={0}
           role="region"
           aria-label="DevOps lifecycle — tap a stage to filter tools"
         >
           <div
-            className={`flex w-max min-w-0 flex-nowrap items-stretch gap-0 lg:w-full lg:max-w-full lg:flex-wrap lg:justify-between ${compact ? 'lg:gap-1' : 'lg:gap-2'}`}
+            className={`flex w-max min-w-0 flex-nowrap items-stretch gap-0 lg:w-full lg:max-w-full lg:flex-nowrap lg:justify-start ${compact ? 'lg:gap-1' : 'lg:gap-1.5'}`}
             role="list"
           >
             {LIFECYCLE.map((step, i) => {
@@ -117,10 +109,10 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
                     onClick={() => toggle(step.id)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`flex shrink-0 flex-col justify-center rounded-xl border px-2 py-1.5 text-center transition-shadow sm:px-2.5 lg:min-h-0 lg:min-w-0 lg:w-full lg:flex-1 ${
+                    className={`flex shrink-0 flex-col justify-center rounded-lg border px-2 py-1 text-center transition-shadow sm:px-2 lg:min-h-0 lg:min-w-[86px] lg:flex-1 ${
                       compact
-                        ? 'min-h-[38px] min-w-[96px] sm:min-w-[100px] lg:py-1.5'
-                        : 'min-h-[48px] min-w-[112px] px-3 py-2'
+                        ? 'min-h-[34px] min-w-[88px]'
+                        : 'min-h-[40px] min-w-[100px] px-2.5 py-1.5'
                     } ${
                       active
                         ? 'border-cyan-400/60 bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/30 ring-2 ring-cyan-400/50 dark:from-indigo-500 dark:to-violet-600'
@@ -128,16 +120,16 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
                     }`}
                     aria-pressed={active}
                   >
-                    <span className={compact ? 'text-xs leading-none' : 'text-sm'} aria-hidden>
+                    <span className={compact ? 'text-[11px] leading-none' : 'text-xs'} aria-hidden>
                       {step.icon}
                     </span>
                     <span
-                      className={`whitespace-nowrap font-extrabold ${compact ? 'text-[10px] sm:text-[11px]' : 'text-xs sm:text-[11px]'}`}
+                      className={`whitespace-nowrap font-extrabold ${compact ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-[11px]'}`}
                     >
                       {step.label}
                     </span>
                     <span
-                      className={`text-[9px] opacity-90 ${compact ? 'hidden xl:block' : 'hidden lg:block'}`}
+                      className={`text-[8px] opacity-90 ${compact ? 'hidden 2xl:block' : 'hidden xl:block'}`}
                     >
                       {step.hint}
                     </span>
@@ -154,7 +146,7 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
                     </div>
                   )}
                   {i < LIFECYCLE.length - 1 && (
-                    <span className="px-1 text-indigo-300 dark:text-indigo-500 lg:hidden" aria-hidden>
+                    <span className="px-0.5 text-indigo-300 dark:text-indigo-500 lg:hidden" aria-hidden>
                       ·
                     </span>
                   )}
@@ -170,7 +162,7 @@ export default function LifecycleStrip({ selectedId, onSelectStage, compact = fa
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className={`text-center font-medium text-emerald-600 dark:text-emerald-400 ${compact ? 'mt-1.5 text-[10px]' : 'mt-2 text-[11px]'}`}
+            className={`text-center font-medium text-emerald-600 dark:text-emerald-400 ${compact ? 'mt-1 text-[10px]' : 'mt-1.5 text-[11px]'}`}
           >
             Filtering by <strong className="capitalize">{selectedId}</strong> — matching categories only
           </motion.p>

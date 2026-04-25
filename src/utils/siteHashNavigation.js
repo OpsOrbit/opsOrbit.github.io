@@ -3,7 +3,6 @@ import { TOOL_CATEGORY_IDS } from '../data/toolsData'
 import { TECH_WORD_CATEGORY_IDS } from '../data/techWordsData'
 import { CONCEPT_CATEGORY_IDS } from '../data/conceptsData'
 import { PORT_CATEGORY_IDS } from '../data/portsData'
-import { SCENARIO_CATEGORY_IDS, SCENARIO_DIFFICULTY_IDS } from '../data/scenariosData'
 import { PLAYGROUND_TAB_IDS } from '../data/playgroundData'
 import { ARCHITECTURE_IDS } from '../data/architectureData'
 import { CHEATSHEET_TAB_IDS } from '../data/cheatsheetsData'
@@ -38,49 +37,13 @@ const SCRIPTING_IDS = new Set(SCRIPTING_GUIDES.map((g) => g.id))
 const DEFAULT_SCRIPTING_TOPIC = SCRIPTING_GUIDES[0]?.id ?? 'dockerfile'
 
 /**
- * @param {string | undefined} a
- * @param {string | undefined} b
- */
-function parseScenariosCategoryDifficulty(a, b) {
-  if (!a && !b) return { category: 'all', difficulty: 'all' }
-  if (a && !b) {
-    if (a === 'all') return { category: 'all', difficulty: 'all' }
-    if (SCENARIO_CATEGORY_IDS.has(a)) return { category: a, difficulty: 'all' }
-    if (SCENARIO_DIFFICULTY_IDS.has(a)) return { category: 'all', difficulty: a }
-    return { category: 'all', difficulty: 'all' }
-  }
-  if (a && b) {
-    const catA = a === 'all' || SCENARIO_CATEGORY_IDS.has(a)
-    const catB = b === 'all' || SCENARIO_CATEGORY_IDS.has(b)
-    const diffA = a === 'all' || SCENARIO_DIFFICULTY_IDS.has(a)
-    const diffB = b === 'all' || SCENARIO_DIFFICULTY_IDS.has(b)
-    if (catA && diffB)
-      return {
-        category: a === 'all' ? 'all' : a,
-        difficulty: b === 'all' ? 'all' : b,
-      }
-    if (diffA && catB)
-      return {
-        category: b === 'all' ? 'all' : b,
-        difficulty: a === 'all' ? 'all' : a,
-      }
-    if (catA && catB) return { category: a === 'all' ? 'all' : a, difficulty: 'all' }
-    if (diffA && diffB) return { category: 'all', difficulty: a === 'all' ? 'all' : a }
-  }
-  return { category: 'all', difficulty: 'all' }
-}
-
-/**
- * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | { mode: 'techwords', category: string } | { mode: 'concepts', category: string } | { mode: 'ports', category: string } | { mode: 'scenarios', category: string, difficulty: string } | { mode: 'playground', tab: string } | { mode: 'architecture', architectureId: string | null } | { mode: 'cheatsheets', tab: string } | { mode: 'utilities', tab: string } | { mode: 'daily' } | null}
+ * @returns {{ mode: 'commands', tool: string } | { mode: 'scripting', topic: string } | { mode: 'roadmap' } | { mode: 'tools', category: string } | { mode: 'techwords', category: string } | { mode: 'concepts', category: string } | { mode: 'ports', category: string } | { mode: 'scenarios' } | { mode: 'playground', tab: string } | { mode: 'architecture', architectureId: string | null } | { mode: 'cheatsheets', tab: string } | { mode: 'utilities', tab: string } | { mode: 'daily' } | null}
  */
 export function parseWorkspaceHash(hash) {
   if (hash == null || hash === '' || hash === '#') return null
   const trimmed = String(hash).replace(/^#/, '')
   const sc = trimmed.match(/^\/?scenarios(?:\/([^/?#]+))?(?:\/([^/?#]+))?\/?$/)
-  if (sc) {
-    const { category, difficulty } = parseScenariosCategoryDifficulty(sc[1], sc[2])
-    return { mode: 'scenarios', category, difficulty }
-  }
+  if (sc) return { mode: 'scenarios' }
   const pg = trimmed.match(/^\/?playground(?:\/([^/?#]+))?\/?$/)
   if (pg) {
     const seg = pg[1]
@@ -147,7 +110,7 @@ export function parseWorkspaceHash(hash) {
 }
 
 /**
- * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string, conceptsCategory?: string, portsCategory?: string, scenariosCategory?: string, scenariosDifficulty?: string, playgroundTab?: string, architectureId?: string | null, cheatsheetTab?: string, utilitiesTab?: string }} p
+ * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string, conceptsCategory?: string, portsCategory?: string, playgroundTab?: string, architectureId?: string | null, cheatsheetTab?: string, utilitiesTab?: string }} p
  * @returns {string} Hash starting with #/…
  */
 export function buildWorkspaceHash({
@@ -158,8 +121,6 @@ export function buildWorkspaceHash({
   techWordsCategory = 'all',
   conceptsCategory = 'all',
   portsCategory = 'all',
-  scenariosCategory = 'all',
-  scenariosDifficulty = 'all',
   playgroundTab = 'kubernetes',
   architectureId = null,
   cheatsheetTab = 'git',
@@ -195,14 +156,7 @@ export function buildWorkspaceHash({
     if (PORT_CATEGORY_IDS.has(portsCategory)) return `#/ports/${portsCategory}`
     return '#/ports'
   }
-  if (mode === 'scenarios') {
-    const c = scenariosCategory || 'all'
-    const d = scenariosDifficulty || 'all'
-    if (c === 'all' && d === 'all') return '#/scenarios'
-    if (c !== 'all' && d === 'all') return `#/scenarios/${c}`
-    if (c === 'all' && d !== 'all') return `#/scenarios/${d}`
-    return `#/scenarios/${c}/${d}`
-  }
+  if (mode === 'scenarios') return '#/scenarios'
   if (mode === 'playground') {
     const t = playgroundTab || 'kubernetes'
     const safe = PLAYGROUND_TAB_IDS.has(t) ? t : 'kubernetes'

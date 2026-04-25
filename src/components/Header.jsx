@@ -23,10 +23,6 @@ export default function Header({
   onSelectConceptsCategory,
   portsCategoryId,
   onSelectPortsCategory,
-  scenariosCategoryId,
-  scenariosDifficultyId,
-  onSelectScenariosCategory,
-  onSelectScenariosDifficulty,
   onOpenFavorites,
   searchQuery,
   onSearchQueryChange,
@@ -122,10 +118,6 @@ export default function Header({
         onSelectConceptsCategory={onSelectConceptsCategory}
         portsCategoryId={portsCategoryId}
         onSelectPortsCategory={onSelectPortsCategory}
-        scenariosCategoryId={scenariosCategoryId}
-        scenariosDifficultyId={scenariosDifficultyId}
-        onSelectScenariosCategory={onSelectScenariosCategory}
-        onSelectScenariosDifficulty={onSelectScenariosDifficulty}
         onOpenFavorites={onOpenFavorites}
       />
     </header>

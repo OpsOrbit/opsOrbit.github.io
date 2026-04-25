@@ -1,13 +1,6 @@
 import { useMemo, useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import WorkspaceHero from '../workspace/WorkspaceHero'
-import FilterChip from '../tools/FilterChip'
-import {
-  SCENARIO_CATEGORY_OPTIONS,
-  SCENARIO_DIFFICULTY_OPTIONS,
-  scenarioCategoryLabel,
-  scenarioDifficultyLabel,
-} from '../../data/scenariosData'
+import { scenarioCategoryLabel, scenarioDifficultyLabel } from '../../data/scenariosData'
 import { filterScenarios } from '../../utils/scenariosFilter'
 
 /** @type {Record<string, string>} */
@@ -100,25 +93,10 @@ function ScenarioExpanded({ scenario }) {
 }
 
 /**
- * @param {{
- *   query: string
- *   activeCategoryId: string
- *   onSelectCategory: (id: string) => void
- *   activeDifficultyId: string
- *   onSelectDifficulty: (id: string) => void
- * }} props
+ * @param {{ query: string }} props
  */
-export default function ScenariosPage({
-  query,
-  activeCategoryId,
-  onSelectCategory,
-  activeDifficultyId,
-  onSelectDifficulty,
-}) {
-  const filtered = useMemo(
-    () => filterScenarios(query, activeCategoryId, activeDifficultyId),
-    [query, activeCategoryId, activeDifficultyId]
-  )
+export default function ScenariosPage({ query }) {
+  const filtered = useMemo(() => filterScenarios(query, 'all', 'all'), [query])
   const [expandedId, setExpandedId] = useState(/** @type {string | null} */ (null))
 
   const toggleExpand = useCallback((id) => {
@@ -132,53 +110,9 @@ export default function ScenariosPage({
       transition={{ duration: 0.35 }}
       className="min-w-0 pb-8"
     >
-      <WorkspaceHero
-        eyebrow="Debug & interviews"
-        title="Scenarios"
-        description="Real-world DevOps incidents with structured checks, commands, and resolutions — filter with the search bar under the header (e.g. 502, crashloop, SSH)."
-      />
-
-      <div className="mb-2 mt-6">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--hub-muted)]">Category</p>
-        <div className="flex min-w-0 flex-wrap gap-2">
-          {SCENARIO_CATEGORY_OPTIONS.map((c) => {
-            const active = activeCategoryId === c.id || (!activeCategoryId && c.id === 'all')
-            const icons = { all: '✦', aws: '☁', kubernetes: '☸', linux: '🐧', networking: '📡' }
-            return (
-              <FilterChip
-                key={c.id}
-                active={active}
-                label={c.label}
-                icon={icons[c.id] || '◇'}
-                onClick={() => onSelectCategory(c.id)}
-              />
-            )
-          })}
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--hub-muted)]">Difficulty</p>
-        <div className="flex min-w-0 flex-wrap gap-2">
-          {SCENARIO_DIFFICULTY_OPTIONS.map((d) => {
-            const active = activeDifficultyId === d.id || (!activeDifficultyId && d.id === 'all')
-            const icons = { all: '◎', beginner: '①', intermediate: '②', advanced: '③' }
-            return (
-              <FilterChip
-                key={d.id}
-                active={active}
-                label={d.label}
-                icon={icons[d.id] || '◇'}
-                onClick={() => onSelectDifficulty(d.id)}
-              />
-            )
-          })}
-        </div>
-      </div>
-
       {filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[var(--hub-line)] bg-[var(--hub-card)] px-4 py-12 text-center text-sm text-[var(--hub-muted)]">
-          No scenarios match your search or filters. Try clearing keywords or setting filters to “All”.
+          No scenarios match your search. Try different keywords.
         </p>
       ) : (
         <ul className="grid list-none gap-4 sm:grid-cols-2 xl:grid-cols-3">
