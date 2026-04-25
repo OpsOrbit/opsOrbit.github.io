@@ -134,10 +134,10 @@ export default function ScriptingGuides({
   }
 
   return (
-    <div className="pb-7 sm:pb-8">
+    <div className="max-w-full pb-7 sm:pb-8">
       <div className="w-full min-w-0">
         <article
-          className="min-w-0 overflow-hidden rounded-2xl border border-white/25 bg-gradient-to-br from-white/95 via-indigo-50/30 to-violet-50/20 shadow-[0_12px_40px_-12px_rgba(79,70,229,0.12)] backdrop-blur-xl ring-1 ring-indigo-500/10 sm:p-0 dark:border-white/10 dark:from-[var(--hub-surface)] dark:via-indigo-950/25 dark:to-violet-950/20 dark:ring-indigo-400/15"
+          className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-white/25 bg-gradient-to-br from-white/95 via-indigo-50/30 to-violet-50/20 shadow-[0_12px_40px_-12px_rgba(79,70,229,0.12)] backdrop-blur-xl ring-1 ring-indigo-500/10 sm:p-0 dark:border-white/10 dark:from-[var(--hub-surface)] dark:via-indigo-950/25 dark:to-violet-950/20 dark:ring-indigo-400/15"
           aria-labelledby="lab-guide-title"
         >
           <div className="border-b border-[var(--hub-line)]/60 p-4 sm:p-7">
@@ -181,7 +181,7 @@ export default function ScriptingGuides({
                 )}
 
                 {tab === 'commands' && (
-                  <div className="rounded-2xl border border-[var(--hub-line)]/90 bg-[var(--hub-card)]/50 p-6 dark:bg-[var(--hub-elevated)]/30">
+                  <div className="rounded-2xl border border-[var(--hub-line)]/90 bg-[var(--hub-card)]/50 p-4 sm:p-6 dark:bg-[var(--hub-elevated)]/30">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-start gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-surface)] dark:bg-[var(--hub-elevated)]/80">
@@ -198,7 +198,7 @@ export default function ScriptingGuides({
                       <button
                         type="button"
                         onClick={handleOpenCommands}
-                        className="shrink-0 rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-tool-dim)] px-5 py-3 text-[12px] font-bold uppercase tracking-wide text-[var(--hub-text)] shadow-sm transition hover:border-hub-primary/40 hover:shadow-md"
+                        className="shrink-0 rounded-xl border border-[var(--hub-border2)] bg-[var(--hub-tool-dim)] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-[var(--hub-text)] shadow-sm transition hover:border-hub-primary/40 hover:shadow-md sm:px-5 sm:py-3 sm:text-[12px]"
                       >
                         Open commands →
                       </button>
@@ -243,7 +243,7 @@ export default function ScriptingGuides({
               <button
                 type="button"
                 onClick={() => onSelectTopic(nextGuide.id)}
-                className="group flex w-full items-center justify-between gap-3 rounded-xl border border-[var(--hub-line)] bg-[var(--hub-surface)] px-4 py-4 text-left shadow-sm transition hover:border-hub-primary/35 hover:shadow-md dark:bg-[var(--hub-elevated)]/40 sm:px-5"
+                className="group flex w-full max-w-full items-center justify-between gap-3 rounded-xl border border-[var(--hub-line)] bg-[var(--hub-surface)] px-4 py-4 text-left shadow-sm transition hover:border-hub-primary/35 hover:shadow-md dark:bg-[var(--hub-elevated)]/40 sm:px-5"
               >
                 <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--hub-muted)]">Next topic</span>
                 <span className="text-[15px] font-extrabold text-[var(--hub-text)] transition group-hover:text-hub-primary">

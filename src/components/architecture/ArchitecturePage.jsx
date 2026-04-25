@@ -25,9 +25,9 @@ export default function ArchitecturePage({ selectedArchitectureId, onSelectArchi
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35 }}
-      className="min-w-0 pb-10"
+      className="min-w-0 max-w-full pb-8 sm:pb-10"
     >
-      <div className="mb-8 max-w-3xl">
+      <div className="mb-6 max-w-3xl sm:mb-8">
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Reference</p>
         <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-[var(--hub-brand)] sm:text-3xl">Architecture</h1>
         <p className="mt-2 text-sm leading-relaxed text-[var(--hub-muted)]">
@@ -35,12 +35,12 @@ export default function ArchitecturePage({ selectedArchitectureId, onSelectArchi
         </p>
       </div>
 
-      <div className="mb-10">
+      <div className="mb-8 sm:mb-10">
         <ArchitectureFlowStrip />
       </div>
 
       <p className="mb-4 text-[10px] font-bold uppercase tracking-wider text-[var(--hub-muted)]">Patterns</p>
-      <ul className="grid list-none gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <ul className="grid list-none gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         {ARCHITECTURES.map((a, idx) => (
           <li key={a.id}>
             <motion.button
@@ -50,13 +50,13 @@ export default function ArchitecturePage({ selectedArchitectureId, onSelectArchi
               transition={{ delay: idx * 0.05, duration: 0.25 }}
               whileHover={{ y: -3 }}
               onClick={() => onSelectArchitecture(a.id)}
-              className="flex h-full w-full flex-col rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-card)] p-4 text-left shadow-sm transition-shadow hover:border-[var(--hub-tool)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)]"
+              className="flex h-full w-full max-w-full flex-col rounded-2xl border border-[var(--hub-line)] bg-[var(--hub-card)] p-3.5 text-left shadow-sm transition-shadow hover:border-[var(--hub-tool)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] sm:p-4"
             >
               <span className="text-lg" aria-hidden>
                 {idx === 0 ? '☁' : idx === 1 ? '↔' : idx === 2 ? '☸' : '◇'}
               </span>
-              <span className="mt-2 text-base font-extrabold leading-snug text-[var(--hub-text)]">{a.title}</span>
-              <span className="mt-2 text-sm leading-relaxed text-[var(--hub-muted)]">{a.shortDescription}</span>
+              <span className="mt-2 text-[15px] font-extrabold leading-snug text-[var(--hub-text)] sm:text-base">{a.title}</span>
+              <span className="mt-2 text-[13px] leading-relaxed text-[var(--hub-muted)] sm:text-sm">{a.shortDescription}</span>
               <span className="mt-3 text-xs font-semibold text-[var(--hub-tool)]">View diagram →</span>
             </motion.button>
           </li>
@@ -75,12 +75,12 @@ export default function ArchitecturePage({ selectedArchitectureId, onSelectArchi
             <p className="text-sm leading-relaxed text-[var(--hub-muted)]">{selected.shortDescription}</p>
 
             <div
-              className="mt-4 rounded-xl border border-[var(--hub-line)] bg-[var(--hub-elevated)]/50 p-4"
+              className="mt-4 rounded-xl border border-[var(--hub-line)] bg-[var(--hub-elevated)]/50 p-3 sm:p-4"
               data-modal-initial-focus
               tabIndex={0}
             >
               <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--hub-muted)]">Diagram</p>
-              <div className="overflow-x-auto">
+              <div className="max-w-full overflow-x-auto">
                 <ArchitectureDiagram diagramKey={selected.diagramKey} />
               </div>
             </div>

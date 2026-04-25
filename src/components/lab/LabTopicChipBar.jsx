@@ -1,9 +1,9 @@
 const chipBase =
-  'inline-flex min-h-8 max-w-full shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1 text-left text-[11px] font-bold uppercase leading-snug tracking-wide shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:text-sm'
+  'inline-flex min-h-8 max-w-full shrink-0 items-center gap-1.5 rounded-lg border px-2 py-1 text-left text-[10px] font-bold uppercase leading-snug tracking-wide shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:text-sm'
 const chipIdle =
   'border-[var(--hub-border2)] bg-[var(--hub-surface)]/90 text-[var(--hub-tool)] backdrop-blur-sm hover:border-indigo-400/45 hover:bg-gradient-to-r hover:from-indigo-50/80 hover:to-violet-50/40 dark:bg-[var(--hub-elevated)]/50 dark:hover:from-indigo-950/40 dark:hover:to-violet-950/20'
 const chipActive =
-  'border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-cyan-400/35 dark:from-indigo-500 dark:to-violet-600'
+  'border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 ring-1 ring-cyan-400/40 dark:from-indigo-500 dark:to-violet-600'
 
 /**
  * Sticky LAB topic strip — same role as `CommandsToolChipBar` / Tools `DomainNavBar` (no sidebar).
@@ -35,7 +35,7 @@ export default function LabTopicChipBar({ guides, activeId, onSelectTopic, isTop
   }
 
   return (
-    <div className="lab-topic-chip-bar mb-2 rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_10px_24px_-12px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5">
+    <div className="lab-topic-chip-bar mb-2 max-w-full overflow-hidden rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_8px_20px_-14px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5">
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold sm:text-sm" aria-label="Lab location">
           <button
@@ -66,7 +66,7 @@ export default function LabTopicChipBar({ guides, activeId, onSelectTopic, isTop
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-wrap justify-center gap-1.5 sm:gap-2">
+      <div className="flex min-w-0 flex-wrap justify-start gap-1.5 sm:justify-center sm:gap-2">
         {guides.map((g) => {
           const active = g.id === activeId
           const learned = isTopicLearned?.(g.id)

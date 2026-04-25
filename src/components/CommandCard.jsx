@@ -120,7 +120,7 @@ export default function CommandCard({
             }
       }
       transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-      className={`group/cmd relative overflow-hidden rounded-xl border bg-[var(--hub-card)] outline-none transition-[border-color] duration-200 focus-within:ring-2 focus-within:ring-[var(--hub-tool)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--hub-bg)] ${
+      className={`group/cmd relative max-w-full overflow-hidden rounded-xl border bg-[var(--hub-card)] outline-none transition-[border-color] duration-200 focus-within:ring-2 focus-within:ring-[var(--hub-tool)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--hub-bg)] ${
         expanded
           ? 'border-hub-primary/50 ring-1 ring-hub-primary/20'
           : 'border-[var(--hub-line)] shadow-[var(--hub-shadow-card)] hover:border-[var(--hub-border2)]'
@@ -146,7 +146,7 @@ export default function CommandCard({
           onClick={toggleExpand}
         >
           <pre
-            className={`max-h-[5rem] min-w-0 flex-1 overflow-x-auto overflow-y-auto px-2.5 py-2.5 pr-14 font-mono text-[11px] font-medium leading-relaxed sm:text-[12px] ${
+            className={`max-h-[5rem] min-w-0 flex-1 overflow-x-auto overflow-y-auto px-2 py-2 pr-12 font-mono text-[10px] font-medium leading-relaxed sm:px-2.5 sm:py-2.5 sm:pr-14 sm:text-[12px] ${
               dangerous
                 ? 'bg-[var(--hub-danger-bg)] text-[var(--hub-danger)]'
                 : 'bg-[var(--hub-code-bg)] text-[var(--hub-code-text)]'
@@ -179,7 +179,7 @@ export default function CommandCard({
         </div>
       </div>
 
-      <div className={`relative space-y-2 p-3 sm:p-3.5 ${dangerous ? 'pl-3' : ''}`}>
+      <div className={`relative space-y-2 p-2.5 sm:p-3.5 ${dangerous ? 'pl-2.5 sm:pl-3' : ''}`}>
         {dangerous && (
           <p className="text-[11px] font-medium leading-snug text-hub-danger sm:text-xs">
             Potentially destructive — verify before running.

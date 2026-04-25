@@ -322,7 +322,7 @@ export default function DomainNavBar({ activeCategoryId, onSelectCategory }) {
           </span>
         </button>
         <div className="mt-1.5 flex min-w-0 items-stretch gap-1.5">
-          <div className="sticky left-0 z-[1] shrink-0 self-center bg-[var(--hub-bg)] pr-1 shadow-[6px_0_12px_-4px_rgba(0,0,0,0.12)] dark:shadow-[6px_0_12px_-4px_rgba(0,0,0,0.35)]">
+          <div className="shrink-0 self-center pr-0.5">
             <Pill id="all" label="ALL" count={counts.all} />
           </div>
           <div className="hub-inline-scroll scrollbar-hide flex min-w-0 flex-1 flex-nowrap gap-1.5 overflow-x-auto overflow-y-hidden pb-0.5">

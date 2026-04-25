@@ -36,12 +36,12 @@ export default function Header({
       className="sticky top-0 z-[100] flex shrink-0 flex-col gap-0 border-b border-[var(--hub-line)] backdrop-blur-[16px] transition-[padding] duration-200"
       style={{ background: 'var(--hub-topbar)' }}
     >
-      {/* Primary toolbar: mobile = menu + logo + search only (no top-right extras) */}
-      <div className="flex min-h-[52px] w-full min-w-0 items-start gap-2 px-2 pt-[max(0.25rem,env(safe-area-inset-top,0px))] pb-2 sm:min-h-[56px] sm:gap-3 sm:px-3 sm:pb-2.5 lg:items-center lg:gap-4 lg:px-4 lg:pb-2">
+      {/* Primary toolbar: keep first row compact on mobile/tablet. */}
+      <div className="flex min-h-[50px] w-full min-w-0 flex-wrap items-center gap-1.5 px-2 pb-1.5 pt-[max(0.25rem,env(safe-area-inset-top,0px))] sm:min-h-[54px] sm:gap-2 sm:px-3 sm:pb-2 lg:flex-nowrap lg:gap-4 lg:px-4 lg:pb-2">
         <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
           <button
             type="button"
-            className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-text)] transition-colors duration-150 hover:border-[var(--hub-tool)] lg:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-lg border border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-text)] transition-colors duration-150 hover:border-[var(--hub-tool)] sm:h-10 sm:w-10 lg:hidden"
             aria-label="Open menu"
             onClick={() => setToolDrawerOpen(true)}
           >
@@ -55,13 +55,13 @@ export default function Header({
             className="flex min-w-0 shrink-0 items-center rounded-lg outline-none ring-offset-2 ring-offset-[var(--hub-topbar)] transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)]"
             aria-label="OpsOrbit home — Tools"
           >
-            <BrandLogoMark className="h-[2.85rem] w-[5.85rem] min-[360px]:h-[3.15rem] min-[360px]:w-[6.35rem] sm:h-[3.75rem] sm:w-[7.5rem] md:h-[4.25rem] md:w-[8.5rem] lg:h-[4.75rem] lg:w-[9.75rem]" />
+            <BrandLogoMark className="h-[2.4rem] w-[5.15rem] min-[360px]:h-[2.6rem] min-[360px]:w-[5.6rem] sm:h-[3.15rem] sm:w-[6.5rem] md:h-[4.25rem] md:w-[8.5rem] lg:h-[4.75rem] lg:w-[9.75rem]" />
           </a>
         </div>
 
-        {/* Search + news: one column on small screens — search first, news second; desktop = row */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
-          <div className="order-1 min-w-0 w-full lg:order-2 lg:max-w-md lg:shrink-0 xl:max-w-lg">
+        {/* Search is kept in row on mobile; news gets full row below. */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-wrap items-center gap-1.5 sm:gap-2 lg:flex-nowrap lg:gap-3">
+          <div className="order-1 min-w-0 flex-1 lg:order-2 lg:max-w-md lg:flex-none lg:shrink-0 xl:max-w-lg">
             <GlobalSearchBar
               ref={searchBarRef}
               query={searchQuery}
@@ -69,7 +69,7 @@ export default function Header({
               onNavigate={onGlobalSearchNavigate}
             />
           </div>
-          <div className="order-2 min-h-[2.5rem] min-w-0 w-full lg:order-1 lg:flex-1 lg:overflow-hidden">
+          <div className="order-3 min-h-[2.2rem] min-w-0 basis-full lg:order-1 lg:min-h-[2.5rem] lg:basis-auto lg:flex-1 lg:overflow-hidden">
             <HeaderNewsBanner />
           </div>
         </div>

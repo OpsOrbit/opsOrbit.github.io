@@ -70,7 +70,7 @@ export default function ToolsPage({
       <div ref={filterSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
       <div
-        className={`sticky top-0 z-20 -mx-0.5 mb-2 rounded-xl border border-white/10 bg-[var(--hub-bg)]/92 backdrop-blur-md transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/90 lg:z-[5] ${
+        className={`sticky top-0 z-20 -mx-0.5 mb-2 max-w-full overflow-hidden rounded-xl border border-white/10 bg-[var(--hub-bg)]/92 backdrop-blur-md transition-[padding,box-shadow] duration-200 dark:bg-[var(--hub-bg)]/90 lg:z-[5] ${
           filtersCompact
             ? 'py-1.5 shadow-[0_10px_30px_-10px_rgba(79,70,229,0.16)] dark:shadow-black/35 sm:py-2'
             : 'py-2 sm:py-2.5'

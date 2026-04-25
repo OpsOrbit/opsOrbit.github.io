@@ -12,7 +12,7 @@ function LinkedInIcon({ className = 'h-4 w-4 sm:h-[1.125rem] sm:w-[1.125rem]' })
 export default function Footer() {
   return (
     <footer
-      className="shrink-0 border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/90 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-md dark:bg-[var(--hub-elevated)]/50 sm:pb-[calc(4.85rem+env(safe-area-inset-bottom,0px))] sm:pt-4 lg:pb-5"
+      className="mt-4 shrink-0 border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/90 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] pt-3 backdrop-blur-md dark:bg-[var(--hub-elevated)]/50 sm:mt-5 sm:pb-[calc(4.8rem+env(safe-area-inset-bottom,0px))] sm:pt-4 lg:mt-6 lg:pb-5"
       role="contentinfo"
     >
       <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8">

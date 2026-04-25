@@ -236,7 +236,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
   const activeTab = PLAYGROUND_TABS.find((t) => t.id === activeTabId)
 
   return (
-    <div className="min-w-0 pb-10">
+    <div className="min-w-0 max-w-full pb-8 sm:pb-10">
       <div className="mb-6 max-w-3xl">
         <p className="text-sm leading-relaxed text-[var(--hub-muted)]">
           Type CLI commands — output is <strong className="text-[var(--hub-text)]">simulated</strong> for learning. Use{' '}
@@ -251,7 +251,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
         </p>
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="mb-3 flex max-w-full flex-wrap gap-1.5 sm:gap-2">
         {PLAYGROUND_TABS.map((t) => {
           const active = activeTabId === t.id
           return (
@@ -267,7 +267,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
                 setLatencySim(null)
                 setHistory([])
               }}
-              className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] ${
+              className={`flex min-h-[2.15rem] items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
                 active
                   ? 'border-[var(--hub-tool)] bg-[var(--hub-tool-dim)] text-[var(--hub-text)]'
                   : 'border-[var(--hub-border2)] bg-[var(--hub-surface)] text-[var(--hub-muted)] hover:border-[var(--hub-line)] hover:text-[var(--hub-text)]'
@@ -281,8 +281,8 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
         })}
       </div>
 
-      <div className={`${TERM} overflow-hidden`}>
-        <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/80 px-4 py-2.5">
+      <div className={`${TERM} max-w-full overflow-hidden`}>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-900/80 px-3 py-2 sm:px-4 sm:py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             <span className="text-lg leading-none" aria-hidden>
               {activeTab?.icon}
@@ -294,7 +294,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
               <span className="block truncate font-mono text-[10px] text-emerald-500/90">{activeTab?.label}</span>
             </div>
           </div>
-          <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+          <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1">
             <button
               type="button"
               onClick={copyLastCommand}
@@ -349,7 +349,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
           ) : null}
         </AnimatePresence>
 
-        <div className="max-h-[min(440px,52vh)] overflow-y-auto p-4 font-mono text-[13px] leading-relaxed sm:text-sm">
+        <div className="max-h-[min(440px,52vh)] overflow-y-auto p-3 font-mono text-[12px] leading-relaxed sm:p-4 sm:text-sm">
           {history.length === 0 && !pendingOutput && !latencySim ? (
             <p className="text-zinc-500">
               Welcome. Try <span className="text-emerald-400">{suggestions[0] || 'a command'}</span> or choose from{' '}
@@ -404,13 +404,13 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
           {mostUsedForTab.length > 0 ? (
             <div className="mb-3">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-amber-500/90">Most used</p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex max-w-full flex-wrap gap-1.5">
                 {mostUsedForTab.map((sim) => (
                   <button
                     key={sim.id}
                     type="button"
                     onClick={() => applySuggestion(sim.canonical)}
-                    className="rounded-lg border border-amber-900/50 bg-amber-950/30 px-2.5 py-1 font-mono text-[11px] text-amber-200/95 transition-colors hover:border-amber-500/50"
+                    className="max-w-full truncate rounded-lg border border-amber-900/50 bg-amber-950/30 px-2.5 py-1 font-mono text-[10px] text-amber-200/95 transition-colors hover:border-amber-500/50 sm:text-[11px]"
                   >
                     {sim.canonical}
                   </button>
@@ -427,13 +427,13 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
           {favoritesInTab.length > 0 ? (
             <div className="mb-3">
               <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-violet-400/90">Favorites</p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex max-w-full flex-wrap gap-1.5">
                 {favoritesInTab.map((sim) => (
                   <button
                     key={sim.id}
                     type="button"
                     onClick={() => applySuggestion(sim.canonical)}
-                    className="rounded-lg border border-violet-800/60 bg-violet-950/40 px-2.5 py-1 font-mono text-[11px] text-violet-200/95 hover:border-violet-500/50"
+                    className="max-w-full truncate rounded-lg border border-violet-800/60 bg-violet-950/40 px-2.5 py-1 font-mono text-[10px] text-violet-200/95 hover:border-violet-500/50 sm:text-[11px]"
                   >
                     {sim.canonical}
                   </button>
@@ -443,7 +443,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
           ) : null}
 
           <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500">Suggestions</p>
-          <div className="mb-3 flex flex-wrap gap-1.5">
+          <div className="mb-3 flex max-w-full flex-wrap gap-1.5">
             {filteredSuggest.slice(0, 14).map((cmd) => {
               const sim = PLAYGROUND_SIMULATIONS.find((s) => s.tab === activeTabId && s.canonical === cmd)
               const fav = sim && favoriteIds.includes(sim.id)
@@ -452,7 +452,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
                   <button
                     type="button"
                     onClick={() => applySuggestion(cmd)}
-                    className="rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1 font-mono text-[11px] text-emerald-400/95 transition-colors hover:border-emerald-500/50 hover:bg-zinc-800"
+                    className="max-w-full truncate rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1 font-mono text-[10px] text-emerald-400/95 transition-colors hover:border-emerald-500/50 hover:bg-zinc-800 sm:text-[11px]"
                   >
                     {cmd}
                   </button>
@@ -478,7 +478,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
             commands match exactly; use suggestions or Most used.
           </p>
 
-          <div className="relative flex items-stretch gap-2 rounded-xl border border-zinc-700 bg-black/40 px-3 py-2">
+          <div className="relative flex flex-col items-stretch gap-2 rounded-xl border border-zinc-700 bg-black/40 px-3 py-2 sm:flex-row sm:items-stretch">
             <span className="flex shrink-0 items-center font-mono text-emerald-500">$</span>
             <div className="relative min-h-[1.5rem] min-w-0 flex-1 font-mono text-sm leading-normal">
               <div className="pointer-events-none absolute inset-0 whitespace-pre-wrap break-all" aria-hidden>
@@ -511,7 +511,7 @@ export default function PlaygroundPage({ activeTabId, onSelectTab, inputRef }) {
             <button
               type="button"
               onClick={runCommand}
-              className="shrink-0 self-center rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-500"
+              className="shrink-0 self-stretch rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-500 sm:self-center"
             >
               Run
             </button>

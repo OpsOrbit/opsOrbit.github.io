@@ -11,7 +11,7 @@ const TABS = [
 export default function LabTabBar({ activeId, onChange, className = '' }) {
   return (
     <div
-      className={`flex flex-wrap items-stretch gap-1 rounded-xl border border-[var(--hub-line)]/90 bg-[var(--hub-card)]/80 p-1 shadow-sm dark:bg-[var(--hub-elevated)]/50 ${className}`}
+      className={`flex max-w-full flex-wrap items-stretch gap-1 rounded-xl border border-[var(--hub-line)]/90 bg-[var(--hub-card)]/80 p-1 shadow-sm dark:bg-[var(--hub-elevated)]/50 ${className}`}
       role="tablist"
       aria-label="Lab sections"
     >
@@ -25,7 +25,7 @@ export default function LabTabBar({ activeId, onChange, className = '' }) {
             aria-selected={on}
             id={`lab-tab-${t.id}`}
             onClick={() => onChange(t.id)}
-            className={`relative min-h-[38px] flex-1 rounded-lg px-2.5 py-2 text-center text-[11px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary sm:min-h-0 sm:flex-none sm:px-4 sm:text-[12px] ${
+            className={`relative min-h-[34px] min-w-[5.3rem] flex-1 rounded-lg px-2 py-1.5 text-center text-[10px] font-bold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hub-primary sm:min-h-0 sm:flex-none sm:px-4 sm:text-[12px] ${
               on
                 ? 'text-[var(--hub-text)]'
                 : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)]/80 hover:text-[var(--hub-text)]'

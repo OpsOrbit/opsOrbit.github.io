@@ -337,11 +337,11 @@ function usePrefersReducedMotion() {
 
 /** Marquee: no hover text color on <a> — it would override badge text (green-on-green). */
 function linkClassMarquee() {
-  return 'inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-[11px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:text-xs'
+  return 'inline-flex max-w-[min(84vw,28rem)] shrink-0 items-center gap-1.5 whitespace-nowrap text-[10px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:max-w-[min(62vw,36rem)] sm:gap-2 sm:text-xs'
 }
 
 function linkClassCompact() {
-  return 'inline-flex min-w-0 max-w-[min(calc(100vw-5rem),20rem)] shrink-0 items-center gap-1.5 text-[11px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:max-w-[22rem] sm:text-xs'
+  return 'inline-flex min-w-0 max-w-[min(calc(100vw-4.5rem),18rem)] shrink-0 items-center gap-1 text-[10px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:max-w-[22rem] sm:gap-1.5 sm:text-xs'
 }
 
 function SourceBadge({ source }) {
@@ -444,7 +444,7 @@ export default function HeaderNewsBanner() {
             <span className="mx-0.5 shrink-0 text-[var(--hub-faint)]" aria-hidden>
               ·
             </span>
-            <span className="min-w-0 shrink-0">{item.title}</span>
+            <span className="min-w-0 truncate">{item.title}</span>
           </a>
         </Fragment>
       ))}
@@ -452,13 +452,13 @@ export default function HeaderNewsBanner() {
   )
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-1 items-center overflow-hidden px-0.5 sm:px-1">
+    <div className="flex h-full min-h-0 min-w-0 w-full max-w-full flex-1 items-center overflow-hidden px-0 sm:px-1">
       <div
         className="flex min-h-[2.25rem] min-w-0 w-full max-w-full items-stretch overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] shadow-sm dark:bg-[var(--hub-elevated)] sm:min-h-[2.125rem]"
         role="region"
         aria-label="Latest cloud news from official AWS, Azure, and GCP blogs by category, plus community posts"
       >
-        <div className="flex min-w-[2.85rem] shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-1.5 py-1 sm:min-w-[3.25rem] sm:px-2.5">
+        <div className="flex min-w-[2.35rem] shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] px-1 py-1 sm:min-w-[3.25rem] sm:px-2.5">
           <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)] sm:text-[7px] sm:tracking-[0.1em]">
             latest
           </span>

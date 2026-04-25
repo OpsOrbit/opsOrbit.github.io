@@ -27,11 +27,11 @@ export const COMMAND_TOOL_CHIP_IDS = [
 ]
 
 const chipBase =
-  'inline-flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-sm font-bold uppercase tracking-wide shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98]'
+  'inline-flex max-w-full shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-[11px] font-bold uppercase tracking-wide shadow-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-bg)] active:scale-[0.98] sm:text-sm'
 const chipIdle =
   'border-[var(--hub-border2)] bg-[var(--hub-surface)]/90 text-[var(--hub-tool)] backdrop-blur-sm hover:border-indigo-400/45 hover:bg-gradient-to-r hover:from-indigo-50/80 hover:to-violet-50/40 dark:bg-[var(--hub-elevated)]/50 dark:hover:from-indigo-950/40 dark:hover:to-violet-950/20'
 const chipActive =
-  'border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25 ring-2 ring-cyan-400/35 dark:from-indigo-500 dark:to-violet-600'
+  'border-transparent bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 ring-1 ring-cyan-400/40 dark:from-indigo-500 dark:to-violet-600'
 
 /**
  * @param {{
@@ -46,7 +46,7 @@ export default function CommandsToolChipBar({ activeToolId, toolCounts, toolLabe
   const allActive = !normalized
 
   return (
-    <div className="commands-tool-chip-bar mb-2 rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_10px_24px_-12px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5">
+    <div className="commands-tool-chip-bar mb-2 max-w-full overflow-hidden rounded-xl border border-indigo-200/40 bg-[var(--hub-surface)]/95 p-2 shadow-[0_8px_20px_-14px_rgba(79,70,229,0.2)] ring-1 ring-indigo-500/15 backdrop-blur-md dark:border-indigo-500/20 dark:bg-[var(--hub-elevated)]/88 dark:shadow-black/30 dark:ring-indigo-400/20 sm:p-2.5">
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold sm:text-sm" aria-label="Commands path">
           <button
@@ -78,7 +78,7 @@ export default function CommandsToolChipBar({ activeToolId, toolCounts, toolLabe
       </div>
 
       {/* Static wrap layout (no horizontal scroll) — matches Tools desktop domain chips */}
-      <div className="flex min-w-0 flex-wrap justify-center gap-1.5 sm:gap-2">
+      <div className="flex min-w-0 flex-wrap justify-start gap-1.5 sm:justify-center sm:gap-2">
         {COMMAND_TOOL_CHIP_IDS.map((id) => {
           const active = id === 'all' ? allActive : normalized === id
           const count = id === 'all' ? (toolCounts.all ?? 0) : (toolCounts[id] ?? 0)
@@ -92,7 +92,7 @@ export default function CommandsToolChipBar({ activeToolId, toolCounts, toolLabe
               aria-pressed={active}
             >
               {id !== 'all' ? <ToolIcon tool={id} className="h-4 w-4 shrink-0 opacity-90" /> : null}
-              <span className="whitespace-nowrap">{label}</span>
+              <span className="max-w-[8.75rem] truncate whitespace-nowrap sm:max-w-none">{label}</span>
               <span
                 className={`rounded-full px-1 py-0.5 font-mono text-[10px] font-bold tabular-nums ${
                   active ? 'bg-white/25 text-white' : 'bg-[var(--hub-border2)] text-[var(--hub-muted)]'
