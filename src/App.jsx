@@ -24,11 +24,19 @@ import { useLabProgress } from './hooks/useLabProgress'
 import { useCommandFavorites } from './hooks/useCommandFavorites'
 import { useToolFavorites } from './hooks/useToolFavorites'
 import { useCommandLearned } from './hooks/useCommandLearned'
-import { parseWorkspaceHash, buildWorkspaceHash } from './utils/siteHashNavigation'
+import {
+  parseWorkspaceFromLocation,
+  buildWorkspaceHash,
+  clearWorkspaceSearchParams,
+  HASH_COMMAND_TOOLS,
+} from './utils/siteHashNavigation'
 import { commandMatchesQuery } from './utils/commandIntentSearch'
 import { mergeRelatedIds } from './utils/commandPanelBreakdown'
 import { filterDevopsTools } from './utils/toolsFilter'
 import { TOOL_CATEGORY_IDS } from './data/toolsData'
+import { TECH_WORD_CATEGORY_IDS } from './data/techWordsData'
+import { CONCEPT_CATEGORY_IDS } from './data/conceptsData'
+import { PORT_CATEGORY_IDS } from './data/portsData'
 import { CommandsWorkspaceContext } from './context/CommandsWorkspaceContext'
 import ToolsPage from './components/tools/ToolsPage'
 import TechWordsPage from './components/techwords/TechWordsPage'
@@ -44,13 +52,13 @@ import ScenariosPage from './components/scenarios/ScenariosPage'
 import { filterPorts } from './utils/portsFilter'
 import { filterScenarios } from './utils/scenariosFilter'
 import PlaygroundPage from './components/playground/PlaygroundPage'
-import { PLAYGROUND_SIMULATION_COUNT } from './data/playgroundData'
+import { PLAYGROUND_SIMULATION_COUNT, PLAYGROUND_TAB_IDS } from './data/playgroundData'
 import ArchitecturePage from './components/architecture/ArchitecturePage'
 import { ARCHITECTURES } from './data/architectureData'
 import CheatsheetsPage from './components/cheatsheets/CheatsheetsPage'
-import { countCheatsheetRows } from './data/cheatsheetsData'
+import { countCheatsheetRows, CHEATSHEET_TAB_IDS } from './data/cheatsheetsData'
 import UtilitiesPage from './components/utilities/UtilitiesPage'
-import { countVisibleUtilityTools } from './data/utilitiesData'
+import { countVisibleUtilityTools, UTILITIES_TOOL_IDS } from './data/utilitiesData'
 import DailyPage from './components/daily/DailyPage'
 import { stepWorkspaceMode } from './constants/workspaceModes'
 
@@ -75,7 +83,7 @@ function readInitialWorkspaceState() {
     utilitiesTabId: 'cidr',
   }
   if (typeof window === 'undefined') return defaults
-  const parsed = parseWorkspaceHash(window.location.hash)
+  const parsed = parseWorkspaceFromLocation(window.location)
   if (!parsed) return defaults
   if (parsed.mode === 'roadmap') return { ...defaults, workspaceMode: 'roadmap' }
   if (parsed.mode === 'techwords')
@@ -111,17 +119,7 @@ function readInitialWorkspaceState() {
     }
   if (parsed.mode === 'daily') return { ...defaults, workspaceMode: 'daily' }
   if (parsed.mode === 'tools') {
-    let toolsCategoryId = parsed.category || 'all'
-    const sp = new URLSearchParams(window.location.search || '')
-    const qDomain = (sp.get('domain') || '').toLowerCase()
-    if (
-      (!toolsCategoryId || toolsCategoryId === 'all') &&
-      qDomain &&
-      TOOL_CATEGORY_IDS.has(qDomain)
-    ) {
-      toolsCategoryId = qDomain
-    }
-    return { ...defaults, workspaceMode: 'tools', toolsCategoryId }
+    return { ...defaults, workspaceMode: 'tools', toolsCategoryId: parsed.category || 'all' }
   }
   if (parsed.mode === 'scripting') return { ...defaults, workspaceMode: 'scripting', scriptingTopicId: parsed.topic }
   return { ...defaults, workspaceMode: 'commands', tool: parsed.tool }
@@ -161,6 +159,8 @@ function levelLabel(l) {
 }
 
 const ARCHITECTURE_PATTERN_COUNT = ARCHITECTURES.length
+
+const SCRIPTING_TOPIC_IDS = new Set(SCRIPTING_GUIDES.map((g) => g.id))
 
 const COUNT_TOOL_IDS = [
   'all',
@@ -211,6 +211,8 @@ export default function App() {
   const [expandedCommandId, setExpandedCommandId] = useState(null)
   const searchBarRef = useRef(/** @type {{ focus: () => void } | null} */ (null))
   const playgroundInputRef = useRef(null)
+  /** First URL sync uses replaceState; later filter changes use pushState so browser back restores filters. */
+  const workspaceUrlSyncedRef = useRef(false)
   const [favoritesOpen, setFavoritesOpen] = useState(false)
   const labProgress = useLabProgress()
   const { isFavorite, toggleFavorite, favoriteIds: commandFavoriteIds } = useCommandFavorites()
@@ -321,8 +323,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const onHashChange = () => {
-      const parsed = parseWorkspaceHash(window.location.hash)
+    const syncFromUrl = () => {
+      const parsed = parseWorkspaceFromLocation(window.location)
       if (!parsed) return
       setWorkspaceMode(parsed.mode)
       setSelected(null)
@@ -346,11 +348,7 @@ export default function App() {
       if (parsed.mode === 'playground') {
         setPlaygroundTabId(parsed.tab || 'kubernetes')
       }
-      if (parsed.mode === 'architecture') {
-        setArchitectureId(parsed.architectureId ?? null)
-      } else {
-        setArchitectureId(null)
-      }
+      setArchitectureId(parsed.mode === 'architecture' ? (parsed.architectureId ?? null) : null)
       if (parsed.mode === 'cheatsheets') {
         setCheatsheetTabId(parsed.tab || 'git')
       }
@@ -361,11 +359,16 @@ export default function App() {
         setScriptingTopicId(parsed.topic)
       }
     }
-    window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
+    window.addEventListener('hashchange', syncFromUrl)
+    window.addEventListener('popstate', syncFromUrl)
+    return () => {
+      window.removeEventListener('hashchange', syncFromUrl)
+      window.removeEventListener('popstate', syncFromUrl)
+    }
   }, [])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
     const nextHash = buildWorkspaceHash({
       mode: workspaceMode,
       tool,
@@ -379,23 +382,78 @@ export default function App() {
       cheatsheetTab: cheatsheetTabId,
       utilitiesTab: utilitiesTabId,
     })
-    if (typeof window === 'undefined') return
     const url = new URL(window.location.href)
-    if (workspaceMode === 'tools') {
-      if (!toolsCategoryId || toolsCategoryId === 'all') {
-        url.searchParams.delete('domain')
-      } else if (TOOL_CATEGORY_IDS.has(toolsCategoryId)) {
-        url.searchParams.set('domain', toolsCategoryId)
-      }
-    } else {
-      url.searchParams.delete('domain')
+    clearWorkspaceSearchParams(url)
+
+    if (workspaceMode === 'tools' && toolsCategoryId && toolsCategoryId !== 'all' && TOOL_CATEGORY_IDS.has(toolsCategoryId)) {
+      url.searchParams.set('domain', toolsCategoryId)
     }
+    if (workspaceMode === 'commands' && tool && tool !== 'all' && HASH_COMMAND_TOOLS.has(tool)) {
+      url.searchParams.set('category', tool)
+    }
+    if (
+      workspaceMode === 'techwords' &&
+      techWordsCategoryId &&
+      techWordsCategoryId !== 'all' &&
+      TECH_WORD_CATEGORY_IDS.has(techWordsCategoryId)
+    ) {
+      url.searchParams.set('category', techWordsCategoryId)
+    }
+    if (
+      workspaceMode === 'concepts' &&
+      conceptsCategoryId &&
+      conceptsCategoryId !== 'all' &&
+      CONCEPT_CATEGORY_IDS.has(conceptsCategoryId)
+    ) {
+      url.searchParams.set('category', conceptsCategoryId)
+    }
+    if (
+      workspaceMode === 'ports' &&
+      portsCategoryId &&
+      portsCategoryId !== 'all' &&
+      PORT_CATEGORY_IDS.has(portsCategoryId)
+    ) {
+      url.searchParams.set('category', portsCategoryId)
+    }
+    if (workspaceMode === 'playground' && playgroundTabId && PLAYGROUND_TAB_IDS.has(playgroundTabId)) {
+      if (playgroundTabId !== 'kubernetes') {
+        url.searchParams.set('tab', playgroundTabId)
+      }
+    }
+    if (workspaceMode === 'cheatsheets' && cheatsheetTabId && CHEATSHEET_TAB_IDS.has(cheatsheetTabId)) {
+      if (cheatsheetTabId !== 'git') {
+        url.searchParams.set('tab', cheatsheetTabId)
+      }
+    }
+    if (workspaceMode === 'utilities' && utilitiesTabId && UTILITIES_TOOL_IDS.has(utilitiesTabId)) {
+      if (utilitiesTabId !== 'cidr') {
+        url.searchParams.set('tab', utilitiesTabId)
+      }
+    }
+    const defaultScriptingId = SCRIPTING_GUIDES[0]?.id
+    if (
+      workspaceMode === 'scripting' &&
+      scriptingTopicId &&
+      SCRIPTING_TOPIC_IDS.has(scriptingTopicId) &&
+      scriptingTopicId !== defaultScriptingId
+    ) {
+      url.searchParams.set('template', scriptingTopicId)
+    }
+
     url.hash = nextHash
     const next = `${url.pathname}${url.search}${url.hash}`
     const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`
-    if (cur !== next) {
-      window.history.replaceState(null, '', next)
+    if (cur === next) {
+      if (!workspaceUrlSyncedRef.current) workspaceUrlSyncedRef.current = true
+      return
     }
+
+    if (!workspaceUrlSyncedRef.current) {
+      workspaceUrlSyncedRef.current = true
+      window.history.replaceState(null, '', next)
+      return
+    }
+    window.history.pushState(null, '', next)
   }, [
     workspaceMode,
     tool,
@@ -760,7 +818,7 @@ export default function App() {
 
       <WorkspaceModeNav workspaceMode={workspaceMode} onWorkspaceModeChange={setWorkspaceMode} />
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden max-lg:overflow-y-visible lg:overflow-hidden">
         <MainWorkspaceHeader
           tool={tool}
           toolLabel={toolLabel}
@@ -773,7 +831,7 @@ export default function App() {
         <main
           id="main-content"
           tabIndex={-1}
-          className="min-h-0 min-w-0 flex-1 touch-pan-y overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[calc(4.65rem+env(safe-area-inset-bottom,0px))] pl-[max(0.75rem,env(safe-area-inset-left,0px))] pr-[max(0.75rem,env(safe-area-inset-right,0px))] pt-2 outline-none [-webkit-overflow-scrolling:touch] sm:pb-[calc(4.8rem+env(safe-area-inset-bottom,0px))] sm:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:pt-3 md:pl-[max(1.25rem,env(safe-area-inset-left,0px))] md:pr-[max(1.25rem,env(safe-area-inset-right,0px))] lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6"
+          className="min-w-0 touch-pan-y overflow-x-hidden outline-none max-lg:flex-none max-lg:min-h-0 max-lg:overflow-y-visible max-lg:overscroll-y-auto max-lg:pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))] max-lg:pl-[max(0.75rem,env(safe-area-inset-left,0px))] max-lg:pr-[max(0.75rem,env(safe-area-inset-right,0px))] max-lg:pt-2 sm:max-lg:pb-[calc(5.85rem+env(safe-area-inset-bottom,0px))] sm:max-lg:pl-[max(1rem,env(safe-area-inset-left,0px))] sm:max-lg:pr-[max(1rem,env(safe-area-inset-right,0px))] sm:max-lg:pt-3 md:max-lg:pl-[max(1.25rem,env(safe-area-inset-left,0px))] md:max-lg:pr-[max(1.25rem,env(safe-area-inset-right,0px))] lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-y-contain lg:pb-6 lg:pl-[max(2rem,env(safe-area-inset-left,0px))] lg:pr-[max(2rem,env(safe-area-inset-right,0px))] lg:pt-6 [-webkit-overflow-scrolling:touch]"
         >
             <div
               className={

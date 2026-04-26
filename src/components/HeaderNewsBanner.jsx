@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useCallback } from 'react'
+import { Fragment, useState, useEffect, useCallback, useSyncExternalStore } from 'react'
 import { OFFICIAL_NEWS_FEEDS } from '../../lib/officialNewsFeeds.js'
 
 const CACHE_KEY = 'devops-hub-header-news-v13-cats-dates'
@@ -193,8 +193,16 @@ function headlineSortTime(it) {
   return Number.isNaN(t) ? 0 : t
 }
 
-function NewsMetaChips({ category, publishedAt }) {
+function NewsMetaChips({ category, publishedAt, compact }) {
   const dateStr = formatNewsDate(publishedAt)
+  if (compact) {
+    if (!category) return null
+    return (
+      <span className="max-w-[4.5rem] truncate rounded border border-[var(--hub-line)] bg-[var(--hub-bg)]/90 px-1 py-0.5 text-[7px] font-bold uppercase tracking-wide text-[var(--hub-muted)] sm:max-w-[5.5rem] sm:text-[8px]">
+        {category}
+      </span>
+    )
+  }
   if (!category && !dateStr) return null
   return (
     <span className="flex shrink-0 items-center gap-1.5" aria-hidden={!category && !dateStr}>
@@ -212,6 +220,19 @@ function NewsMetaChips({ category, publishedAt }) {
         </time>
       ) : null}
     </span>
+  )
+}
+
+function useNewsLayoutNarrow() {
+  return useSyncExternalStore(
+    (cb) => {
+      if (typeof window === 'undefined') return () => {}
+      const mq = window.matchMedia('(max-width: 1023px)')
+      mq.addEventListener('change', cb)
+      return () => mq.removeEventListener('change', cb)
+    },
+    () => (typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false),
+    () => false
   )
 }
 
@@ -368,6 +389,7 @@ export default function HeaderNewsBanner() {
   const [items, setItems] = useState([])
   const [status, setStatus] = useState('idle')
   const reduceMotion = usePrefersReducedMotion()
+  const narrowLayout = useNewsLayoutNarrow()
 
   const run = useCallback(async (opts) => {
     const background = Boolean(opts?.background)
@@ -413,10 +435,43 @@ export default function HeaderNewsBanner() {
 
   if (status !== 'ready' || items.length === 0) {
     return (
-      <div className="flex h-10 w-full min-w-0 items-center justify-center rounded-lg border border-dashed border-[var(--hub-line)] bg-[var(--hub-bg)]/60 px-2 text-center sm:h-11">
+      <div className="flex h-9 w-full min-w-0 max-w-full items-center justify-center rounded-lg border border-dashed border-[var(--hub-line)] bg-[var(--hub-bg)]/60 px-2 text-center sm:h-10 lg:h-11">
         <p className="text-[10px] font-medium leading-tight text-[var(--hub-muted)] sm:text-[11px]">
           News feed unavailable — check connection or try later
         </p>
+      </div>
+    )
+  }
+
+  /** Phones / tablets: one headline row, no marquee — avoids overflow and broken ticker. */
+  if (narrowLayout) {
+    const item = items[0]
+    return (
+      <div className="flex h-9 w-full min-w-0 max-w-full items-stretch overflow-hidden sm:h-10">
+        <div
+          className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-lg border border-[var(--hub-line)] bg-[var(--hub-surface)] px-2 py-1 shadow-sm dark:bg-[var(--hub-elevated)] sm:gap-2.5 sm:px-2.5"
+          role="region"
+          aria-label="Latest cloud news"
+        >
+          <div className="flex w-11 shrink-0 flex-col items-center justify-center border-r border-[var(--hub-line)]/80 bg-[var(--hub-tool-dim2)] py-0.5 pr-2 sm:w-12">
+            <span className="text-center font-[family-name:Orbitron] text-[6px] font-bold uppercase leading-tight tracking-[0.08em] text-[var(--hub-brand)]">
+              news
+            </span>
+          </div>
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden text-[10px] font-medium text-[var(--hub-text)] underline-offset-2 hover:underline sm:text-xs"
+            title={`${item.source}${item.category ? ` · ${item.category}` : ''} — ${item.title}`}
+          >
+            <span className="shrink-0">
+              <SourceBadge source={item.source} />
+            </span>
+            <NewsMetaChips category={item.category} publishedAt={item.publishedAt} compact />
+            <span className="min-w-0 flex-1 truncate whitespace-nowrap">{item.title}</span>
+          </a>
+        </div>
       </div>
     )
   }
@@ -439,7 +494,7 @@ export default function HeaderNewsBanner() {
           >
             <span className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
               <SourceBadge source={item.source} />
-              <NewsMetaChips category={item.category} publishedAt={item.publishedAt} />
+              <NewsMetaChips category={item.category} publishedAt={item.publishedAt} compact={false} />
             </span>
             <span className="mx-0.5 shrink-0 text-[var(--hub-faint)]" aria-hidden>
               ·
@@ -485,7 +540,7 @@ export default function HeaderNewsBanner() {
                 >
                   <span className="flex shrink-0 items-center gap-1">
                     <SourceBadge source={item.source} />
-                    <NewsMetaChips category={item.category} publishedAt={item.publishedAt} />
+                    <NewsMetaChips category={item.category} publishedAt={item.publishedAt} compact={false} />
                   </span>
                   <span className="min-w-0 truncate">{item.title}</span>
                 </a>

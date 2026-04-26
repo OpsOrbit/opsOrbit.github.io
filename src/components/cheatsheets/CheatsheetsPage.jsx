@@ -36,7 +36,7 @@ export default function CheatsheetsPage({ query, activeTabId, onSelectTab }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="min-w-0 pb-10"
+      className="min-w-0 pb-8 max-lg:pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] lg:pb-10"
     >
       <div className="mb-6 max-w-3xl">
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--hub-muted)]">Reference</p>

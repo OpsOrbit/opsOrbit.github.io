@@ -109,6 +109,93 @@ export function parseWorkspaceHash(hash) {
   return null
 }
 
+const WORKSPACE_QUERY_KEYS = ['domain', 'category', 'tool', 'tab', 'template']
+
+/** Remove workspace filter query keys before rebuilding URL. */
+export function clearWorkspaceSearchParams(url) {
+  for (const k of WORKSPACE_QUERY_KEYS) url.searchParams.delete(k)
+}
+
+/**
+ * Parse workspace from `location` (hash path + optional query) for bookmarks and history (back/forward).
+ * Query mirrors filters when useful alongside hash (e.g. `?domain=` with `#/tools`, `?tab=` with `#/cheatsheets`).
+ *
+ * @param {{ hash?: string, search?: string } | Location} loc
+ * @returns {ReturnType<typeof parseWorkspaceHash> | null}
+ */
+export function parseWorkspaceFromLocation(loc) {
+  if (!loc || typeof loc.hash === 'undefined') return null
+  const hash = loc.hash ?? ''
+  const base = parseWorkspaceHash(hash)
+  if (!base) return null
+  const sp = new URLSearchParams(loc.search || '')
+
+  if (base.mode === 'tools') {
+    const q = (sp.get('domain') || '').toLowerCase()
+    if (q && TOOL_CATEGORY_IDS.has(q) && (!base.category || base.category === 'all')) {
+      return { ...base, category: q }
+    }
+  }
+
+  if (base.mode === 'commands') {
+    const qTool = (sp.get('category') || sp.get('tool') || '').toLowerCase()
+    if (qTool && HASH_COMMAND_TOOLS.has(qTool) && (!base.tool || base.tool === 'all')) {
+      return { ...base, tool: qTool }
+    }
+  }
+
+  if (base.mode === 'techwords') {
+    const q = (sp.get('category') || '').toLowerCase()
+    if (q && TECH_WORD_CATEGORY_IDS.has(q) && (!base.category || base.category === 'all')) {
+      return { ...base, category: q }
+    }
+  }
+
+  if (base.mode === 'concepts') {
+    const q = (sp.get('category') || '').toLowerCase()
+    if (q && CONCEPT_CATEGORY_IDS.has(q) && (!base.category || base.category === 'all')) {
+      return { ...base, category: q }
+    }
+  }
+
+  if (base.mode === 'ports') {
+    const q = (sp.get('category') || '').toLowerCase()
+    if (q && PORT_CATEGORY_IDS.has(q) && (!base.category || base.category === 'all')) {
+      return { ...base, category: q }
+    }
+  }
+
+  if (base.mode === 'playground') {
+    const q = (sp.get('tab') || '').toLowerCase()
+    if (q && PLAYGROUND_TAB_IDS.has(q)) {
+      return { ...base, tab: q }
+    }
+  }
+
+  if (base.mode === 'scripting') {
+    const q = (sp.get('template') || '').toLowerCase()
+    if (q && SCRIPTING_IDS.has(q)) {
+      return { ...base, topic: q }
+    }
+  }
+
+  if (base.mode === 'cheatsheets') {
+    const q = (sp.get('tab') || '').toLowerCase()
+    if (q && CHEATSHEET_TAB_IDS.has(q)) {
+      return { ...base, tab: q }
+    }
+  }
+
+  if (base.mode === 'utilities') {
+    const q = (sp.get('tab') || '').toLowerCase()
+    if (q && UTILITIES_TOOL_IDS.has(q)) {
+      return { ...base, tab: q }
+    }
+  }
+
+  return base
+}
+
 /**
  * @param {{ mode: string, tool?: string, topic?: string, toolsCategory?: string, techWordsCategory?: string, conceptsCategory?: string, portsCategory?: string, playgroundTab?: string, architectureId?: string | null, cheatsheetTab?: string, utilitiesTab?: string }} p
  * @returns {string} Hash starting with #/…

@@ -120,6 +120,13 @@
     overflow-x: hidden;
   }
 
+  @media (max-width: 1023px) {
+    #root {
+      overflow-y: visible;
+      min-height: min(100%, 100svh);
+    }
+  }
+
   img,
   svg,
   canvas,

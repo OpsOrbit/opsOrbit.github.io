@@ -11,28 +11,28 @@ export default function MobileWorkspaceBottomNav({ workspaceMode, onWorkspaceMod
       <button
         type="button"
         onClick={() => onWorkspaceModeChange(mode)}
-        className={`flex min-h-[40px] min-w-[3rem] shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-0.5 text-[8.5px] font-bold uppercase tracking-wide transition-[color,background-color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-surface)] min-[360px]:min-w-[3.3rem] min-[360px]:text-[9.5px] ${
+        className={`flex min-h-[38px] min-w-[2.85rem] shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-0.5 text-[8px] font-bold uppercase tracking-wide transition-[color,background-color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--hub-surface)] min-[360px]:min-w-[3.1rem] min-[360px]:text-[8.5px] min-[400px]:min-w-[3.25rem] ${
           active
-            ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/90 ring-inset'
+            ? 'bg-[var(--hub-tool-dim)] text-[var(--hub-text)] ring-1 ring-[var(--hub-tool)]/70 ring-inset shadow-none'
             : 'text-[var(--hub-muted)] hover:bg-[var(--hub-tool-dim2)] hover:text-[var(--hub-text)]'
         }`}
         aria-current={active ? 'page' : undefined}
         aria-pressed={active}
       >
-        <span className="text-[0.85rem] leading-none min-[360px]:text-[0.95rem]" aria-hidden>
+        <span className="text-[0.8rem] leading-none min-[360px]:text-[0.88rem]" aria-hidden>
           {icon}
         </span>
-        <span className="max-w-[3.8rem] truncate text-center leading-tight min-[360px]:max-w-[4.5rem]">{label}</span>
+        <span className="max-w-[3.25rem] truncate text-center leading-tight min-[360px]:max-w-[3.85rem]">{label}</span>
       </button>
     )
   }
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[85] border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/96 pb-[max(0.2rem,env(safe-area-inset-bottom,0px))] pt-0.5 shadow-[0_-6px_20px_-10px_rgba(0,0,0,0.12)] backdrop-blur-md dark:bg-[var(--hub-elevated)]/96 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-[100] border-t border-[var(--hub-line)] bg-[var(--hub-surface)]/96 pb-[max(0.25rem,env(safe-area-inset-bottom,0px))] pl-[max(0px,env(safe-area-inset-left,0px))] pr-[max(0px,env(safe-area-inset-right,0px))] pt-0.5 shadow-[0_-6px_20px_-10px_rgba(0,0,0,0.12)] backdrop-blur-md dark:bg-[var(--hub-elevated)]/96 lg:hidden"
       aria-label="Workspace"
     >
-      <div className="hub-inline-scroll scrollbar-hide mx-auto flex w-full max-w-2xl snap-x snap-mandatory items-stretch justify-start gap-0.5 overflow-x-auto px-1 pb-0.5 pt-0.5 min-[480px]:justify-center min-[480px]:overflow-visible sm:gap-1 sm:px-2">
+      <div className="hub-inline-scroll scrollbar-hide mx-auto flex w-full max-w-2xl items-stretch justify-start gap-0.5 overflow-x-auto overscroll-x-contain px-1 pb-0.5 pe-4 pt-0.5 min-[520px]:justify-center min-[520px]:overflow-x-visible min-[520px]:pe-2 sm:gap-1 sm:px-2">
         <Item mode="tools" label="Tools" icon="🧰" />
         <Item mode="commands" label="Cmds" icon="⌘" />
         <Item mode="scripting" label="Lab" icon="⚡" />

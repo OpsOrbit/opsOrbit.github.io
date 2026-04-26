@@ -36,8 +36,7 @@ export default function Header({
       className="sticky top-0 z-[100] flex shrink-0 flex-col gap-0 border-b border-[var(--hub-line)] backdrop-blur-[16px] transition-[padding] duration-200"
       style={{ background: 'var(--hub-topbar)' }}
     >
-      {/* Primary toolbar: keep first row compact on mobile/tablet. */}
-      <div className="flex min-h-[50px] w-full min-w-0 flex-wrap items-center gap-1.5 px-2 pb-1.5 pt-[max(0.25rem,env(safe-area-inset-top,0px))] sm:min-h-[54px] sm:gap-2 sm:px-3 sm:pb-2 lg:flex-nowrap lg:gap-4 lg:px-4 lg:pb-2">
+      <div className="flex min-h-[46px] w-full min-w-0 flex-nowrap items-start gap-1.5 px-2 pb-1 pt-[max(0.2rem,env(safe-area-inset-top,0px))] sm:min-h-[50px] sm:items-center sm:gap-2 sm:px-3 sm:pb-1.5 sm:pt-[max(0.25rem,env(safe-area-inset-top,0px))] lg:min-h-[54px] lg:gap-4 lg:px-4 lg:pb-2">
         <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
           <button
             type="button"
@@ -55,13 +54,16 @@ export default function Header({
             className="flex min-w-0 shrink-0 items-center rounded-lg outline-none ring-offset-2 ring-offset-[var(--hub-topbar)] transition-opacity hover:opacity-95 focus-visible:ring-2 focus-visible:ring-[var(--hub-tool)]"
             aria-label="OpsOrbit home — Tools"
           >
-            <BrandLogoMark className="h-[2.4rem] w-[5.15rem] min-[360px]:h-[2.6rem] min-[360px]:w-[5.6rem] sm:h-[3.15rem] sm:w-[6.5rem] md:h-[4.25rem] md:w-[8.5rem] lg:h-[4.75rem] lg:w-[9.75rem]" />
+            <BrandLogoMark className="h-[2.15rem] w-[4.6rem] max-w-[min(42vw,5.5rem)] min-[360px]:h-[2.35rem] min-[360px]:w-[5rem] sm:h-[3.15rem] sm:max-w-none sm:w-[6.5rem] md:h-[4.25rem] md:w-[8.5rem] lg:h-[4.75rem] lg:w-[9.75rem]" />
           </a>
         </div>
 
-        {/* Search is kept in row on mobile; news gets full row below. */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-wrap items-center gap-1.5 sm:gap-2 lg:flex-nowrap lg:gap-3">
-          <div className="order-1 min-w-0 flex-1 lg:order-2 lg:max-w-md lg:flex-none lg:shrink-0 xl:max-w-lg">
+        {/* Mobile: column-reverse → search above news; lg+: single row news | search */}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col-reverse gap-1 sm:gap-1.5 lg:flex-row lg:items-center lg:gap-3">
+          <div className="min-h-0 min-w-0 w-full overflow-hidden border-t border-[var(--hub-line)]/60 pt-1 lg:order-1 lg:flex-1 lg:border-0 lg:pt-0">
+            <HeaderNewsBanner />
+          </div>
+          <div className="min-w-0 w-full shrink-0 lg:order-2 lg:max-w-md lg:flex-none xl:max-w-lg">
             <GlobalSearchBar
               ref={searchBarRef}
               query={searchQuery}
@@ -69,13 +71,9 @@ export default function Header({
               onNavigate={onGlobalSearchNavigate}
             />
           </div>
-          <div className="order-3 min-h-[2.2rem] min-w-0 basis-full lg:order-1 lg:min-h-[2.5rem] lg:basis-auto lg:flex-1 lg:overflow-hidden">
-            <HeaderNewsBanner />
-          </div>
         </div>
 
-        {/* Desktop / large tablet only: favorites, count badge, theme */}
-        <div className="hidden min-w-0 shrink-0 items-center gap-2 border-[var(--hub-line)]/60 lg:flex lg:border-l lg:pl-4 xl:gap-2.5">
+        <div className="hidden min-w-0 shrink-0 items-center gap-2 self-center border-[var(--hub-line)]/60 lg:flex lg:border-l lg:pl-4 xl:gap-2.5">
           <div className="flex shrink-0 items-center justify-end gap-1.5 xl:gap-2">
             {onOpenFavorites ? (
               <button
